@@ -1,33 +1,17 @@
-<<<<<<< HEAD
 // Define your hardware and variables
-DcMotor frontLeft, frontRight, backLeft, backRight;
-DcMotorEx leftDeadWheel, rightDeadWheel; // assuming your dead wheels are connected to REV Throughbore encoders
-=======
 package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import java.lang.Math;
->>>>>>> 76c872ebf49a72b7b3c65db801b68ab61a92e000
 
 @TeleOp(name = "Manual PID ", group = "Concept")
-public class DeadStraight_Sai extends LinearOpMode {
+public class DeadStraight extends LinearOpMode {
 
-<<<<<<< HEAD
-// PID variables
-double kp = 0.001;  // Tune these values
-double ki = 0.0;
-double kd = 0.0;
-double integral = 0;
-double lastError = 0;
-double targetDistance = 1000; // Example target distance in mm
-=======
     DcMotor frontLeft, frontRight, backLeft, backRight;
     DcMotorEx leftDeadWheel, rightDeadWheel; // assuming your dead wheels are connected to REV Throughbore encoders
->>>>>>> 76c872ebf49a72b7b3c65db801b68ab61a92e000
 
     double wheelCircumference = 60 * Math.PI; // Dead wheel diameter = 60 mm
     double encoderCountsPerRevolution = 8192; // REV Throughbore encoder counts
@@ -99,4 +83,3 @@ double targetDistance = 1000; // Example target distance in mm
         backRight.setPower(0);
     }
 }
-
