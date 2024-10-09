@@ -1,14 +1,14 @@
-// Define your hardware and variables
 package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import java.lang.Math;
 
-@TeleOp(name = "Manual PID ", group = "Concept")
-public class DeadStraight extends LinearOpMode {
+@TeleOp(name = "Dead Test", group = "Concept")
+public class DeadStraight_Sai extends LinearOpMode {
 
     DcMotor frontLeft, frontRight, backLeft, backRight;
     DcMotorEx leftDeadWheel, rightDeadWheel; // assuming your dead wheels are connected to REV Throughbore encoders
@@ -83,3 +83,4 @@ public class DeadStraight extends LinearOpMode {
         backRight.setPower(0);
     }
 }
+
