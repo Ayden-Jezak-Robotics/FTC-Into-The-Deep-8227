@@ -31,9 +31,6 @@ public class DeadStraight extends LinearOpMode {
         frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
         PIDController = new PIDController(0, 0, 0);
-        PIDController.setTargetAmount(12);
-
-        timer = new ElapsedTime();
 
         waitForStart();
         while(opModeIsActive()){
