@@ -13,6 +13,8 @@ public class DeadStraight extends LinearOpMode {
     private DcMotor backRight;
     private DcMotor frontRight;
     private DcMotor frontLeft;
+    private DcMotor rightDeadWheel;
+    private DcMotor leftDeadWheel;
     private PIDController PIDController;
     private ElapsedTime timer;
     private int ticksPerRotation = 8192;
@@ -25,17 +27,26 @@ public class DeadStraight extends LinearOpMode {
         backRight = hardwareMap.get(DcMotor.class, "backRight");
         frontRight = hardwareMap.get(DcMotor.class, "frontLeft");
         frontLeft = hardwareMap.get(DcMotor.class, "frontRight");
+        rightDeadWheel = hardwareMap.get(DcMotor.class, "rightDeadWheel");
+        leftDeadWheel = hardwareMap.get(DcMotor.class,"leftDeadWheel");
+
 
         frontLeft.setDirection(DcMotorSimple.Direction.FORWARD);
         backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
         PIDController = new PIDController(0, 0, 0);
+        PIDController.setTargetAmount(12);
 
-
+        timer = new ElapsedTime();
         waitForStart();
         while(opModeIsActive()){
+            double currentPosition = (leftDeadWheel.getCurrentPosition() + rightDeadWheel.getCurrentPosition())/2;
+            double deltaTime = timer.seconds();
+            timer.reset();
 
+            double output = PIDController.update(currentPosition, deltaTime);
+            setMotorPower(output);
         }
     }
     private void setMotorPower(double motorPower){

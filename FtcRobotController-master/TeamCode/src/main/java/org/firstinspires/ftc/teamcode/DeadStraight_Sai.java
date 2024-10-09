@@ -18,7 +18,7 @@ public class DeadStraight_Sai extends LinearOpMode {
     double distancePerCount = wheelCircumference / encoderCountsPerRevolution;
 
     // PID variables
-    double kp = 0.1;  // Tune these values
+    double kp = 0.01;  // Tune these values
     double ki = 0.0;
     double kd = 0.0;
     double integral = 0;
@@ -44,6 +44,11 @@ public class DeadStraight_Sai extends LinearOpMode {
         frontRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         backLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         backRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        frontLeft.setDirection(DcMotorSimple.Direction.FORWARD);
+        backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
+
 
         waitForStart();
 
