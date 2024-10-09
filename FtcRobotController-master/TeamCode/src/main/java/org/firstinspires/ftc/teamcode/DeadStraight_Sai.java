@@ -1,13 +1,13 @@
 // Define your hardware and variables
 DcMotor frontLeft, frontRight, backLeft, backRight;
-        DcMotorEx leftDeadWheel, rightDeadWheel; // assuming your dead wheels are connected to REV Throughbore encoders
+DcMotorEx leftDeadWheel, rightDeadWheel; // assuming your dead wheels are connected to REV Throughbore encoders
 
 double wheelCircumference = 60 * Math.PI; // Dead wheel diameter = 60 mm
 double encoderCountsPerRevolution = 8192; // REV Throughbore encoder counts
 double distancePerCount = wheelCircumference / encoderCountsPerRevolution;
 
 // PID variables
-double kp = 0.1;  // Tune these values
+double kp = 0.001;  // Tune these values
 double ki = 0.0;
 double kd = 0.0;
 double integral = 0;
