@@ -22,7 +22,6 @@ public class DeadStraight extends LinearOpMode {
         frontLeft.setDirection(DcMotorSimple.Direction.FORWARD);
         backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
-        //Hi there this is a comment.
 
         waitForStart();
         while(opModeIsActive()){
