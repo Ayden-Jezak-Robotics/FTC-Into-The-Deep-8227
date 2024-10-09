@@ -3,8 +3,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.util.ElapsedTime;
-import java.lang.Math;
 
 @TeleOp(name = "Manual PID ", group = "Concept")
 public class DeadStraight extends LinearOpMode {
@@ -13,11 +11,6 @@ public class DeadStraight extends LinearOpMode {
     private DcMotor backRight;
     private DcMotor frontRight;
     private DcMotor frontLeft;
-    private PIDController PIDController;
-    private ElapsedTime timer;
-    private int ticksPerRotation = 8192;
-    double wheelCircumference = (Math.PI * 60)/2.54;
-    double ticksPerInch = ticksPerRotation/wheelCircumference;
 
     @Override
     public void runOpMode() {
@@ -30,22 +23,17 @@ public class DeadStraight extends LinearOpMode {
         backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        PIDController = new PIDController(0, 0, 0);
-
         waitForStart();
         while(opModeIsActive()){
-
+            setMotorPower(1);
         }
+
     }
     private void setMotorPower(double motorPower){
         backLeft.setPower(motorPower);
         backRight.setPower(motorPower);
         frontLeft.setPower(motorPower);
         frontRight.setPower(motorPower);
-
-    }
-    private void setPosition(double inches) {
-        // I hate you - Cruz Swinson
 
     }
 }
