@@ -9,6 +9,7 @@ import java.lang.Math;
 
 @TeleOp(name = "Dead Test", group = "Concept")
 public class DeadStraight_Sai extends LinearOpMode {
+    //new and fixed.......
 
     DcMotor frontLeft, frontRight, backLeft, backRight;
     DcMotorEx leftDeadWheel, rightDeadWheel; // assuming your dead wheels are connected to REV Throughbore encoders
