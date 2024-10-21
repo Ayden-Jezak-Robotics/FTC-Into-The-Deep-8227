@@ -15,11 +15,13 @@ public class DeadStraight extends LinearOpMode {
     private DcMotor frontLeft;
     private DcMotor rightDeadWheel;
     private DcMotor leftDeadWheel;
+    private double motorTicks;
     private PIDController PIDController;
     private ElapsedTime timer;
     private int ticksPerRotation = 8192;
-    double wheelCircumference = (Math.PI * 60)/2.54;
-    double ticksPerInch = ticksPerRotation/wheelCircumference;
+    double wheelCircumference = (Math.PI * 60);
+    double inchesPerTick = (wheelCircumference/ticksPerRotation)/2.54;
+    double ticksPerInch = (ticksPerRotation/wheelCircumference)*25.4;
 
     @Override
     public void runOpMode() {
@@ -34,19 +36,33 @@ public class DeadStraight extends LinearOpMode {
         frontLeft.setDirection(DcMotorSimple.Direction.FORWARD);
         backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        backRight.setDirection(DcMotorSimple.Direction.FORWARD);
+        rightDeadWheel.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftDeadWheel.setDirection(DcMotorSimple.Direction.FORWARD);
 
-        PIDController = new PIDController(0, 0, 0);
-        PIDController.setTargetAmount(12);
+        rightDeadWheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftDeadWheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        rightDeadWheel.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        leftDeadWheel.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        PIDController = new PIDController(0.00004, 0.00000075, 0.00000075);
 
         timer = new ElapsedTime();
         waitForStart();
         while(opModeIsActive()){
-            double currentPosition = (leftDeadWheel.getCurrentPosition() + rightDeadWheel.getCurrentPosition())/2;
+            setPosition(36);
+            double currentPosition = ((leftDeadWheel.getCurrentPosition() + rightDeadWheel.getCurrentPosition())/2);
             double deltaTime = timer.seconds();
             timer.reset();
 
             double output = PIDController.update(currentPosition, deltaTime);
             setMotorPower(output);
+            telemetry.addData("Left Wheel", leftDeadWheel.getCurrentPosition());
+            telemetry.addData("Right Wheel", rightDeadWheel.getCurrentPosition());
+            telemetry.addData("Target Ticks", motorTicks);
+            telemetry.addData("Motor Power", output);
+            telemetry.update();
         }
     }
     private void setMotorPower(double motorPower){
@@ -58,6 +74,7 @@ public class DeadStraight extends LinearOpMode {
     }
     private void setPosition(double inches) {
         // I hate you - Cruz Swinson
-
+        motorTicks = inches * ticksPerInch;
+        PIDController.setTargetAmount(motorTicks);
     }
 }
