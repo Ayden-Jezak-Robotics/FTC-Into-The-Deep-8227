@@ -46,7 +46,8 @@ public class DeadStraight extends LinearOpMode {
         rightDeadWheel.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         leftDeadWheel.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        PIDController = new PIDController(0.00004, 0.00000075, 0.00000075);
+        PIDController = new PIDController(0.00004, 0, 0);
+        //kP= 0.00003, kI= 0.000003, kD= 0.000005
 
         timer = new ElapsedTime();
         waitForStart();
@@ -60,8 +61,12 @@ public class DeadStraight extends LinearOpMode {
             setMotorPower(output);
             telemetry.addData("Left Wheel", leftDeadWheel.getCurrentPosition());
             telemetry.addData("Right Wheel", rightDeadWheel.getCurrentPosition());
+            telemetry.addData("Integral", PIDController.integral*PIDController.kI);
+            telemetry.addData("Derivative", PIDController.derivative*PIDController.kD);
             telemetry.addData("Target Ticks", motorTicks);
             telemetry.addData("Motor Power", output);
+            telemetry.addData("ElapsedTime", deltaTime);
+            telemetry.addData("ERROR", PIDController.error);
             telemetry.update();
         }
     }

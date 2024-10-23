@@ -1,12 +1,15 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.qualcomm.robotcore.hardware.DcMotor;
+
 public class PIDController {
 
-    private double kP, kI, kD; // PID gains
-    private double integral, previousError;
+    public double kP, kI, kD; // PID gains
+    public double integral, previousError, derivative, error;
     private double targetAmount; // Desired value
-    private double maxOutput = 0.5; // Maximum allowable motor power
-    private double rampRate = 0.25; // Rate at which the power ramps up
+    private double maxOutput = 1; // Maximum allowable motor power
+    private double rampRate = 0.1; // Rate at which the power ramps up
 
     public PIDController(double kP, double kI, double kD) {
         this.kP = kP;
@@ -21,30 +24,37 @@ public class PIDController {
         this.targetAmount = targetAmount;
     }
 
+    // Sai
+    public void makeStraight(DcMotor leftOne, DcMotor rightOne)
+    {
+
+    }
+    //
+
     public double update(double currentValue, double deltaTime) {
-        double error = (targetAmount - currentValue);
+        error = (targetAmount - currentValue);
         integral += error * deltaTime;
-        double derivative = (error - previousError) / deltaTime;
+        derivative = (error - previousError) / deltaTime;
 
         double baseOutput = (kP * error) + (kI * integral) + (kD * derivative);
 
-        double output = rampUpOutput(baseOutput, deltaTime);
+        double output = baseOutput;
 
         previousError = error;
         return clampOutput(output);
     }
 
-   private double rampUpOutput(double baseOutput, double deltaTime) {
+    /*
+    private double rampUpOutput(double baseOutput, double deltaTime) {
         double targetOutput = baseOutput;
         double currentOutput = previousOutput;
 
         // Calculate the maximum change in output based on the ramp rate
-        rampRate = .2;
         double maxChange = rampRate * deltaTime;
 
         // Calculate the new output by ramping up
         if (targetOutput > currentOutput) {
-            currentOutput += Math.min(maxChange, targetOutput - currentOutput);
+            currentOutput += maxChange;
         } else {
             currentOutput = targetOutput; // Directly set to target if ramping down
         }
@@ -52,6 +62,7 @@ public class PIDController {
         previousOutput = currentOutput; // Update the previous output
         return currentOutput;
     }
+    */
 
 
     public double clampOutput(double output) {
