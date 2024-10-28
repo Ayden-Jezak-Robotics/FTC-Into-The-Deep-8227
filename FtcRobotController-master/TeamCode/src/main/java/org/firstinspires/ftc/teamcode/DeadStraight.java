@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import java.lang.Math;
 
-@TeleOp(name = "Manual PID ", group = "Concept")
+@TeleOp(name = "Manual PID OLD", group = "Concept")
 public class DeadStraight extends LinearOpMode {
 
     private DcMotor backLeft;
@@ -46,13 +46,13 @@ public class DeadStraight extends LinearOpMode {
         rightDeadWheel.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         leftDeadWheel.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        PIDController = new PIDController(0.00004, 0, 0);
+        PIDController = new PIDController(0.00002, 0, 0, 0.1);
         //kP= 0.00003, kI= 0.000003, kD= 0.000005
 
         timer = new ElapsedTime();
         waitForStart();
         while(opModeIsActive()){
-            setPosition(36);
+            setPosition(12);
             double currentPosition = ((leftDeadWheel.getCurrentPosition() + rightDeadWheel.getCurrentPosition())/2);
             double deltaTime = timer.seconds();
             timer.reset();

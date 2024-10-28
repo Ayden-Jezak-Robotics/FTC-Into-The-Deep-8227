@@ -8,7 +8,7 @@ public class PIDController {
     public double kP, kI, kD, kF; // PID gains
     public double integral, previousError, derivative, error;
     private double targetAmount; // Desired value
-    private double maxOutput = 1; // Maximum allowable motor power
+    private double maxOutput = 0.5; // Maximum allowable motor power
     private double output;
     //private double rampRate = 0.1;// Rate at which the power ramps up
     public double tolerance = 50;
@@ -30,15 +30,16 @@ public class PIDController {
     public double update(double currentValue, double deltaTime) {
         error = (targetAmount - currentValue);
         integral += error * deltaTime;
-        derivative = (error - previousError) / deltaTime;
+        //derivative = (error - previousError) / deltaTime;
+        derivative = (error - previousError);
         double accelTicks = targetAmount/4;
 
-        double baseOutput = (kP * error) + (kI * integral) + (kD * derivative) + kF;
+        double baseOutput = (kP * error) + (kI * integral) + (kD * derivative);
         while (currentValue < accelTicks){
-            output = baseOutput * (currentValue/accelTicks);
+            output = kF + baseOutput * (currentValue/accelTicks);
             return clampOutput(output);
         }
-        output = baseOutput;
+        output = kF+ baseOutput;
         previousError = error;
 
         return clampOutput(output);
