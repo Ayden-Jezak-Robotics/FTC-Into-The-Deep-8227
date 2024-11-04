@@ -27,8 +27,8 @@ public class DeadStraight extends LinearOpMode {
     public void runOpMode() {
         backLeft = hardwareMap.get(DcMotor.class, "backLeft");
         backRight = hardwareMap.get(DcMotor.class, "backRight");
-        frontRight = hardwareMap.get(DcMotor.class, "frontLeft");
-        frontLeft = hardwareMap.get(DcMotor.class, "frontRight");
+        frontRight = hardwareMap.get(DcMotor.class, "frontRight");
+        frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
         rightDeadWheel = hardwareMap.get(DcMotor.class, "rightDeadWheel");
         leftDeadWheel = hardwareMap.get(DcMotor.class,"leftDeadWheel");
 

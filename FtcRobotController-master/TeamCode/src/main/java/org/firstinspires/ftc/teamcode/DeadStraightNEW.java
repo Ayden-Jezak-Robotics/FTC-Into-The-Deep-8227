@@ -1,12 +1,12 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@TeleOp(name = "Manual PID NEW ", group = "Concept")
+
+@Autonomous(name = "DeadStraightNew", group = "Concept")
 public class DeadStraightNEW extends LinearOpMode {
 
     private DcMotor backLeft;
@@ -20,7 +20,7 @@ public class DeadStraightNEW extends LinearOpMode {
     private double currentValue;
     private double leftCurrentValue, rightCurrentValue, centerCurrentValue;
     private double deltaTime;
-    private PIDStrafer PIDStrafer;
+    private PIDStrafer StraferPIDController;
     private PIDController leftPIDController;
     private PIDController rightPIDController;
     private ElapsedTime timer;
@@ -35,21 +35,20 @@ public class DeadStraightNEW extends LinearOpMode {
     public void runOpMode() {
         backLeft = hardwareMap.get(DcMotor.class, "backLeft");
         backRight = hardwareMap.get(DcMotor.class, "backRight");
-        frontRight = hardwareMap.get(DcMotor.class, "frontLeft");
-        frontLeft = hardwareMap.get(DcMotor.class, "frontRight");
+        frontRight = hardwareMap.get(DcMotor.class, "frontRight");
+        frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
         rightDeadWheel = hardwareMap.get(DcMotor.class, "rightDeadWheel");
         leftDeadWheel = hardwareMap.get(DcMotor.class, "leftDeadWheel");
         centerDeadWheel = hardwareMap.get(DcMotor.class, "centerDeadWheel");
 
 
-        frontLeft.setDirection(DcMotorSimple.Direction.FORWARD);
-        backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
-        backRight.setDirection(DcMotorSimple.Direction.FORWARD);
-        rightDeadWheel.setDirection(DcMotorSimple.Direction.REVERSE);
-        leftDeadWheel.setDirection(DcMotorSimple.Direction.FORWARD);
-        centerDeadWheel.setDirection(DcMotorSimple.Direction.FORWARD);
-
+        frontLeft.setDirection(DcMotor.Direction.FORWARD);
+        backLeft.setDirection(DcMotor.Direction.REVERSE);
+        frontRight.setDirection(DcMotor.Direction.REVERSE);
+        backRight.setDirection(DcMotor.Direction.FORWARD);
+        rightDeadWheel.setDirection(DcMotor.Direction.REVERSE);
+        leftDeadWheel.setDirection(DcMotor.Direction.FORWARD);
+        centerDeadWheel.setDirection(DcMotor.Direction.FORWARD);
         rightDeadWheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftDeadWheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         centerDeadWheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -59,21 +58,20 @@ public class DeadStraightNEW extends LinearOpMode {
         centerDeadWheel.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         //0.00002, 0, 0.0001, 0.1
-        // PIDController = new PIDController(0.00002, 0, 0, 0.1);
-        leftPIDController = new PIDController(0.00002, 0.0001, 0.001, 0.3);
-        rightPIDController = new PIDController(0.00002, 0.0001, 0.001, 0.3);
-        PIDStrafer = new PIDStrafer(0.00002, 0, 0, 0.3);
+        leftPIDController = new PIDController(0.00002, 0.0001, 0.001, 0.1);
+        rightPIDController = new PIDController(0.00002, 0.0001, 0.001, 0.1);
+        StraferPIDController = new PIDStrafer(0.00002, 0, 0, 0.3);
 
         //kP= 0.00003, kI= 0.000003, kD= 0.000005
 
         //part which makes it actually move
         timer = new ElapsedTime();
+
         waitForStart();
+        telemetry.addData("LOOK",getRuntime());
         setPosition(12);
-        //setStrafePosition(36);
-        //strafe();
         driveStraight();
-        doStrafingData();
+        doAllTelemetryData();
         reset();
     }
 
@@ -88,8 +86,8 @@ public class DeadStraightNEW extends LinearOpMode {
 
     private void driveStraight(){
         timer.reset();
-        leftPIDController.update(rightDeadWheel.getCurrentPosition(), deltaTime);
-        rightPIDController.update(leftDeadWheel.getCurrentPosition(), deltaTime);
+        leftOutput = leftPIDController.update(leftCurrentValue, deltaTime);
+        rightOutput = rightPIDController.update(rightCurrentValue, deltaTime);
         leftError = leftPIDController.error;
         rightError = rightPIDController.error;
         while (Math.abs(leftError) >= leftPIDController.tolerance && Math.abs(rightError) >= rightPIDController.tolerance) {
@@ -99,21 +97,22 @@ public class DeadStraightNEW extends LinearOpMode {
             timer.reset();
             leftOutput = leftPIDController.update(leftCurrentValue, deltaTime);
             rightOutput = rightPIDController.update(rightCurrentValue, deltaTime);
+            leftError = leftPIDController.error;
+            rightError = rightPIDController.error;
             setIndividualMotorPower(leftOutput, rightOutput);
             doAllTelemetryData();
         }
     }
     private void strafe (){
         timer.reset();
-        PIDStrafer.update(centerDeadWheel.getCurrentPosition(), deltaTime);
-        centerError = PIDStrafer.error;
-        while (Math.abs(centerError) >= PIDStrafer.tolerance) {
+        StraferPIDController.update(centerDeadWheel.getCurrentPosition(), deltaTime);
+        while (Math.abs(StraferPIDController.error) >= StraferPIDController.tolerance) {
             centerCurrentValue = centerDeadWheel.getCurrentPosition();
             deltaTime = timer.seconds();
             timer.reset();
-            centerOutput = PIDStrafer.update(centerCurrentValue, deltaTime);
-            setStraferPower(-centerOutput);
-            doAllTelemetryData();
+            centerOutput = StraferPIDController.update(centerCurrentValue, deltaTime);
+            setStrafingMotorPower(centerOutput);
+            doStrafingData();
         }
     }
 
@@ -125,13 +124,13 @@ public class DeadStraightNEW extends LinearOpMode {
         telemetry.addData("ElapsedTime", deltaTime);
         telemetry.addData("Left Error", leftPIDController.error);
         telemetry.addData("Right Error", rightPIDController.error);
-        telemetry.addData("Center Error", PIDStrafer.error);
+        telemetry.addData("Center Error", StraferPIDController.error);
         telemetry.addData("Left Current Value", leftCurrentValue);
         telemetry.addData("Right Current Value", rightCurrentValue);
         telemetry.addData("Center Current Value", centerCurrentValue);
         telemetry.addData("Left Tolerance", leftPIDController.tolerance);
         telemetry.addData("Right Tolerance", rightPIDController.tolerance);
-        telemetry.addData("Center Tolerance", PIDStrafer.tolerance);
+        telemetry.addData("Center Tolerance", StraferPIDController.tolerance);
         telemetry.addData("Motor Power Left", leftOutput);
         telemetry.addData("Motor Power Right", rightOutput);
         telemetry.addData("left Derivative", leftPIDController.derivative);
@@ -140,13 +139,13 @@ public class DeadStraightNEW extends LinearOpMode {
     }
     private void doStrafingData(){
         telemetry.addData("Center Wheel", centerDeadWheel.getCurrentPosition());
-        telemetry.addData("Center Error", PIDStrafer.error);
+        telemetry.addData("Center Error", StraferPIDController.error);
         telemetry.addData("Center Current Value", centerCurrentValue);
-        telemetry.addData("Center Tolerance", PIDStrafer.tolerance);
+        telemetry.addData("Center Tolerance", StraferPIDController.tolerance);
         telemetry.update();
     }
 
-    private void setMotorPower(double motorPower){
+    private void setAllMotorPower(double motorPower){
         backLeft.setPower(motorPower);
         backRight.setPower(motorPower);
         frontLeft.setPower(motorPower);
@@ -154,25 +153,32 @@ public class DeadStraightNEW extends LinearOpMode {
 
     }
 
-    private void setStraferPower(double motorPower){
+    private void setStrafingMotorPower(double motorPower){
         backLeft.setPower(motorPower);
         backRight.setPower(-motorPower);
         frontLeft.setPower(motorPower);
         frontRight.setPower(-motorPower);
     }
+
     private void reset(){
-        setMotorPower(0);
+        setAllMotorPower(0);
         setPosition(0);
+        setStrafePosition(0);
+        leftPIDController.reset();
+        rightPIDController.reset();
+
         rightDeadWheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftDeadWheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        centerDeadWheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightDeadWheel.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         leftDeadWheel.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        centerDeadWheel.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     private void setStrafePosition(double inches)
     {
         motorTicks = inches * ticksPerInch;
-        PIDStrafer.setTargetAmount(motorTicks);
+        StraferPIDController.setTargetAmount(motorTicks);
     }
     private void setPosition(double inches) {
         // I hate you - Cruz Swinson

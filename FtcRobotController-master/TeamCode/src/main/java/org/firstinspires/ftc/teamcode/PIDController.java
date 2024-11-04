@@ -30,13 +30,13 @@ public class PIDController {
     public double update(double currentValue, double deltaTime) {
         error = (targetAmount - currentValue);
         integral += error * deltaTime;
-        //derivative = (error - previousError) / deltaTime;
-        derivative = (error - previousError);
+        derivative = (error - previousError) / deltaTime;
         double accelTicks = targetAmount/4;
 
         double baseOutput = (kP * error) + (kI * integral) + (kD * derivative);
-        while (currentValue < accelTicks){
+        if (currentValue < accelTicks){
             output = kF + baseOutput * (currentValue/accelTicks);
+            previousError = error;
             return clampOutput(output);
         }
         output = kF+ baseOutput;

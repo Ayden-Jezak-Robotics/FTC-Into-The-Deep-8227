@@ -1,16 +1,16 @@
 package org.firstinspires.ftc.teamcode;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
-public class PIDStrafer {
-
-    public double kP, kI, kD, kF; // PID gains
+public class PIDControllerNeat
+{
+    public double kP, kI, kD, kF, tolerance; // PID gains
     public double integral, previousError, derivative, error;
     private double targetAmount; // Desired value
     private double maxOutput = 0.5; // Maximum allowable motor power
     private double output;
-    //private double rampRate = 0.1;// Rate at which the power ramps up
-    public double tolerance = 300;
 
-    public PIDStrafer(double kP, double kI, double kD, double kF) {
+    public PIDControllerNeat(double kP, double kI, double kD, double kF, double givenTolerance) {
         this.kP = kP;
         this.kI = kI;
         this.kD = kD;
@@ -18,15 +18,28 @@ public class PIDStrafer {
         this.integral = 0;
         this.previousError = 0;
         this.targetAmount = 0;
+        this.tolerance = givenTolerance;
+    }
+    public PIDControllerNeat(String type) {
+        if (type.equals("Straight"))
+        {
+            this.kP = kP;
+            this.kI = kI;
+            this.kD = kD;
+            this.kF = kF;
+            this.integral = 0;
+            this.previousError = 0;
+            this.targetAmount = 0;
+            this.tolerance = 200;
+        }
+
     }
 
-    public void setTargetAmount(double targetAmount)
-    {
+    public void setTargetAmount(double targetAmount) {
         this.targetAmount = targetAmount;
     }
 
-    public double update(double currentValue, double deltaTime)
-    {
+    public double update(double currentValue, double deltaTime) {
         error = (targetAmount - currentValue);
         integral += error * deltaTime;
         derivative = (error - previousError) / deltaTime;
