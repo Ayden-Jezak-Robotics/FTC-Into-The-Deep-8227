@@ -23,7 +23,7 @@ public class Test extends LinearOpMode
     // reg variables
     private double deltaTime;
 
-    //decalre PIDControllers
+    //declare PIDControllers
     private SanjuPIDController centerPIDController, leftPIDController, rightPIDController;
 
     // declare Mathy Variables
@@ -77,8 +77,6 @@ public class Test extends LinearOpMode
         telemetry.addData("in DriveStraight", "yes");
         telemetry.update();
         while (opModeIsActive() && !isStraightTargetReached()) {
-            telemetry.addData("in while", "ofstraight");
-            telemetry.update();
             leftPosition = leftDeadWheel.getCurrentPosition(); //position in ticks
             rightPosition = rightDeadWheel.getCurrentPosition(); //same
 
@@ -140,10 +138,10 @@ public class Test extends LinearOpMode
         centerDeadWheel = hardwareMap.get(DcMotor.class, "centerDeadWheel");
 
         // Set motor directions
-        frontLeft.setDirection(DcMotorSimple.Direction.FORWARD);
-        frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
-        backLeft.setDirection(DcMotorSimple.Direction.FORWARD);
-        backRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        frontRight.setDirection(DcMotorSimple.Direction.FORWARD);
+        backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        backRight.setDirection(DcMotorSimple.Direction.FORWARD);
 
         rightDeadWheel.setDirection(DcMotorSimple.Direction.REVERSE); //Make sure the deadwheels are in the right direction
         leftDeadWheel.setDirection(DcMotorSimple.Direction.FORWARD);

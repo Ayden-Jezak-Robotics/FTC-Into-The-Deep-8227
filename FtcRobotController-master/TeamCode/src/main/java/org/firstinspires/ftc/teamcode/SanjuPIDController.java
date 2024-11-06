@@ -30,7 +30,7 @@ public class SanjuPIDController {
     {
         if (type.equals("straight"))
         {
-            this.kP = 0.01;
+            this.kP = 0.001;
             this.kI = 0;
             this.kD = 0;
             this.kF = 0.1;
@@ -57,9 +57,9 @@ public class SanjuPIDController {
         error = target - currentPosition;
 
         //useful if one motor reaches destination but other doesn't
-        if (Math.abs(error) < 10) {  //10 is the tolerance
+        /*if (Math.abs(error) < 10) {  //10 is the tolerance
             return 0; // Stop power once target is reached
-        }
+        }*/
 
         double aMaxPoint = target/4;
 
@@ -73,7 +73,7 @@ public class SanjuPIDController {
         double derivative = kD * (error - lastError)/deltaTime;
         lastError = error;
 
-        double baseOutput = proportional + integral + derivative;;
+        double baseOutput = proportional + integral + derivative;
         double output;
 
         if (currentPosition < aMaxPoint)
