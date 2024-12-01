@@ -3,8 +3,11 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+// Not Working
+
 public class SanjuPIDController {
     private double kP, kI, kD, kF;
+    private double derivative;
     private double target; //in ticks
     private double integralSum;
     private double error; // in ticks
@@ -30,17 +33,24 @@ public class SanjuPIDController {
     {
         if (type.equals("straight"))
         {
-            this.kP = 0.001;
+            this.kP = 0.00003;
             this.kI = 0;
             this.kD = 0;
-            this.kF = 0.1;
+            this.kF = 0.15;
         }
         if (type.equals("strafe"))
         {
-            this.kP = 0;
+            this.kP = 0.00008;
+            this.kI = 0;
+            this.kD = 0.00001;
+            this.kF = 0.22;
+        }
+        if (type.equals("turn"))
+        {
+            this.kP = 0.003;
             this.kI = 0;
             this.kD = 0;
-            this.kF = 0;
+            this.kF = 0.15;
         }
         this.integralSum = 0;
         this.lastError = 0;
@@ -48,18 +58,17 @@ public class SanjuPIDController {
 
     public void setTarget(double target) //set always in inches
     {
-        this.target = target * ticksPerInch;
-        error = target;
+        this.target = target;
+    }
+
+    public void setError(double newError)
+    {
+        error = newError;
     }
 
     public double calculateOutput(double currentPosition, double deltaTime)
     {
         error = target - currentPosition;
-
-        //useful if one motor reaches destination but other doesn't
-        /*if (Math.abs(error) < 10) {  //10 is the tolerance
-            return 0; // Stop power once target is reached
-        }*/
 
         double aMaxPoint = target/4;
 
@@ -70,19 +79,40 @@ public class SanjuPIDController {
         integralSum = Range.clip(integralSum, -MAX_INTEGRAL, MAX_INTEGRAL);
         double integral = kI * integralSum;
 
-        double derivative = kD * (error - lastError)/deltaTime;
+        double feedforward = kF * Math.signum(error);
+
+        derivative = kD * (error - lastError)/deltaTime;
+
         lastError = error;
 
         double baseOutput = proportional + integral + derivative;
         double output;
 
-        if (currentPosition < aMaxPoint)
+        if (target <0)
         {
-            output = kF + (currentPosition/aMaxPoint) * baseOutput;
+            if (currentPosition > aMaxPoint)
+            {
+                output = feedforward + (currentPosition/aMaxPoint) * baseOutput;
+            }
+            else
+            {
+                output = feedforward + baseOutput;
+            }
+        }
+        else if (target > 0)
+        {
+            if (currentPosition < aMaxPoint)
+            {
+                output = feedforward + (currentPosition/aMaxPoint) * baseOutput;
+            }
+            else
+            {
+                output = feedforward + baseOutput;
+            }
         }
         else
         {
-            output = kF + baseOutput;
+            output = feedforward + baseOutput;
         }
 
         output = Range.clip(output, -0.5, 0.5);
@@ -90,11 +120,28 @@ public class SanjuPIDController {
         return output;
     }
 
+    public double getDerivative() {
+        return derivative;
+    }
+
+    public double updateError(double target, double newLoc)
+    {
+        error = target - newLoc;
+        return error;
+    }
+
     public double getError()
     {
         return error;
     }
-
+    public double getTarget()
+    {
+        return target;
+    }
+    public double getkF()
+    {
+        return kF;
+    }
     public void reset()
     {
         integralSum = 0;
