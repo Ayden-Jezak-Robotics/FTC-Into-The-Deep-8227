@@ -44,7 +44,7 @@ public class Test extends LinearOpMode
     //gyro stuff
     private BNO055IMU imu;
     double heading;
-    double turnSpeed = 0.14;
+    double turnSpeed = 0.2;
 
     //mathy variables
     // declare Mathy Variables
@@ -82,9 +82,11 @@ public class Test extends LinearOpMode
             //driveToPosition(0,36);
             //driveToPosition(36,0);
             //driveToPosition(0,-36);
-            driveToPosition(-36,0);
-            //driveToPosition(12,12);
+            //driveToPosition(-36,0);
+            neatPosition(36,0);
+            neatPosition(-36,0);
             //driveTurn(90);
+            timer.reset();
             break;
         }
 
@@ -149,122 +151,86 @@ public class Test extends LinearOpMode
             setStrafePower(centerOutput);
         }
         stopMotors();
+
     }
 
 
-    private void driveToPosition(double initialTargetX, double initialTargetY) {//input in inches
+    private void neatStraight(double targetY) //input in ticks
+    {
+        leftDeadWheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightDeadWheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        centerDeadWheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        leftPIDController.setTarget(targetY); // Forward motion is Y
+        rightPIDController.setTarget(targetY);
+        leftPIDController.setError(targetY); // Forward motion is Y
+        rightPIDController.setError(targetY);
+        timer.reset();
+
+        while (opModeIsActive() && !isStraightTargetReached()) {
+            leftPosition = leftDeadWheel.getCurrentPosition(); //position in ticks
+            rightPosition = rightDeadWheel.getCurrentPosition(); //same
+            deltaTime = Math.max(timer.milliseconds(), 1e-3); // Avoids setting time to zero, Minimum deltaTime of 1 microsecond
+            timer.reset();
+            leftOutput = leftPIDController.calculateOutput(leftPosition, deltaTime);
+            rightOutput = rightPIDController.calculateOutput(rightPosition, deltaTime);
+            setStraightPower(leftOutput, rightOutput);
+        }
+        stopMotors();
+    }
+
+    private void neatStrafe(double targetX) //input in ticks, + strafes to the right
+    {
+        leftDeadWheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightDeadWheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        centerDeadWheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        centerPIDController.setTarget(targetX); // Strafing motion is X
+        centerPIDController.setError(targetX); // Strafing motion is X
+        timer.reset();
+
+        while (opModeIsActive() && !isStrafeTargetReached())
+        {
+            centerPosition = centerDeadWheel.getCurrentPosition(); //position in ticks
+
+            deltaTime = Math.max(timer.milliseconds(), 1e-3); // Avoids setting time to zero, Minimum deltaTime of 1 microsecond
+            timer.reset();
+            centerOutput = centerPIDController.calculateOutput(centerPosition, deltaTime);
+
+            setStrafePower(centerOutput);
+        }
+        stopMotors();
+    }
+
+    private void neatPosition(double initialTargetX, double initialTargetY)
+    {
         // Reset encoders before starting
         double targetX = initialTargetX * ticksPerInch;
         double targetY = initialTargetY * ticksPerInch;
 
-        leftDeadWheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightDeadWheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        centerDeadWheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        neatStrafe(targetX);
+        checkHeading();
+        leftPosition = leftDeadWheel.getCurrentPosition(); //position in ticks
+        rightPosition = rightDeadWheel.getCurrentPosition();
+        double average = (leftPosition+rightPosition)/2;
+        double newYError = targetY - average;
+        telemetry.addData("leftPos",leftPosition);
+        telemetry.addData("rightPos", rightPosition);
+        telemetry.addData("newYError", newYError);
+        telemetry.update();
+        sleep(2000);
 
-        if (targetX == 0)
-        {
-            driveStraight(targetY, targetY, targetY);
-            centerPosition = centerDeadWheel.getCurrentPosition(); //position in ticks
-            double centerUpdatedError = centerPIDController.updateError(targetX, centerPosition);
-            telemetry.addData("center updated error", centerUpdatedError);
-            telemetry.update();
-            if (Math.abs(centerUpdatedError) > 1100) {
-                sleep(2000);
-                driveStrafe(targetX, centerUpdatedError);
-            }
-            checkHeading();
-        }
-        else {
-            driveStrafe(targetX, targetX);
-            centerPosition = centerDeadWheel.getCurrentPosition(); //position in ticks
-            double centerUpdatedError = centerPIDController.updateError(targetX, centerPosition);
-            telemetry.addData("center updated error", centerUpdatedError);
-            leftPosition = leftDeadWheel.getCurrentPosition(); //position in ticks
-            rightPosition = rightDeadWheel.getCurrentPosition(); //same
-            double leftUpdatedError = leftPIDController.updateError(targetY, leftPosition);
-            double rightUpdatedError = rightPIDController.updateError(targetY, rightPosition);
-            telemetry.addData("left updated error", leftUpdatedError);
-            telemetry.addData("right updated error", rightUpdatedError);
-            telemetry.update();
-            if (Math.abs(leftUpdatedError) > 1100 || Math.abs(rightUpdatedError) > 1100) {
-                sleep(2000);
-                driveStraight(targetY, leftUpdatedError, rightUpdatedError);
-            }
-            centerPosition = centerDeadWheel.getCurrentPosition(); //position in ticks
-            centerUpdatedError = centerPIDController.updateError(targetX, centerPosition);
-            telemetry.addData("center updated error", centerUpdatedError);
-            leftPosition = leftDeadWheel.getCurrentPosition(); //position in ticks
-            rightPosition = rightDeadWheel.getCurrentPosition(); //same
-            leftUpdatedError = leftPIDController.updateError(targetY, leftPosition);
-            rightUpdatedError = rightPIDController.updateError(targetY, rightPosition);
-            telemetry.addData("AFTER UPDATE left", leftUpdatedError);
-            telemetry.addData("AFTER UPDATE right", rightUpdatedError);
-            telemetry.update();
-            sleep(2000);
-            checkHeading();
-            centerPosition = centerDeadWheel.getCurrentPosition(); //position in ticks
-            centerUpdatedError = centerPIDController.updateError(targetX, centerPosition);
-            telemetry.addData("center updated error", centerUpdatedError);
-            leftPosition = leftDeadWheel.getCurrentPosition(); //position in ticks
-            rightPosition = rightDeadWheel.getCurrentPosition(); //same
-            leftUpdatedError = leftPIDController.updateError(targetY, leftPosition);
-            rightUpdatedError = rightPIDController.updateError(targetY, rightPosition);
-            telemetry.addData("AFTER CHECK left", leftUpdatedError);
-            telemetry.addData("AFTER CHECK right", rightUpdatedError);
-            telemetry.update();
-            sleep(2000);
-        }
-
-    }
-
-    private void driveDiagonal(double targetX, double targetY) {
-        // Reset encoders before starting
-        leftDeadWheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightDeadWheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        centerDeadWheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        // Reset and set target for PID controllers
-        leftPIDController.setTarget(targetY); // Forward motion is Y
-        rightPIDController.setTarget(targetY);
-        centerPIDController.setTarget(targetX); // Strafing motion is X
-
-        timer.reset();
-
-        while (opModeIsActive() && (!isStraightTargetReached() || !isStrafeTargetReached())) {
-            // Get current positions
-            leftPosition = leftDeadWheel.getCurrentPosition();
-            rightPosition = rightDeadWheel.getCurrentPosition();
-            centerPosition = centerDeadWheel.getCurrentPosition();
-
-            // Calculate delta time
-            deltaTime = Math.max(timer.milliseconds(), 1e-3); // Avoid divide-by-zero errors
-            timer.reset();
-
-            // PID outputs
-            double forwardLeftOutput = leftPIDController.calculateOutput(leftPosition, deltaTime);
-            double forwardRightOutput = rightPIDController.calculateOutput(rightPosition, deltaTime);
-            double strafeOutput = centerPIDController.calculateOutput(centerPosition, deltaTime);
-
-            // Combine motor powers
-            double backLeftPower = forwardLeftOutput - strafeOutput;
-            backLeftPower = Range.clip(backLeftPower, -0.8, 0.8);
-            double backRightPower = forwardRightOutput + strafeOutput;
-            backRightPower = Range.clip(backRightPower, -0.8, 0.8);
-            double frontRightPower = forwardRightOutput - strafeOutput;
-            frontRightPower = Range.clip(frontRightPower, -0.8, 0.8);
-            double frontLeftPower = forwardLeftOutput + strafeOutput;
-            frontLeftPower = Range.clip(frontLeftPower, -0.8, 0.8);
-
-            // Set motor powers
-            frontLeft.setPower(frontLeftPower);
-            frontRight.setPower(frontRightPower);
-            backLeft.setPower(backLeftPower);
-            backRight.setPower(backRightPower);
-
-        }
-        stopMotors();
+        neatStraight(newYError);
+        leftPosition = leftDeadWheel.getCurrentPosition(); //position in ticks
+        rightPosition = rightDeadWheel.getCurrentPosition();
+        telemetry.addData("leftPos",leftPosition);
+        telemetry.addData("rightPos", rightPosition);
+        telemetry.update();
+        sleep(2000);
         checkHeading();
     }
+
+
 
     private void driveTurn(double targetAngle)
     {
@@ -339,6 +305,10 @@ public class Test extends LinearOpMode
     private boolean isStrafeTargetReached()
     {
         double centerError = Math.abs(centerPIDController.getError());
+
+            telemetry.addData("derivative", centerPIDController.getDerivative());
+            //telemetry.addData("integral at 3600", centerPIDController.getIntegral());
+            telemetry.update();
 
         return centerError < 50; // Tolerance of 50 encoder counts
         //Later make tolerance a variable

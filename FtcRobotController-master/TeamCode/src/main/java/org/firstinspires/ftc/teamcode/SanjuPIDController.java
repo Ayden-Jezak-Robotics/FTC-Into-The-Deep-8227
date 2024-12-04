@@ -36,13 +36,13 @@ public class SanjuPIDController {
             this.kP = 0.00003;
             this.kI = 0;
             this.kD = 0;
-            this.kF = 0.15;
+            this.kF = 0.2;
         }
         if (type.equals("strafe"))
         {
-            this.kP = 0.00008;
+            this.kP = 0.00003;
             this.kI = 0;
-            this.kD = 0.00001;
+            this.kD = 0;
             this.kF = 0.22;
         }
         if (type.equals("turn"))
@@ -115,7 +115,7 @@ public class SanjuPIDController {
             output = feedforward + baseOutput;
         }
 
-        output = Range.clip(output, -0.5, 0.5);
+        output = Range.clip(output, -1, 1);
 
         return output;
     }
