@@ -88,7 +88,14 @@ public class SanjuPIDController {
         double baseOutput = proportional + integral + derivative;
         double output;
 
-        if (target <0)
+        //NEW
+        if (Math.abs(target) < 4400)
+        {
+            output = feedforward;
+        }
+        //
+
+        else if (target <0)
         {
             if (currentPosition > aMaxPoint)
             {
