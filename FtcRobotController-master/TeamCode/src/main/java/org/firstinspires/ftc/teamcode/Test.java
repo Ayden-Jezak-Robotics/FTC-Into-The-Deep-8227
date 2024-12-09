@@ -7,11 +7,15 @@ import com.qualcomm.robotcore.hardware.DcMotor; //use DcMotor
 import com.qualcomm.robotcore.hardware.DcMotorSimple; //
 import com.qualcomm.robotcore.util.ElapsedTime; // use for time
 import com.qualcomm.robotcore.util.Range;
-
-//Problem = position, output, and error all not changing
-// PID not working
-//Something is zero that shouldn't be zero
-
+/*
+import org.openftc.easyopencv.OpenCvWebcam;
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory;
+import org.openftc.easyopencv.OpenCvPipeline;
+import org.openftc.apriltag.AprilTagDetectionPipeline;
+import org.openftc.apriltag.AprilTagDetection;
+import java.util.ArrayList;
+*/
 
 @Autonomous(name = "Test", group = "Draft")
 public class Test extends LinearOpMode
@@ -52,6 +56,12 @@ public class Test extends LinearOpMode
     double wheelCircumference = (Math.PI * 60)/25.4;
     double ticksPerInch = (ticksPerRotation / wheelCircumference);
 
+    //april tag
+    private VisionPortal visionPortal;
+    private AprilTagProcessor tagProcessor;
+    private int[] portalsList;
+
+
     @Override
     public void runOpMode() throws InterruptedException
     {
@@ -83,8 +93,8 @@ public class Test extends LinearOpMode
             //driveToPosition(36,0);
             //driveToPosition(0,-36);
             //driveToPosition(-36,0);
-            neatPosition(36,0);
-            neatPosition(-36,0);
+            drivePosition(0,36);
+            detectAprilTags(); // Refine position after the task
             //driveTurn(90);
             timer.reset();
             break;
@@ -96,7 +106,8 @@ public class Test extends LinearOpMode
     {
         heading = imu.getAngularOrientation().firstAngle;
         if (Math.abs(heading) > 1) {
-            correctHeading(heading);
+            //NEW
+            driveTurn(heading);
         }
     }
     private void correctHeading(double heading) {
@@ -114,48 +125,8 @@ public class Test extends LinearOpMode
         stopMotors();
     }
 
-    private void driveStraight(double targetY, double leftErrorY, double rightErrorY) //input in ticks
-    {
-        leftPIDController.setTarget(targetY); // Forward motion is Y
-        rightPIDController.setTarget(targetY);
-        leftPIDController.setError(leftErrorY); // Forward motion is Y
-        rightPIDController.setError(rightErrorY);
-        timer.reset();
 
-        while (opModeIsActive() && !isStraightTargetReached()) {
-            leftPosition = leftDeadWheel.getCurrentPosition(); //position in ticks
-            rightPosition = rightDeadWheel.getCurrentPosition(); //same
-            deltaTime = Math.max(timer.milliseconds(), 1e-3); // Avoids setting time to zero, Minimum deltaTime of 1 microsecond
-            timer.reset();
-            leftOutput = leftPIDController.calculateOutput(leftPosition, deltaTime);
-            rightOutput = rightPIDController.calculateOutput(rightPosition, deltaTime);
-            setStraightPower(leftOutput, rightOutput);
-        }
-        stopMotors();
-    }
-
-    private void driveStrafe(double targetX, double errorX) //input in ticks, + strafes to the right
-    {
-        centerPIDController.setTarget(targetX); // Strafing motion is X
-        centerPIDController.setError(errorX); // Strafing motion is X
-        timer.reset();
-
-        while (opModeIsActive() && !isStrafeTargetReached())
-        {
-            centerPosition = centerDeadWheel.getCurrentPosition(); //position in ticks
-
-            deltaTime = Math.max(timer.milliseconds(), 1e-3); // Avoids setting time to zero, Minimum deltaTime of 1 microsecond
-            timer.reset();
-            centerOutput = centerPIDController.calculateOutput(centerPosition, deltaTime);
-
-            setStrafePower(centerOutput);
-        }
-        stopMotors();
-
-    }
-
-
-    private void neatStraight(double targetY) //input in ticks
+    private void driveStraight(double targetY) //input in ticks
     {
         leftDeadWheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightDeadWheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -179,7 +150,7 @@ public class Test extends LinearOpMode
         stopMotors();
     }
 
-    private void neatStrafe(double targetX) //input in ticks, + strafes to the right
+    private void driveStrafe(double targetX) //input in ticks, + strafes to the right
     {
         leftDeadWheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightDeadWheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -202,13 +173,13 @@ public class Test extends LinearOpMode
         stopMotors();
     }
 
-    private void neatPosition(double initialTargetX, double initialTargetY)
+    private void driveToPosition(double initialTargetX, double initialTargetY)
     {
         // Reset encoders before starting
         double targetX = initialTargetX * ticksPerInch;
         double targetY = initialTargetY * ticksPerInch;
 
-        neatStrafe(targetX);
+        driveStrafe(targetX);
         checkHeading();
         leftPosition = leftDeadWheel.getCurrentPosition(); //position in ticks
         rightPosition = rightDeadWheel.getCurrentPosition();
@@ -220,7 +191,7 @@ public class Test extends LinearOpMode
         telemetry.update();
         sleep(2000);
 
-        neatStraight(newYError);
+        driveStraight(newYError);
         leftPosition = leftDeadWheel.getCurrentPosition(); //position in ticks
         rightPosition = rightDeadWheel.getCurrentPosition();
         telemetry.addData("leftPos",leftPosition);
@@ -322,6 +293,27 @@ public class Test extends LinearOpMode
         //Later make tolerance a variable
     }
 
+    private void detectAprilTags() {
+        // Get the latest detections from the tag processor
+        ArrayList<AprilTagDetection> detections = tagProcessor.getDetections();
+    
+        if (detections.size() > 0) {
+            AprilTagDetection tag = detections.get(0); // Use the first detected tag
+    
+            telemetry.addData("Tag ID", tag.id);
+            telemetry.addData("Position (x)", "%.2f meters", tag.ftcPose.x);
+            telemetry.addData("Position (y)", "%.2f meters", tag.ftcPose.y);
+            telemetry.addData("Position (z)", "%.2f meters", tag.ftcPose.z);
+            telemetry.addData("Rotation (roll)", "%.2f degrees", Math.toDegrees(tag.ftcPose.roll));
+            telemetry.addData("Rotation (pitch)", "%.2f degrees", Math.toDegrees(tag.ftcPose.pitch));
+            telemetry.addData("Rotation (yaw)", "%.2f degrees", Math.toDegrees(tag.ftcPose.yaw));
+        } else {
+            telemetry.addLine("No tags detected");
+        }
+        telemetry.update();
+    }
+    
+
     private void initializeHardware()
     {
         // Hardware initialization
@@ -368,5 +360,32 @@ public class Test extends LinearOpMode
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
         parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
         imu.initialize(parameters);
+
+        //initialize april tags
+        initializeAprilTags();
     }
+
+    private void initializeAprilTags() {
+        // Create the multi-portal view for camera monitoring
+        portalsList = VisionPortal.makeMultiPortalView(1, VisionPortal.MultiPortalLayout.HORIZONTAL);
+    
+        // Set up the AprilTagProcessor
+        tagProcessor = new AprilTagProcessor.Builder()
+                .setDrawAxes(true)
+                .setDrawCubeProjection(true)
+                .setDrawTagID(true)
+                .setDrawTagOutline(true)
+                .setTagFamily(AprilTagProcessor.TagFamily.TAG_36h11) // Match your tag family
+                .build();
+    
+        // Set up the VisionPortal with the webcam
+        visionPortal = new VisionPortal.Builder()
+                .addProcessor(tagProcessor)
+                .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
+                .setCameraResolution(new Size(640, 480))
+                .enableCameraMonitoring(true)
+                .setCameraMonitorViewId(portalsList[0])
+                .build();
+    }
+    
 }
