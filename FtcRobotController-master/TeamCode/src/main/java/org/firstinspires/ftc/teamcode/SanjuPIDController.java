@@ -35,14 +35,14 @@ public class SanjuPIDController {
         {
             this.kP = 0.00003;
             this.kI = 0;
-            this.kD = 0;
+            this.kD = 0.004;
             this.kF = 0.2;
         }
         if (type.equals("strafe"))
         {
             this.kP = 0.00003;
             this.kI = 0;
-            this.kD = 0;
+            this.kD = 0.004;
             this.kF = 0.22;
         }
         if (type.equals("turn"))
@@ -70,7 +70,7 @@ public class SanjuPIDController {
     {
         error = target - currentPosition;
 
-        double aMaxPoint = target/4;
+        double aMaxPoint = target/3;
 
         double proportional = kP * error;
 
@@ -88,7 +88,7 @@ public class SanjuPIDController {
         double baseOutput = proportional + integral + derivative;
         double output;
 
-        if (Math.abs(target) < 4400 && target != 0)
+        if (Math.abs(target) < 6600 && target != 0)
         {
             output = 0.30 * Math.signum(target);
         }
