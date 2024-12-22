@@ -1,23 +1,15 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
-
-// Not Working
 
 public class SanjuPIDController {
     private double kP, kI, kD, kF;
     private double derivative;
-    private double target; //in ticks
+    private double originalError; //in ticks
     private double integralSum;
     private double error; // in ticks
     private double lastError;
-    private static final double MAX_INTEGRAL = 1000; // Adjust based on your system's needs
-
-    // declare Mathy Variables
-    private int ticksPerRotation = 8192;
-    double wheelCircumference = (Math.PI * 60)/25.4;
-    double ticksPerInch = (ticksPerRotation / wheelCircumference);
+    // Adjust based on your system's needs
 
     public SanjuPIDController(double kP, double kI, double kD, double kF)
     {
@@ -29,36 +21,37 @@ public class SanjuPIDController {
         this.lastError = 0;
     }
 
-    public SanjuPIDController(String type)
+    public SanjuPIDController(PIDType type)
     {
-        if (type.equals("straight"))
-        {
-            this.kP = 0.00003;
-            this.kI = 0;
-            this.kD = 0.004;
-            this.kF = 0.2;
+        switch (type) {
+            case STRAIGHT:
+                this.kP = 0.00003;
+                this.kI = 0;
+                this.kD = 0.004;
+                this.kF = 0.2;
+                break;
+            case STRAFE:
+                this.kP = 0.00003;
+                this.kI = 0;
+                this.kD = 0.004;
+                this.kF = 0.22;
+                break;
+            case TURN:
+                this.kP = 0.003;
+                this.kI = 0;
+                this.kD = 0;
+                this.kF = 0.15;
+                break;
+            default:
         }
-        if (type.equals("strafe"))
-        {
-            this.kP = 0.00003;
-            this.kI = 0;
-            this.kD = 0.004;
-            this.kF = 0.22;
-        }
-        if (type.equals("turn"))
-        {
-            this.kP = 0.003;
-            this.kI = 0;
-            this.kD = 0;
-            this.kF = 0.15;
-        }
+
         this.integralSum = 0;
         this.lastError = 0;
     }
 
-    public void setTarget(double target) //set always in inches
+    public void setTarget(double target)
     {
-        this.target = target;
+        this.originalError = target;
     }
 
     public void setError(double newError)
@@ -68,15 +61,15 @@ public class SanjuPIDController {
 
     public double calculateOutput(double currentPosition, double deltaTime)
     {
-        error = target - currentPosition;
+        error = originalError - currentPosition;
 
-        double aMaxPoint = target/3;
+        double aMaxPoint = originalError /3;
 
         double proportional = kP * error;
 
         integralSum += (error * deltaTime);
         // Anti-windup especially when distance is large
-        integralSum = Range.clip(integralSum, -MAX_INTEGRAL, MAX_INTEGRAL);
+        integralSum = Range.clip(integralSum, - Constants.MAX_INTEGRAL, Constants.MAX_INTEGRAL);
         double integral = kI * integralSum;
 
         double feedforward = kF * Math.signum(error);
@@ -88,11 +81,11 @@ public class SanjuPIDController {
         double baseOutput = proportional + integral + derivative;
         double output;
 
-        if (Math.abs(target) < 6600 && target != 0)
+        if (Math.abs(originalError) < 6600 && originalError != 0)
         {
-            output = 0.30 * Math.signum(target);
+            output = 0.30 * Math.signum(originalError);
         }
-        else if (target <0)
+        else if (originalError <0)
         {
             if (currentPosition > aMaxPoint)
             {
@@ -103,7 +96,7 @@ public class SanjuPIDController {
                 output = feedforward + baseOutput;
             }
         }
-        else if (target > 0)
+        else if (originalError > 0)
         {
             if (currentPosition < aMaxPoint)
             {
@@ -119,7 +112,7 @@ public class SanjuPIDController {
             output = feedforward + baseOutput;
         }
 
-        output = Range.clip(output, -1, 1);
+//       output = Range.clip(output, -1, 1);
 
         return output;
     }
@@ -140,7 +133,7 @@ public class SanjuPIDController {
     }
     public double getTarget()
     {
-        return target;
+        return originalError;
     }
     public double getkF()
     {

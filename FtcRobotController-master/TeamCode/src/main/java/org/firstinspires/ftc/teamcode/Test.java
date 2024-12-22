@@ -71,10 +71,10 @@ public class Test extends LinearOpMode
         telemetry.update();
 
         //setting PID Controllers
-        leftPIDController = new SanjuPIDController("straight");
-        rightPIDController = new SanjuPIDController("straight");
-        centerPIDController = new SanjuPIDController("strafe");
-        turnPIDController = new SanjuPIDController("turn");
+        leftPIDController = new SanjuPIDController(PIDType.STRAIGHT);
+        rightPIDController = new SanjuPIDController(PIDType.STRAIGHT);
+        centerPIDController = new SanjuPIDController(PIDType.STRAFE);
+        turnPIDController = new SanjuPIDController(PIDType.TURN);
 
         waitForStart(); //FTC SDK method which wait for the "Play"
         // MAIN PART OF THE CODE!!!!!!!!!!!!
