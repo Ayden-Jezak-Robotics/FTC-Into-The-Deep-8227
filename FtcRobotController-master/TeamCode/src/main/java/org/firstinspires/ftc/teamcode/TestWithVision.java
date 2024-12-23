@@ -1,16 +1,21 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.bosch.BNO055IMU; //for gyro
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode; //utilized linear mode
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous; //send to Autonomous on Driver Hub
+
 import com.qualcomm.robotcore.hardware.DcMotor; //use DcMotor
 import com.qualcomm.robotcore.hardware.DcMotorSimple; //
 import com.qualcomm.robotcore.util.ElapsedTime; // use for time
 import com.qualcomm.robotcore.util.Range;
 
-//Problem = position, output, and error all not changing
-// PID not working
-//Something is zero that shouldn't be zero
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+import android.util.Size;
 
 
 @Autonomous(name = "TestWithVision", group = "Draft")
@@ -51,6 +56,9 @@ public class TestWithVision extends LinearOpMode
     private int ticksPerRotation = 8192;
     double wheelCircumference = (Math.PI * 60)/25.4;
     double ticksPerInch = (ticksPerRotation / wheelCircumference);
+
+    double initX = 0; //might wanna change this for the actual match
+    double initY = 0; // also this
 
     @Override
     public void runOpMode() throws InterruptedException
@@ -127,9 +135,9 @@ public class TestWithVision extends LinearOpMode
         rightPIDController.setError(targetY);
         timer.reset();
 
-        while (opModeIsActive() && !isStraightTargetReached()) {
-            leftPosition = leftDeadWheel.getCurrentPosition(); //position in ticks
-            rightPosition = rightDeadWheel.getCurrentPosition(); //same
+        while (opModeIsActive() && !isAprilTargetReached()) {
+            leftPosition = leftDeadWheel.getCurrentPosition() + initY; //position in ticks
+            rightPosition = rightDeadWheel.getCurrentPosition() + initY; //same
             deltaTime = Math.max(timer.milliseconds(), 1e-3); // Avoids setting time to zero, Minimum deltaTime of 1 microsecond
             timer.reset();
             leftOutput = leftPIDController.calculateOutput(leftPosition, deltaTime);
@@ -149,9 +157,9 @@ public class TestWithVision extends LinearOpMode
         centerPIDController.setError(targetX); // Strafing motion is X
         timer.reset();
 
-        while (opModeIsActive() && !isStrafeTargetReached())
+        while (opModeIsActive() && !isAprilTargetReached())
         {
-            centerPosition = centerDeadWheel.getCurrentPosition(); //position in ticks
+            centerPosition = centerDeadWheel.getCurrentPosition() + initX; //position in ticks
 
             deltaTime = Math.max(timer.milliseconds(), 1e-3); // Avoids setting time to zero, Minimum deltaTime of 1 microsecond
             timer.reset();
@@ -188,10 +196,25 @@ public class TestWithVision extends LinearOpMode
         telemetry.update();
         sleep(2000);
         checkHeading();
+        updateCoordinates(targetX, targetY);
     }
 
 
+    private void updateCoordinates(targetX, targetY)
+    {
+        if (tagProcessor.getDetections().size() > 0)
+            {
+                AprilTagDetection tag = tagProcessor.getDetections().get(0);
 
+                initX = tag.robotPose.getPosition().x;
+                initY = tag.robotPose.getPosition().y;
+            }
+            else
+            {
+                initX = targetX;
+                initY = targetY;
+            }
+    }
     private void driveTurn(double targetAngle)
     {
         turnPIDController.setTarget(targetAngle); // Strafing motion is X
@@ -262,6 +285,29 @@ public class TestWithVision extends LinearOpMode
         return leftError < 50 && rightError < 50; // Tolerance of 50 encoder counts
     }
 
+    private boolean isAprilTargetReached()
+    {
+        double x;
+        double y;
+        if (tagProcessor.getDetections().size() > 0)
+            {
+                AprilTagDetection tag = tagProcessor.getDetections().get(0);
+
+                x =  tag.robotPose.getPosition().x * ticksPerInch;
+                y = tag.robotPose.getPosition().y * ticksPerInch;
+                if (Math.abs(initX - x) < 50 && Math.abs(initY - y) < 50)
+                {
+                    return true;
+                }
+            }
+            else
+            {
+                double leftError = Math.abs(leftPIDController.getError());
+                double rightError = Math.abs(rightPIDController.getError());
+                return leftError < 50 && rightError < 50;
+            }
+    }
+
     private boolean isStrafeTargetReached()
     {
         double centerError = Math.abs(centerPIDController.getError());
@@ -328,5 +374,23 @@ public class TestWithVision extends LinearOpMode
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
         parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
         imu.initialize(parameters);
+
+        //initialize april
+        AprilTagProcessor tagProcessor = new AprilTagProcessor.Builder() //identifies tag, estimates pose
+                .setDrawAxes(true)
+                .setDrawCubeProjection(true)
+                .setDrawTagID(true)
+                .setDrawTagOutline(true)
+                .setTagFamily(AprilTagProcessor.TagFamily.TAG_36h11)
+                //.setTagLibrary(AprilTagGameDatabase.getCurrentGameTagLibrary())
+                .build();
+
+        VisionPortal visionPortal = new VisionPortal.Builder() //manages initializations of cameras and runs processors on a seperate thread
+                .addProcessor(tagProcessor)
+                .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
+                .setCameraResolution(new Size(640, 480))
+                .setStreamFormat(VisionPortal.StreamFormat.YUY2)
+                .setAutoStopLiveView(true)
+                .build();
     }
 }
