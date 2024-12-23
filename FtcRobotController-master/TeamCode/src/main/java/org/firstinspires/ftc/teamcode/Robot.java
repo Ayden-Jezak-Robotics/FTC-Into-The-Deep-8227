@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 
@@ -11,6 +12,7 @@ public class Robot {
 
     private final LinearOpMode opMode;
     private HardwareMap hardwareMap;
+    private Telemetry telemetry;
 
     private final Position currentPosition;
     private double currentHeading;
@@ -20,16 +22,18 @@ public class Robot {
     private final GyroUtility gyros;
     private final VisionUtility myAprilTagProcessor;
 
-    public Robot(LinearOpMode opMode, HardwareMap hardwareMap, Position initialPosition, double initialHeading) {
+    public Robot(LinearOpMode opMode, HardwareMap hardwareMap, Telemetry telemetry, Position initialPosition, double initialHeading) {
         this.opMode = opMode;
         this.hardwareMap = hardwareMap;
+        this.telemetry = telemetry;
+
         this.currentPosition = initialPosition;
         this.currentHeading = initialHeading;
 
-        this.motors = new MotorUtility(this.hardwareMap);
-        this.deadWheels = new DeadWheelUtility(this.hardwareMap);
-        this.gyros = new GyroUtility(this.hardwareMap);
-        this.myAprilTagProcessor = new VisionUtility();
+        this.motors = new MotorUtility(this.hardwareMap, this.telemetry);
+        this.deadWheels = new DeadWheelUtility(this.hardwareMap, this.telemetry);
+        this.gyros = new GyroUtility(this.hardwareMap, this.telemetry);
+        this.myAprilTagProcessor = new VisionUtility(this.hardwareMap);
     }
 
     public void moveToPositionAndHeading(Position targetPosition, double targetHeading) {

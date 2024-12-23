@@ -1,9 +1,10 @@
 package org.firstinspires.ftc.teamcode;
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
-
 import android.util.Size;
 
+import com.qualcomm.robotcore.hardware.HardwareMap;
+
+import org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -21,11 +22,14 @@ public class VisionUtility {
 
     private AprilTagProcessor myAprilTagProcessor;
     private VisionPortal myVisionPortal;
+    private HardwareMap hardwareMap;
 
-    VisionUtility() {
+    VisionUtility(HardwareMap hardwareMap) {
 
         Position cameraPosition = new Position(DistanceUnit.MM, 0, 0, 0, 0);
         YawPitchRollAngles cameraOrientation = new YawPitchRollAngles(AngleUnit.DEGREES, 0, -90, 0, 0);
+
+        this.hardwareMap = hardwareMap;
 
         this.myAprilTagProcessor = new AprilTagProcessor.Builder()
                .setCameraPose(cameraPosition, cameraOrientation)
@@ -33,7 +37,7 @@ public class VisionUtility {
                .build();
         this.myVisionPortal = new VisionPortal.Builder()
                .setShowStatsOverlay(true)
-               .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
+               .setCamera(BlocksOpModeCompanion.hardwareMap.get(WebcamName.class, "Webcam 1"))
                .addProcessor(myAprilTagProcessor)
                .setCameraResolution(new Size(640, 480))
                .setStreamFormat(VisionPortal.StreamFormat.YUY2)
