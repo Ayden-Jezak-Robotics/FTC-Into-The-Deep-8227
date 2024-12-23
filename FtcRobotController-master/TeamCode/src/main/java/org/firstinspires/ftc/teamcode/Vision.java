@@ -41,7 +41,7 @@ public class Vision extends LinearOpMode
         while (!isStopRequested() && opModeIsActive())
         {
 
-            if (tagProcessor.getDetections().size() > 0)
+            if (!tagProcessor.getDetections().isEmpty())
             {
                 AprilTagDetection tag = tagProcessor.getDetections().get(0);
 
@@ -53,6 +53,8 @@ public class Vision extends LinearOpMode
                 telemetry.addData("pitch", tag.ftcPose.pitch);
                 telemetry.addData("yaw", tag.robotPose.getOrientation().getYaw(AngleUnit.DEGREES));
                 telemetry.addData("Heading", tag.ftcPose.yaw);
+            } else {
+                telemetry.addData("Error", "No April tag in view");
             }
             telemetry.update();
         }
