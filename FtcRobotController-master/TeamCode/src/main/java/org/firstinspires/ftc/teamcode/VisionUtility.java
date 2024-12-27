@@ -26,7 +26,7 @@ public class VisionUtility {
     VisionUtility(HardwareMap hardwareMap) {
 
         Position cameraPosition = new Position(DistanceUnit.MM, 0, 0, 0, 0);
-        YawPitchRollAngles cameraOrientation = new YawPitchRollAngles(AngleUnit.DEGREES, 0, -90, 0, 0);
+        YawPitchRollAngles cameraOrientation = new YawPitchRollAngles(AngleUnit.DEGREES, 0, 0, 0, 0);
 
         this.myHardwareMap = hardwareMap;
 
@@ -62,7 +62,8 @@ public class VisionUtility {
                     myAprilTagDetections.remove(detection);
 
                 }
-            } else {
+            }
+            else {
                 myAprilTagDetections.remove(detection);
             }
         }
@@ -79,8 +80,11 @@ public class VisionUtility {
         List<AprilTagDetection> myAprilTagDetections = getDetections();
 
         for (AprilTagDetection detection : myAprilTagDetections) {
-            robotPosition = detection.robotPose;
-            break; // Assuming you want the position from the first valid detection
+            if (detection != null)
+            {
+                robotPosition = detection.robotPose;
+                break; // Assuming you want the position from the first valid detection
+            } 
         }
 
         return robotPosition; // Could still be null if no valid detection found

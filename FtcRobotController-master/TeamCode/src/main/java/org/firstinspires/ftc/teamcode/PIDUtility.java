@@ -81,18 +81,11 @@ public class PIDUtility {
             if (Math.abs(error) < Constants.MINIMUM_DISTANCE) {
                 return 0;
             }
-        } else { // For Turn based calculations
-            double rawError = targetPosition - currentPosition;
+        } 
+        else { // For Turn based calculations
+            error = targetPosition - currentPosition;
 
             // Normalize error to the range [-180, 180]
-
-            if (rawError > 180) {
-                error = rawError - 360;
-            } else if (rawError < -180) {
-                error = rawError + 360;
-            } else {
-                error = rawError;
-            }
 
             if (Math.abs(error) < Constants.TURN_TOLERANCE) {
                 return 0;
@@ -130,8 +123,9 @@ public class PIDUtility {
             errorCompleted = (currentPosition - initialPosition) * Constants.DEAD_WHEEL_TICKS_PER_INCH;
 
 
-        } else {
-            if (Math.abs(originalError) < 20 && originalError != 0) {
+        }
+        else {
+            if (Math.abs(originalError) < 20) {
                 return 0.30 * Math.signum(originalError);
             }
 

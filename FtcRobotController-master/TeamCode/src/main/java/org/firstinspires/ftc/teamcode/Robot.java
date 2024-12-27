@@ -103,26 +103,26 @@ public class Robot {
         double imuWeight = 0.5; // Initial weight for IMU
         double encoderWeight = 0.5; // Initial weight for encoder
 
-        double leftEncoder = deadWheels.getPosition(DeadWheel.LEFT);
+        double leftEncoder = deadWheels.getPosition(DeadWheel.LEFT); //in ticks
         double rightEncoder = deadWheels.getPosition(DeadWheel.RIGHT);
         double centerEncoder = deadWheels.getPosition(DeadWheel.CENTER);
 
         // Get changes in encoder values
         double deltaLeft = leftEncoder - deadWheels.getPreviousLeft();
         double deltaRight = rightEncoder - deadWheels.getPreviousRight();
-        double deltaTheta = (deltaRight - deltaLeft) / Constants.WHEEL_BASE_WIDTH;
+        double deltaTheta = Math.toDegrees((deltaRight - deltaLeft) / Constants.WHEEL_BASE_WIDTH);
 
         // Update previous encoder values
-        deadWheels.setPreviousLeft(leftEncoder);
+        deadWheels.setPreviousLeft(leftEncoder); //in ticks
         deadWheels.setPreviousRight(rightEncoder);
         deadWheels.setPreviousCenter(centerEncoder);
 
         // Normalize IMU and encoder headings
-        double imuHeadingNormalized = gyros.normalizeHeading(gyros.getHeading());
+        double imuHeading = gyros.getHeading();
         double encoderHeadingNormalized = gyros.normalizeHeading(currentHeading + deltaTheta);
 
         // Compare IMU and encoder headings to adjust weights
-        double headingDifference = Math.abs(imuHeadingNormalized - encoderHeadingNormalized);
+        double headingDifference = Math.abs(imuHeading - encoderHeadingNormalized);
         if (headingDifference > 10) { // Threshold for significant discrepancy
             imuWeight = 0.3; // Reduce trust in IMU
             encoderWeight = 0.7; // Increase trust in encoders
@@ -132,19 +132,19 @@ public class Robot {
         }
 
         // Blend IMU and encoder headings
-        currentHeading = gyros.normalizeHeading((imuWeight * imuHeadingNormalized) + (encoderWeight * encoderHeadingNormalized));
+        currentHeading = gyros.normalizeHeading((imuWeight * imuHeading) + (encoderWeight * encoderHeadingNormalized));
 
         // Local displacements
         double deltaXLocal = (deltaLeft + deltaRight) / 2.0;
-        double deltaYLocal = centerEncoder - deadWheels.getPreviousRight();
+        double deltaYLocal = centerEncoder - deadWheels.getPreviousCenter();
 
         // Transform local displacements to global coordinates
-        double deltaXGlobal = deltaXLocal * Math.cos(Math.toRadians(currentHeading)) - deltaYLocal * Math.sin(Math.toRadians(currentHeading));
-        double deltaYGlobal = deltaXLocal * Math.sin(Math.toRadians(currentHeading)) + deltaYLocal * Math.cos(Math.toRadians(currentHeading));
+        double deltaXGlobal = deltaYLocal * Math.cos(Math.toRadians(currentHeading)) + deltaXLocal * Math.sin(Math.toRadians(currentHeading));
+        double deltaYGlobal = deltaXLocal * Math.cos(Math.toRadians(currentHeading)) - deltaYLocal * Math.sin(Math.toRadians(currentHeading));
 
         // Update global position
-        currentPosition.x += deltaXGlobal;
-        currentPosition.y += deltaYGlobal;
+        currentPosition.x += deltaXGlobal/Constants.DEAD_WHEEL_TICKS_PER_INCH;
+        currentPosition.y += deltaYGlobal/Constants.DEAD_WHEEL_TICKS_PER_INCH;
     }
 
     public void updateFromAprilTags() {
@@ -156,7 +156,7 @@ public class Robot {
         if (currentAprilTagPosition != null) {
             currentPosition.x = (1 - aprilTagWeight) * currentPosition.x + aprilTagWeight * currentAprilTagPosition.getPosition().x;
             currentPosition.y = (1 - aprilTagWeight) * currentPosition.y + aprilTagWeight * currentAprilTagPosition.getPosition().y;
-            currentHeading = gyros.normalizeAngle((1 - aprilTagWeight) * currentHeading + aprilTagWeight * currentAprilTagPosition.getOrientation().getYaw());
+            currentHeading = (1 - aprilTagWeight) * currentHeading + aprilTagWeight * currentAprilTagPosition.getOrientation().getYaw();
         }
     }
 }

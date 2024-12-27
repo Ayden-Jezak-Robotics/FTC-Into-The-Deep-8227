@@ -12,10 +12,10 @@ public class AutoOpBlueLeft extends LinearOpMode {
     Position initialPosition = new Position(DistanceUnit.INCH, 0, 0, 0, System.nanoTime());
     double initialHeading = 0;
 
-    private final Robot robot = new Robot(this, hardwareMap, telemetry, initialPosition, initialHeading);
-
     @Override
     public void runOpMode() throws InterruptedException {
+        
+        Robot robot = new Robot(this, hardwareMap, telemetry, initialPosition, initialHeading);
 
         waitForStart();
 

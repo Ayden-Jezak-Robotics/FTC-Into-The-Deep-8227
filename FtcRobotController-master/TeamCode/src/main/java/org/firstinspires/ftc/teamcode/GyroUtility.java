@@ -25,12 +25,6 @@ public class GyroUtility {
         return imu.getAngularOrientation().firstAngle;
     }
 
-    public double normalizeHeading(double angle) {
-        while (angle >= 360) angle -= 360;
-        while (angle < 0) angle += 360;
-        return angle;
-    }
-
     public double normalizeAngle(double angle) {
         double normalizedAngle;
         if (angle > 180) {
