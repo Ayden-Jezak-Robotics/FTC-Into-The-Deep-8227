@@ -9,6 +9,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class GyroUtility {
 
     private BNO055IMU imu;
+    private double previousHeading = 0;
 
     GyroUtility(HardwareMap hardwareMap, Telemetry telemetry) {
         imu = hardwareMap.get(BNO055IMU.class, "imu");
@@ -25,15 +26,19 @@ public class GyroUtility {
         return imu.getAngularOrientation().firstAngle;
     }
 
-    public double normalizeAngle(double angle) {
-        double normalizedAngle;
-        if (angle > 180) {
-            normalizedAngle = angle - 360;
-        } else if (angle < -180) {
-            normalizedAngle = angle + 360;
-        } else {
-            normalizedAngle = angle;
-        }
-        return normalizedAngle;
+    public double getPreviousHeading()
+    {
+        return this.previousHeading;
     }
+
+    public void setPreviousHeading(double previousHeading) {
+        this.previousHeading = previousHeading;
+    }
+
+    public double normalizeHeading(double angle) {
+        while (angle >= 180) angle -= 360;
+        while (angle < -180) angle += 360;
+        return angle;
+    }
+
 }
