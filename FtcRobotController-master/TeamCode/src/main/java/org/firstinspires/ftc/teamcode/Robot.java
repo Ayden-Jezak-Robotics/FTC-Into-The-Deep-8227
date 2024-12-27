@@ -65,7 +65,7 @@ public class Robot {
             // Calculate power outputs using PID
             double xPower = xPID.calculatePower(currentPosition.x, timer.milliseconds());
             double yPower = yPID.calculatePower(currentPosition.y, timer.milliseconds());
-            double turnPower = turnPID.calculatePower(gyros.getHeading(), timer.milliseconds());
+            double turnPower = turnPID.calculatePower(currentHeading, timer.milliseconds());
             timer.reset();
 
             // Convert x, y, and turn power to motor powers
