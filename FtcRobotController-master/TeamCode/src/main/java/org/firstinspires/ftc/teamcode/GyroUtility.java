@@ -5,6 +5,9 @@ import static java.lang.Thread.sleep;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
+
 public class GyroUtility {
 
     private BNO055IMU imu;
@@ -25,7 +28,11 @@ public class GyroUtility {
     }
 
     double getHeading() {
-        return imu.getAngularOrientation().firstAngle;
+        return imu.getAngularOrientation().toAngleUnit(AngleUnit.RADIANS).firstAngle;
+    }
+
+    Position getPosition() {
+        return  imu.getPosition();
     }
 
     public double normalizeHeading(double angle) {
