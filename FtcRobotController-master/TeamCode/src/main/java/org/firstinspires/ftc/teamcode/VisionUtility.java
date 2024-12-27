@@ -79,12 +79,14 @@ public class VisionUtility {
 
         List<AprilTagDetection> myAprilTagDetections = getDetections();
 
-        for (AprilTagDetection detection : myAprilTagDetections) {
-            if (detection != null)
-            {
-                robotPosition = detection.robotPose;
-                break; // Assuming you want the position from the first valid detection
-            } 
+        if (myAprilTagDetections != null) {
+            for (AprilTagDetection detection : myAprilTagDetections) {
+                if (detection != null)
+                {
+                    robotPosition = detection.robotPose;
+                    break; // Assuming you want the position from the first valid detection
+                }
+            }
         }
 
         return robotPosition; // Could still be null if no valid detection found

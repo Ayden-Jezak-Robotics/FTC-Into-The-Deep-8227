@@ -32,13 +32,13 @@ public class PIDUtility {
             case STRAIGHT:
                 this.kP = 0.00003;
                 this.kI = 0;
-                this.kD = 0.004;
+                this.kD = 0.00;
                 this.kF = 0.2;
                 break;
             case STRAFE:
                 this.kP = 0.00003;
                 this.kI = 0;
-                this.kD = 0.004;
+                this.kD = 0.00;
                 this.kF = 0.22;
                 break;
             case TURN:
@@ -71,7 +71,7 @@ public class PIDUtility {
         this.aMaxPoint = originalError / 3;
     }
 
-    public double calculatePower(double currentPosition, double time) // time is in Milliseconds
+    public double calculatePower(double currentPosition, double time) // time is in Seconds
     {
         double error;
 
@@ -97,7 +97,7 @@ public class PIDUtility {
         if (time < Constants.MINIMUM_TIME_IN_SECONDS) {
             deltaTime = Constants.MINIMUM_TIME_IN_SECONDS; // Prevent zero or very small time steps
         } else {
-            deltaTime = time / Constants.CONVERT_TIME_TO_SECONDS;
+            deltaTime = time;
         }
 
         integralSum += (error * deltaTime);
@@ -134,7 +134,7 @@ public class PIDUtility {
         }
 
         if (Math.abs(errorCompleted) < Math.abs(aMaxPoint)) {
-            return kFeedForwardValue + (currentPosition / aMaxPoint) * baseOutput;
+            return kFeedForwardValue + (errorCompleted / aMaxPoint) * baseOutput;
         } else {
             return kFeedForwardValue + baseOutput;
         }
