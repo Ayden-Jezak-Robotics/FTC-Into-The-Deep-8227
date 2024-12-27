@@ -132,7 +132,7 @@ public class Robot {
         }
 
         // Blend IMU and encoder headings
-        currentHeading = gyros.normalizeHeading((imuWeight * imuHeading) + (encoderWeight * encoderHeadingNormalized));
+        currentHeading = (imuWeight * imuHeading) + (encoderWeight * encoderHeadingNormalized);
 
         // Local displacements
         double deltaXLocal = (deltaLeft + deltaRight) / 2.0;
