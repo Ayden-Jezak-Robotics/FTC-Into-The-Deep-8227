@@ -54,9 +54,9 @@ public class PIDUtility {
         this.priorError = 0;
     }
 
-    public void setOriginalError(double initialPosition, double targetPosition) {
-        this.initialPosition = initialPosition;
-        this.targetPosition = targetPosition;
+    public void setOriginalError(double initial, double target) {
+        this.initialPosition = initial;
+        this.targetPosition = target;
 
         this.originalError = (targetPosition - initialPosition);
 
@@ -65,7 +65,7 @@ public class PIDUtility {
         }
 
         if (type == PIDType.STRAIGHT || type == PIDType.STRAFE) {
-            this.originalError = this.originalError * Constants.DEAD_WHEEL_TICKS_PER_INCH;
+            originalError = originalError * Constants.DEAD_WHEEL_TICKS_PER_INCH;
         }
 
         this.aMaxPoint = originalError / 3;
@@ -76,7 +76,7 @@ public class PIDUtility {
         double error;
 
         if (type == PIDType.STRAIGHT || type == PIDType.STRAFE) {
-            error = (targetPosition - currentPosition) * Constants.DEAD_WHEEL_TICKS_PER_INCH;
+            error = (targetPosition - currentPosition) * Constants.DEAD_WHEEL_TICKS_PER_INCH; // Error in ticks
 
             if (Math.abs(error) < Constants.MINIMUM_DISTANCE) {
                 return 0;
@@ -86,13 +86,10 @@ public class PIDUtility {
 
             // Normalize error to the range [-180, 180]
 
-            if (rawError > 180) {
-                error = rawError - 360;
-            } else if (rawError < -180) {
-                error = rawError + 360;
-            } else {
-                error = rawError;
-            }
+            while (rawError >= 180) rawError -= 360;
+            while (rawError < -180) rawError += 360;
+
+            error = rawError; // Error in degrees
 
             if (Math.abs(error) < Constants.TURN_TOLERANCE) {
                 return 0;
@@ -140,7 +137,7 @@ public class PIDUtility {
         }
 
         if (Math.abs(errorCompleted) < Math.abs(aMaxPoint)) {
-            return kFeedForwardValue + (currentPosition / aMaxPoint) * baseOutput;
+            return kFeedForwardValue + (Math.abs(errorCompleted) / Math.abs(aMaxPoint)) * baseOutput;
         } else {
             return kFeedForwardValue + baseOutput;
         }

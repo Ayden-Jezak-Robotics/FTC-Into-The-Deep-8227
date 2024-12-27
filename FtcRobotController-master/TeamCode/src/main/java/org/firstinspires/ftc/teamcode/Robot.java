@@ -22,7 +22,7 @@ public class Robot {
     private final GyroUtility gyros;
     private final VisionUtility myAprilTagProcessor;
 
-    public Robot(LinearOpMode opMode, HardwareMap hardwareMap, Telemetry telemetry, Position initialPosition, double initialHeading) {
+    public Robot(LinearOpMode opMode, HardwareMap hardwareMap, Telemetry telemetry, Position initialPosition, double initialHeading) throws InterruptedException {
         this.opMode = opMode;
         this.hardwareMap = hardwareMap;
         this.telemetry = telemetry;
@@ -30,9 +30,9 @@ public class Robot {
         this.currentPosition = initialPosition;
         this.currentHeading = initialHeading;
 
-        this.motors = new MotorUtility(this.hardwareMap, this.telemetry);
-        this.deadWheels = new DeadWheelUtility(this.hardwareMap, this.telemetry);
-        this.gyros = new GyroUtility(this.hardwareMap, this.telemetry);
+        this.motors = new MotorUtility(this.hardwareMap);
+        this.deadWheels = new DeadWheelUtility(this.hardwareMap);
+        this.gyros = new  GyroUtility(this.hardwareMap);
         this.myAprilTagProcessor = new VisionUtility(this.hardwareMap);
     }
 
@@ -50,12 +50,13 @@ public class Robot {
        ElapsedTime timer = new ElapsedTime();
 
         while (opMode.opModeIsActive()) {
-            updatePosition();
-            updateFromAprilTags();
+            telemetry.addData("X", currentPosition.x);
+            telemetry.addData("Y", currentPosition.y);
+            telemetry.addData("Heading", currentHeading);
 
-            double remainingX = targetPosition.x - currentPosition.x;
-            double remainingY = targetPosition.y - currentPosition.y;
-            double remainingTheta = targetHeading-currentHeading;
+            double remainingX = (targetPosition.x - currentPosition.x) * Constants.DEAD_WHEEL_TICKS_PER_INCH;
+            double remainingY = (targetPosition.y - currentPosition.y) * Constants.DEAD_WHEEL_TICKS_PER_INCH;
+            double remainingTheta = targetHeading - currentHeading;
 
             // Break condition
             if (Math.abs(remainingX) < Constants.MINIMUM_DISTANCE && Math.abs(remainingY) < Constants.MINIMUM_DISTANCE && Math.abs(remainingTheta) < Constants.TURN_TOLERANCE) {
@@ -65,7 +66,7 @@ public class Robot {
             // Calculate power outputs using PID
             double xPower = xPID.calculatePower(currentPosition.x, timer.milliseconds());
             double yPower = yPID.calculatePower(currentPosition.y, timer.milliseconds());
-            double turnPower = turnPID.calculatePower(gyros.getHeading(), timer.milliseconds());
+            double turnPower = turnPID.calculatePower(currentHeading, timer.milliseconds());
             timer.reset();
 
             // Convert x, y, and turn power to motor powers
@@ -73,6 +74,9 @@ public class Robot {
 
             // Apply motor powers
             motors.setMotorPowers(motorPowers[0], motorPowers[1], motorPowers[2], motorPowers[3]);
+
+            updatePosition();
+            updateFromAprilTags();
 
         }
 
@@ -156,7 +160,7 @@ public class Robot {
         if (currentAprilTagPosition != null) {
             currentPosition.x = (1 - aprilTagWeight) * currentPosition.x + aprilTagWeight * currentAprilTagPosition.getPosition().x;
             currentPosition.y = (1 - aprilTagWeight) * currentPosition.y + aprilTagWeight * currentAprilTagPosition.getPosition().y;
-            currentHeading = gyros.normalizeAngle((1 - aprilTagWeight) * currentHeading + aprilTagWeight * currentAprilTagPosition.getOrientation().getYaw());
+            currentHeading = gyros.normalizeHeading((1 - aprilTagWeight) * currentHeading + aprilTagWeight * currentAprilTagPosition.getOrientation().getYaw());
         }
     }
 }
