@@ -37,8 +37,8 @@ public class Robot {
     }
 
     public void moveToPositionAndHeading(Position targetPosition, double targetHeading) {
-        PIDUtility xPID = new PIDUtility(PIDType.STRAIGHT);
-        PIDUtility yPID = new PIDUtility(PIDType.STRAFE);
+        PIDUtility yPID = new PIDUtility(PIDType.STRAIGHT);
+        PIDUtility xPID = new PIDUtility(PIDType.STRAFE);
         PIDUtility turnPID = new PIDUtility(PIDType.TURN);
         telemetry.addLine("Starting move");
         telemetry.update();
@@ -58,7 +58,7 @@ public class Robot {
 
             double remainingX = (targetPosition.x - currentPosition.x) * Constants.DEAD_WHEEL_TICKS_PER_INCH;
             double remainingY = (targetPosition.y - currentPosition.y) * Constants.DEAD_WHEEL_TICKS_PER_INCH;
-            double remainingTheta = targetHeading-currentHeading;
+            double remainingTheta = targetHeading - currentHeading;
 
             // Break condition
             if (Math.abs(remainingX) < Constants.MINIMUM_DISTANCE && Math.abs(remainingY) < Constants.MINIMUM_DISTANCE && Math.abs(remainingTheta) < Constants.TURN_TOLERANCE) {
@@ -69,12 +69,13 @@ public class Robot {
             double time = timer.seconds();
 
             // Calculate power outputs using PID
-            double xPower = xPID.calculatePower(currentPosition.x, time);
-            double yPower = yPID.calculatePower(currentPosition.y, time);
-            double turnPower = turnPID.calculatePower(currentHeading, time);
+            double xPower = xPID.calculatePower(currentPosition.x, timer.seconds());
+            double yPower = yPID.calculatePower(currentPosition.y, timer.seconds());
+            double turnPower = turnPID.calculatePower(currentHeading, timer.seconds());
 
             telemetry.addData("CurrentX", currentPosition.x);
             telemetry.addData("CurrentY", currentPosition.y);
+            telemetry.addData("Current Heading", currentHeading);
             telemetry.addData("xPower", xPower);
             telemetry.addData("yPower", yPower);
             telemetry.addData("turnPower", turnPower);
@@ -127,6 +128,7 @@ public class Robot {
         // Get changes in encoder values
         double deltaLeft = leftEncoder - deadWheels.getPreviousLeft();
         double deltaRight = rightEncoder - deadWheels.getPreviousRight();
+        double deltaCenter = centerEncoder - deadWheels.getPreviousCenter();
         double deltaTheta = Math.toDegrees((deltaRight - deltaLeft)*Constants.DEAD_WHEEL_MM_PER_TICK / Constants.WHEEL_BASE_WIDTH);
         double deltaIMU = imuHeadingInDegrees - gyros.getPreviousHeading();
 
@@ -153,12 +155,12 @@ public class Robot {
         currentHeading = currentHeading + (imuWeight * deltaIMU) + (encoderWeight * deltaTheta);
 
         // Local displacements
-        double deltaXLocal = (deltaLeft + deltaRight) / 2.0;
-        double deltaYLocal = centerEncoder - deadWheels.getPreviousCenter();
+        double deltaYLocal = (deltaLeft + deltaRight) / 2.0;
+        double deltaXLocal = deltaCenter;
 
         // Transform local displacements to global coordinates
-        double deltaXGlobal = deltaYLocal * Math.cos(Math.toRadians(currentHeading)) + deltaXLocal * Math.sin(Math.toRadians(currentHeading));
-        double deltaYGlobal = deltaXLocal * Math.cos(Math.toRadians(currentHeading)) - deltaYLocal * Math.sin(Math.toRadians(currentHeading));
+        double deltaYGlobal = deltaYLocal * Math.cos(Math.toRadians(currentHeading)) + deltaXLocal * Math.sin(Math.toRadians(currentHeading));
+        double deltaXGlobal = deltaXLocal * Math.cos(Math.toRadians(currentHeading)) - deltaYLocal * Math.sin(Math.toRadians(currentHeading));
 
         // Update global position
         currentPosition.x += deltaXGlobal/Constants.DEAD_WHEEL_TICKS_PER_INCH;
