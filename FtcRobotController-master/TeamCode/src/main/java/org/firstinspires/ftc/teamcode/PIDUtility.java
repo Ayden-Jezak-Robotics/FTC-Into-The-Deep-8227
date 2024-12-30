@@ -32,17 +32,17 @@ public class PIDUtility {
             case STRAIGHT:
                 this.kP = 0.00003;
                 this.kI = 0;
-                this.kD = 0.00;
+                this.kD = 0;
                 this.kF = 0.2;
                 break;
             case STRAFE:
                 this.kP = 0.00003;
                 this.kI = 0;
-                this.kD = 0.00;
+                this.kD = 0;
                 this.kF = 0.22;
                 break;
             case TURN:
-                this.kP = 0.003;
+                this.kP = 0.015; //NEW
                 this.kI = 0;
                 this.kD = 0;
                 this.kF = 0.15;
@@ -118,7 +118,7 @@ public class PIDUtility {
         /// THIS IS THE PROBLEM, I THINK :
         if (type == PIDType.STRAIGHT || type == PIDType.STRAFE) {
             if (Math.abs(originalError) < 6600 ) {
-                return 0.30 * Math.signum(originalError);
+                return 0.22 * Math.signum(originalError); //NEW 0.22 instead of 0.3
             }
 
             errorCompleted = (currentPosition - initialPosition) * Constants.DEAD_WHEEL_TICKS_PER_INCH;
@@ -129,8 +129,8 @@ public class PIDUtility {
 
             /// IN OUR TEST CASE, ORIGINALERROR FOR TURNING IS ALWAYS .006 DEGREES, SO
             /// ALWAYS RETURNS POSTIVE 0.30 MOTOR VALUE, EVEN AS ACTUAL ERROR GETS BIGGER
-            if (Math.abs(originalError) < 20) {
-                return 0.30 * Math.signum(originalError);
+            if (Math.abs(originalError) < 3) {
+                return 0.15 * Math.signum(originalError); //NEW <3 instead of 20 and 0.15 instead of 0.3
             }
 
             errorCompleted = (currentPosition - initialPosition);

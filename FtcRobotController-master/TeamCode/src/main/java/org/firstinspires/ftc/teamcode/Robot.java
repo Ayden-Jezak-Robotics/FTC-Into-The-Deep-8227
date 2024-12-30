@@ -157,8 +157,8 @@ public class Robot {
         double deltaYLocal = centerEncoder - deadWheels.getPreviousCenter();
 
         // Transform local displacements to global coordinates
-        double deltaYGlobal = deltaYLocal * Math.cos(Math.toRadians(currentHeading)) + deltaXLocal * Math.sin(Math.toRadians(currentHeading));
-        double deltaXGlobal = deltaXLocal * Math.cos(Math.toRadians(currentHeading)) - deltaYLocal * Math.sin(Math.toRadians(currentHeading));
+        double deltaXGlobal = deltaYLocal * Math.cos(Math.toRadians(currentHeading)) + deltaXLocal * Math.sin(Math.toRadians(currentHeading));
+        double deltaYGlobal = deltaXLocal * Math.cos(Math.toRadians(currentHeading)) - deltaYLocal * Math.sin(Math.toRadians(currentHeading));
 
         // Update global position
         currentPosition.x += deltaXGlobal/Constants.DEAD_WHEEL_TICKS_PER_INCH;
