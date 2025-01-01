@@ -19,7 +19,7 @@ public class RobotTester {
 
     private final MotorUtility motors;
     private final DeadWheelUtility deadWheels;
-    private GyroUtility gyros;
+    private IMUUtility gyros;
     private final VisionUtility myAprilTagProcessor;
 
     public RobotTester(LinearOpMode opMode, HardwareMap hardwareMap, Telemetry telemetry, Position initialPosition, double initialHeading) {
@@ -32,7 +32,7 @@ public class RobotTester {
 
         this.motors = new MotorUtility(this.hardwareMap);
         this.deadWheels = new DeadWheelUtility(this.hardwareMap);
-        this.gyros = new GyroUtility(this.hardwareMap, this.telemetry);
+        this.gyros = new IMUUtility(this.hardwareMap, this.telemetry);
         this.myAprilTagProcessor = new VisionUtility(this.hardwareMap);
     }
 
@@ -44,7 +44,7 @@ public class RobotTester {
         telemetry.update();
 
         deadWheels.resetEncoders();
-        this.gyros = new GyroUtility(this.hardwareMap, this.telemetry);
+        this.gyros = new IMUUtility(this.hardwareMap, this.telemetry);
 
         xPID.setOriginalError(currentPosition.x, targetPosition.x);
         yPID.setOriginalError(currentPosition.y, targetPosition.y);

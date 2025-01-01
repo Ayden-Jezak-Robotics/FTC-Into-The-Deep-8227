@@ -19,7 +19,7 @@ public class Robot {
 
     private final MotorUtility motors;
     private final DeadWheelUtility deadWheels;
-    private GyroUtility gyros;
+    private IMUUtility imu;
     private final VisionUtility myAprilTagProcessor;
 
     public Robot(LinearOpMode opMode, HardwareMap hardwareMap, Telemetry telemetry, Position initialPosition, double initialHeading) {
@@ -32,7 +32,7 @@ public class Robot {
 
         this.motors = new MotorUtility(this.hardwareMap);
         this.deadWheels = new DeadWheelUtility(this.hardwareMap);
-        this.gyros = new GyroUtility(this.hardwareMap, this.telemetry);
+        this.imu = new IMUUtility(this.hardwareMap, this.telemetry);
         this.myAprilTagProcessor = new VisionUtility(this.hardwareMap);
     }
 
@@ -44,7 +44,7 @@ public class Robot {
         telemetry.update();
 
         deadWheels.resetEncoders();
-        this.gyros = new GyroUtility(this.hardwareMap, this.telemetry);
+        this.imu = new IMUUtility(this.hardwareMap, this.telemetry);
 
         xPID.setOriginalError(currentPosition.x, targetPosition.x);
         yPID.setOriginalError(currentPosition.y, targetPosition.y);
@@ -123,20 +123,20 @@ public class Robot {
         double leftEncoder = deadWheels.getPosition(DeadWheel.LEFT); //in ticks
         double rightEncoder = deadWheels.getPosition(DeadWheel.RIGHT);
         double centerEncoder = deadWheels.getPosition(DeadWheel.CENTER);
-        double imuHeadingInDegrees = gyros.getHeading();
+        double imuHeadingInDegrees = imu.getHeading();
 
         // Get changes in encoder values
         double deltaLeft = leftEncoder - deadWheels.getPreviousLeft();
         double deltaRight = rightEncoder - deadWheels.getPreviousRight();
         double deltaCenter = centerEncoder - deadWheels.getPreviousCenter();
         double deltaTheta = Math.toDegrees((deltaRight - deltaLeft)*Constants.DEAD_WHEEL_MM_PER_TICK / Constants.WHEEL_BASE_WIDTH);
-        double deltaIMU = imuHeadingInDegrees - gyros.getPreviousHeading();
+        double deltaIMU = imuHeadingInDegrees - imu.getPreviousHeading();
 
         // Update previous encoder values
         deadWheels.setPreviousLeft(leftEncoder); //in ticks
         deadWheels.setPreviousRight(rightEncoder);
         deadWheels.setPreviousCenter(centerEncoder);
-        gyros.setPreviousHeading(imuHeadingInDegrees);
+        imu.setPreviousHeading(imuHeadingInDegrees);
 
 
         //double encoderHeadingNormalized = gyros.normalizeHeading(currentHeading + deltaTheta);

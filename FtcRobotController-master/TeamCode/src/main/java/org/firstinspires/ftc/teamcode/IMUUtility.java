@@ -6,12 +6,12 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-public class GyroUtility {
+public class IMUUtility {
 
     private BNO055IMU imu;
     private double previousHeading = 0;
 
-    GyroUtility(HardwareMap hardwareMap, Telemetry telemetry) {
+    IMUUtility(HardwareMap hardwareMap, Telemetry telemetry) {
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
