@@ -22,7 +22,7 @@ public class Constants {
 
 //    public static final double TURN_SPEED = 0.2;
 
-    public static final double MAX_INTEGRAL = 1000;
+    public static final double MAX_INTEGRAL = 15000;
 
     public static final long MAX_AGE_NANOSECONDS = 250000000;
 

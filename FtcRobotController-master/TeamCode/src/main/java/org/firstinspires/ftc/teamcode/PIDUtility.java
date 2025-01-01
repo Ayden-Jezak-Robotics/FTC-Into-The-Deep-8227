@@ -12,7 +12,7 @@ public class PIDUtility {
     private double targetPosition; // in inches
     private double originalError; //in ticks
 
-    private double aMaxPoint; // in ticks
+    //private double aMaxPoint; // in ticks
     private double integralSum;
     private double priorError;
     // Adjust based on your system's needs
@@ -33,23 +33,25 @@ public class PIDUtility {
         this.type = type;
         this.telemetry = telemetry;
 
+        /// DID SOME EXCEL CALCULATIONS AND SUGGEST WE TRY THE COMMENTED VALUES
+
         switch (type) {
             case STRAIGHT:
-                this.kP = 0.00003;
-                this.kI = 0;
-                this.kD = 0;
+                this.kP = 0.00003; // 0.0003
+                this.kI = 0.00003; // 0.000015
+                this.kD = 0.000001; // 0.000002
                 this.kF = 0; //0.2
                 break;
             case STRAFE:
                 this.kP = 0.00003;
                 this.kI = 0;
-                this.kD = 0;
+                this.kD = 0.000001;
                 this.kF = 0; //0.22
                 break;
             case TURN:
                 this.kP = -0.015; //NEW
                 this.kI = 0;
-                this.kD = 0;
+                this.kD = 0.01;
                 this.kF = 0; //0.15
                 break;
             default:
@@ -65,15 +67,15 @@ public class PIDUtility {
 
         this.originalError = (targetPosition - initialPosition);
 
-        if (originalError == 0) {
-            originalError = .006;
-        }
+//        if (originalError == 0) {
+//            originalError = .006;
+//        }
 
         if (type == PIDType.STRAIGHT || type == PIDType.STRAFE) {
             this.originalError = this.originalError * Constants.DEAD_WHEEL_TICKS_PER_INCH;
         }
 
-        this.aMaxPoint = originalError / 3;
+        //this.aMaxPoint = originalError / 3;
     }
 
     public double calculatePower(double currentPosition, double time) // time is in Seconds
@@ -120,23 +122,12 @@ public class PIDUtility {
         double baseOutput = kProportionalValue + kIntegralValue + kDerivativeValue;
         double errorCompleted;
 
-        /// THIS IS THE PROBLEM, I THINK :
         if (type == PIDType.STRAIGHT || type == PIDType.STRAFE) {
-            /*if (Math.abs(originalError) < 6600 ) {
-                return 0.22 * Math.signum(originalError); //NEW 0.22 instead of 0.3
-            }*/
 
             errorCompleted = (currentPosition - initialPosition) * Constants.DEAD_WHEEL_TICKS_PER_INCH;
 
-
         }
         else {
-
-            /// IN OUR TEST CASE, ORIGINALERROR FOR TURNING IS ALWAYS .006 DEGREES, SO
-            /// ALWAYS RETURNS POSTIVE 0.30 MOTOR VALUE, EVEN AS ACTUAL ERROR GETS BIGGER
-            /*if (Math.abs(originalError) < 3) {
-                return 0.15 * Math.signum(originalError); //NEW <3 instead of 20 and 0.15 instead of 0.3
-            }*/
 
             errorCompleted = (currentPosition - initialPosition);
 
