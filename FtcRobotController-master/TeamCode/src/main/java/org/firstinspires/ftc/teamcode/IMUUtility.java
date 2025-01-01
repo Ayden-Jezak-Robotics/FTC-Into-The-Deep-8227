@@ -5,6 +5,7 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
 
 public class IMUUtility {
 
@@ -24,6 +25,10 @@ public class IMUUtility {
 
     double getHeading() {
         return imu.getAngularOrientation().firstAngle;
+    }
+
+    Position getIMUPosition() {
+        return  imu.getPosition();
     }
 
     public double getPreviousHeading()

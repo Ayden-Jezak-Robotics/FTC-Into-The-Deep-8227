@@ -18,6 +18,8 @@ public class Constants {
     public static final double MINIMUM_DISTANCE = 50;
     public static final double TURN_TOLERANCE = 1;
 
+    public static final double CONVERT_METERS_TO_INCHES = 39.3701;
+
     public static final double APRIL_TAG_WEIGHT = 0.8;
 
 //    public static final double TURN_SPEED = 0.2;

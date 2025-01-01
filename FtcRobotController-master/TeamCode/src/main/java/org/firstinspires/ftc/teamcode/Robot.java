@@ -73,13 +73,16 @@ public class Robot {
             double yPower = yPID.calculatePower(currentPosition.y, timer.seconds());
             double turnPower = turnPID.calculatePower(currentHeading, timer.seconds());
 
+            Position IMUPosition = imu.getIMUPosition();
+
             telemetry.addData("CurrentX", currentPosition.x);
+            telemetry.addData("IMU X", IMUPosition.x * Constants.CONVERT_METERS_TO_INCHES);
             telemetry.addData("CurrentY", currentPosition.y);
+            telemetry.addData("IMU Y", IMUPosition.y * Constants.CONVERT_METERS_TO_INCHES);
             telemetry.addData("Current Heading", currentHeading);
             telemetry.addData("xPower", xPower);
             telemetry.addData("yPower", yPower);
             telemetry.addData("turnPower", turnPower);
-            telemetry.addData("Time", time);
             telemetry.update();
             timer.reset();
 
@@ -143,7 +146,7 @@ public class Robot {
 
         // Compare IMU and encoder headings to adjust weights
         double headingDifference = Math.abs(deltaIMU - deltaTheta);
-        if (headingDifference > 10) { // Threshold for significant discrepancy
+        if (headingDifference > 5) { // Threshold for significant discrepancy
             imuWeight = 0.3; // Reduce trust in IMU
             encoderWeight = 0.7; // Increase trust in encoders
         } else {
