@@ -37,14 +37,14 @@ public class PIDUtility {
 
         switch (type) {
             case STRAIGHT:
-                this.kP = 0.000085;
-                this.kI = 0.0000267;
+                this.kP = 0.000086;
+                this.kI = 0.0000568;
                 this.kD = 0.000002;
                 this.kF = 0; //0.2
                 break;
             case STRAFE:
-                this.kP = 0.000085;
-                this.kI = 0.0000267;
+                this.kP = 0.000086;
+                this.kI = 0.0000568;
                 this.kD = 0.000002;
                 this.kF = 0; //0.22
                 break;
