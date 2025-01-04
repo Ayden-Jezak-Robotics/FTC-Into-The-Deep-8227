@@ -37,22 +37,22 @@ public class PIDUtility {
 
         switch (type) {
             case STRAIGHT:
-                this.kP = 0.00003; // 0.0003
-                this.kI = 0.00003; // 0.000015
-                this.kD = 0.000001; // 0.000002
+                this.kP = 0.000085;
+                this.kI = 0.0000267;
+                this.kD = 0.000002;
                 this.kF = 0; //0.2
                 break;
             case STRAFE:
-                this.kP = 0.00003;
-                this.kI = 0;
-                this.kD = 0.000001;
+                this.kP = 0.000085;
+                this.kI = 0.0000267;
+                this.kD = 0.000002;
                 this.kF = 0; //0.22
                 break;
             case TURN:
-                this.kP = -0.015; //NEW
-                this.kI = 0;
-                this.kD = 0.01;
-                this.kF = 0; //0.15
+                this.kP = 0.025;
+                this.kI = 0.02;
+                this.kD = 0.0004;
+                this.kF = 0;
                 break;
             default:
         }
@@ -88,7 +88,7 @@ public class PIDUtility {
             if (Math.abs(error) < Constants.MINIMUM_DISTANCE) {
                 return 0;
             }
-        } 
+        }
         else { // For Turn based calculations
             error = targetPosition - currentPosition;
 
@@ -107,11 +107,18 @@ public class PIDUtility {
             deltaTime = time;
         }
 
-        integralSum += (error * deltaTime);
+        double kProportionalValue = Range.clip(kP * error, -Constants.MAX_KP, Constants.MAX_KP);
 
-        double kProportionalValue = kP * error;
+        //Decay the Integral Sum over time
+        integralSum = (integralSum * 0.98) + (error * deltaTime);
 
-        double kIntegralValue = kI * Range.clip(integralSum, -Constants.MAX_INTEGRAL, Constants.MAX_INTEGRAL);
+        double kIntegralValue;
+
+        if (type == PIDType.STRAIGHT || type == PIDType.STRAFE) {
+            kIntegralValue = kI * Range.clip(integralSum, -Constants.MAX_INTEGRAL_XY, Constants.MAX_INTEGRAL_XY);
+        } else {
+            kIntegralValue = kI * Range.clip(integralSum, -Constants.MAX_INTEGRAL_TURN, Constants.MAX_INTEGRAL_TURN);
+        }
 
         double kDerivativeValue = kD * ((error - priorError) / deltaTime);
 
@@ -120,17 +127,18 @@ public class PIDUtility {
         priorError = error;
 
         double baseOutput = kProportionalValue + kIntegralValue + kDerivativeValue;
-        double errorCompleted;
 
         if (type == PIDType.STRAIGHT || type == PIDType.STRAFE) {
-
-            errorCompleted = (currentPosition - initialPosition) * Constants.DEAD_WHEEL_TICKS_PER_INCH;
-
+            if (Math.abs(baseOutput) < Constants.MINIMUM_POWER_OUTPUT_DRIVE) {
+                // Enforce minimum power while maintaining the sign
+                baseOutput = Math.signum(baseOutput) * Constants.MINIMUM_POWER_OUTPUT_DRIVE;
+            }
         }
         else {
-
-            errorCompleted = (currentPosition - initialPosition);
-
+            if (Math.abs(baseOutput) < Constants.MINIMUM_POWER_OUTPUT_TURN) {
+                // Enforce minimum power while maintaining the sign
+                baseOutput = Math.signum(baseOutput) * Constants.MINIMUM_POWER_OUTPUT_TURN;
+            }
         }
 
         return baseOutput;

@@ -24,7 +24,13 @@ public class Constants {
 
 //    public static final double TURN_SPEED = 0.2;
 
-    public static final double MAX_INTEGRAL = 15000;
+    public static final double MAX_KP = 0.80;
+
+    public static final double MINIMUM_POWER_OUTPUT_DRIVE = 0.20;
+    public static final double MINIMUM_POWER_OUTPUT_TURN = 0.20;
+
+    public static final double MAX_INTEGRAL_XY = 7500;
+    public static final double MAX_INTEGRAL_TURN = 10;
 
     public static final long MAX_AGE_NANOSECONDS = 250000000;
 
