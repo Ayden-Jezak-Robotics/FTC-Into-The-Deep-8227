@@ -49,9 +49,9 @@ public class PIDUtility {
                 this.kF = 0; //0.22
                 break;
             case TURN:
-                this.kP = 0.025;
-                this.kI = 0.02;
-                this.kD = 0.0004;
+                this.kP = 0.015;
+                this.kI = 0.015;
+                this.kD = 0.00025;
                 this.kF = 0;
                 break;
             default:
@@ -67,15 +67,9 @@ public class PIDUtility {
 
         this.originalError = (targetPosition - initialPosition);
 
-//        if (originalError == 0) {
-//            originalError = .006;
-//        }
-
         if (type == PIDType.STRAIGHT || type == PIDType.STRAFE) {
             this.originalError = this.originalError * Constants.DEAD_WHEEL_TICKS_PER_INCH;
         }
-
-        //this.aMaxPoint = originalError / 3;
     }
 
     public double calculatePower(double currentPosition, double time) // time is in Seconds
@@ -92,8 +86,6 @@ public class PIDUtility {
         else { // For Turn based calculations
             error = targetPosition - currentPosition;
 
-            // Normalize error to the range [-180, 180]
-
             if (Math.abs(error) < Constants.TURN_TOLERANCE) {
                 return 0;
             }
@@ -109,7 +101,7 @@ public class PIDUtility {
 
         double kProportionalValue = Range.clip(kP * error, -Constants.MAX_KP, Constants.MAX_KP);
 
-        //Decay the Integral Sum over time
+        // Decay the Integral Sum over time
         integralSum = (integralSum * 0.98) + (error * deltaTime);
 
         double kIntegralValue;
