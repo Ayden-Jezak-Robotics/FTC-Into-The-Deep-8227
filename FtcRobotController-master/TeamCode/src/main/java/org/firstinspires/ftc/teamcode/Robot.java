@@ -46,6 +46,7 @@ public class Robot {
         deadWheels.resetEncoders();
         this.imu = new IMUUtility(this.hardwareMap, this.telemetry);
 
+        //NEW Don't need this
         xPID.setOriginalError(currentPosition.x, targetPosition.x);
         yPID.setOriginalError(currentPosition.y, targetPosition.y);
         turnPID.setOriginalError(currentHeading, targetHeading);
@@ -71,12 +72,8 @@ public class Robot {
             double yPower = yPID.calculatePower(currentPosition.y, timer.seconds());
             double turnPower = turnPID.calculatePower(currentHeading, timer.seconds());
 
-            Position IMUPosition = imu.getIMUPosition();
-
             telemetry.addData("CurrentX", currentPosition.x);
-            telemetry.addData("IMU X", IMUPosition.x * Constants.CONVERT_METERS_TO_INCHES);
             telemetry.addData("CurrentY", currentPosition.y);
-            telemetry.addData("IMU Y", IMUPosition.y * Constants.CONVERT_METERS_TO_INCHES);
             telemetry.addData("Current Heading", currentHeading);
             telemetry.addData("xPower", xPower);
             telemetry.addData("yPower", yPower);
@@ -154,13 +151,19 @@ public class Robot {
         }
 
         // Blend IMU and encoder headings
-        currentHeading = currentHeading + (imuWeight * deltaIMU) + (encoderWeight * deltaTheta);
+        //NEW telemetry and normalizing currentHeading
+        currentHeading = imu.normalizeHeading(currentHeading + (imuWeight * deltaIMU) + (encoderWeight * deltaTheta));
+        telemetry.addData("deltaTheta", deltaTheta);
+        telemetry.addData("yPower", deltaIMU);
+        telemetry.addData("currentHeading", currentHeading);
+        telemetry.update();
 
         // Local displacements
         double deltaYLocal = (deltaLeft + deltaRight) / 2.0;
         double deltaXLocal = deltaCenter;
 
         // Transform local displacements to global coordinates
+        // NEW If heading is not calculated properly, the position will be inaccurate
         double deltaYGlobal = deltaYLocal * Math.cos(Math.toRadians(currentHeading)) + deltaXLocal * Math.sin(Math.toRadians(currentHeading));
         double deltaXGlobal = deltaXLocal * Math.cos(Math.toRadians(currentHeading)) - deltaYLocal * Math.sin(Math.toRadians(currentHeading));
 

@@ -61,6 +61,7 @@ public class PIDUtility {
         this.priorError = 0;
     }
 
+    //NEW Don't need this. I only needed it for the !isStraightTargetReached method which we don't use anymore
     public void setOriginalError(double initialPosition, double targetPosition) {
         this.initialPosition = initialPosition;
         this.targetPosition = targetPosition;
@@ -71,6 +72,13 @@ public class PIDUtility {
             this.originalError = this.originalError * Constants.DEAD_WHEEL_TICKS_PER_INCH;
         }
     }
+
+    private double normalizeAngle(double angle) {
+        while (angle >= 180) angle -= 360;
+        while (angle < -180) angle += 360;
+        return angle;
+    }
+    
 
     public double calculatePower(double currentPosition, double time) // time is in Seconds
     {
@@ -84,7 +92,8 @@ public class PIDUtility {
             }
         }
         else { // For Turn based calculations
-            error = targetPosition - currentPosition;
+            //NEW need to normalize hypothetically what is target = -45 and you are at 180?
+            error = normalizeAngle(targetPosition - currentPosition);
 
             if (Math.abs(error) < Constants.TURN_TOLERANCE) {
                 return 0;
@@ -121,7 +130,7 @@ public class PIDUtility {
         double baseOutput = kProportionalValue + kIntegralValue + kDerivativeValue;
 
         if (type == PIDType.STRAIGHT || type == PIDType.STRAFE) {
-            if (Math.abs(baseOutput) < Constants.MINIMUM_POWER_OUTPUT_DRIVE) {
+            if (Math.abs(baseOutput) < Constants.MINIMUM_POWER_OUTPUT_DRIVE){
                 // Enforce minimum power while maintaining the sign
                 baseOutput = Math.signum(baseOutput) * Constants.MINIMUM_POWER_OUTPUT_DRIVE;
             }
