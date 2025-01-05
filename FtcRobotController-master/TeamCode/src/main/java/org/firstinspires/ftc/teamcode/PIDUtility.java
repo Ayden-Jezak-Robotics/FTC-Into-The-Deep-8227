@@ -129,6 +129,15 @@ public class PIDUtility {
 
         double baseOutput = kProportionalValue + kIntegralValue + kDerivativeValue;
 
+        telemetry.addData("error", error);
+        telemetry.addData("priorError", priorError);
+        telemetry.addData("deltaTime", deltaTime);
+        telemetry.addData("integralSum", integralSum);
+        telemetry.addData("kIntegralValue", kIntegralValue);
+        telemetry.addData("kDerivativeValue", kDerivativeValue);
+        telemetry.addData("kProportionalValue", kProportionalValue);
+        telemetry.update();
+
         if (type == PIDType.STRAIGHT || type == PIDType.STRAFE) {
             if (Math.abs(baseOutput) < Constants.MINIMUM_POWER_OUTPUT_DRIVE){
                 // Enforce minimum power while maintaining the sign
