@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 
@@ -122,7 +123,7 @@ public class Robot {
         double leftEncoder = deadWheels.getPosition(DeadWheel.LEFT); //in ticks
         double rightEncoder = deadWheels.getPosition(DeadWheel.RIGHT);
         double centerEncoder = deadWheels.getPosition(DeadWheel.CENTER);
-        double imuHeadingInDegrees = imu.getHeading();
+        double imuHeadingInDegrees = imu.getHeading().firstAngle;
 
         // Get changes in encoder values
         double deltaLeft = leftEncoder - deadWheels.getPreviousLeft();
@@ -153,10 +154,10 @@ public class Robot {
         // Blend IMU and encoder headings
         //NEW telemetry and normalizing currentHeading
         currentHeading = imu.normalizeHeading(currentHeading + (imuWeight * deltaIMU) + (encoderWeight * deltaTheta));
-        telemetry.addData("deltaTheta", deltaTheta);
-        telemetry.addData("yPower", deltaIMU);
-        telemetry.addData("currentHeading", currentHeading);
-        telemetry.update();
+//        telemetry.addData("deltaTheta", deltaTheta);
+//        telemetry.addData("yPower", deltaIMU);
+//        telemetry.addData("currentHeading", currentHeading);
+//        telemetry.update();
 
         // Local displacements
         double deltaYLocal = (deltaLeft + deltaRight) / 2.0;
@@ -192,9 +193,6 @@ public class Robot {
     }
 
     public void checkSensorReadings() {
-        PIDUtility yPID = new PIDUtility(PIDType.STRAIGHT);
-        PIDUtility xPID = new PIDUtility(PIDType.STRAFE);
-        PIDUtility turnPID = new PIDUtility(PIDType.TURN);
 
         deadWheels.resetEncoders();
         this.imu = new IMUUtility(this.hardwareMap, this.telemetry);
@@ -204,24 +202,23 @@ public class Robot {
             double leftEncoder = deadWheels.getPosition(DeadWheel.LEFT); //in ticks
             double rightEncoder = deadWheels.getPosition(DeadWheel.RIGHT);
             double centerEncoder = deadWheels.getPosition(DeadWheel.CENTER);
-            double imuHeadingInDegrees = imu.getHeading();
+            Orientation imuHeadingInDegrees = imu.getHeading();
 
             // Get changes in encoder values
             double deltaLeft = leftEncoder - deadWheels.getPreviousLeft();
             double deltaRight = rightEncoder - deadWheels.getPreviousRight();
-            double deltaCenter = centerEncoder - deadWheels.getPreviousCenter();
-            double deltaTheta = Math.toDegrees((deltaRight - deltaLeft)*Constants.DEAD_WHEEL_MM_PER_TICK / Constants.WHEEL_BASE_WIDTH);
+            // double deltaCenter = centerEncoder - deadWheels.getPreviousCenter();
+            // double deltaTheta = Math.toDegrees((deltaRight - deltaLeft)*Constants.DEAD_WHEEL_MM_PER_TICK / Constants.WHEEL_BASE_WIDTH);
 
             double rawTheta = Math.toDegrees((rightEncoder - leftEncoder)*Constants.DEAD_WHEEL_MM_PER_TICK / Constants.WHEEL_BASE_WIDTH);
 
             final Pose3D currentAprilTagPosition = myAprilTagProcessor.getPose();
 
-
             // Update previous encoder values
             deadWheels.setPreviousLeft(leftEncoder); //in ticks
             deadWheels.setPreviousRight(rightEncoder);
             deadWheels.setPreviousCenter(centerEncoder);
-            imu.setPreviousHeading(imuHeadingInDegrees);
+            imu.setPreviousHeading(imuHeadingInDegrees.firstAngle);
 
             // Print Out Various Values
 
@@ -233,7 +230,9 @@ public class Robot {
 
             telemetry.addData("Current Heading", currentHeading);
             telemetry.addData("Encoder Raw", rawTheta);
-            telemetry.addData("IMU Raw", imuHeadingInDegrees);
+            telemetry.addData("IMU Raw 1st", imuHeadingInDegrees.firstAngle);
+            telemetry.addData("IMU Raw 2nd", imuHeadingInDegrees.secondAngle);
+            telemetry.addData("IMU Raw 3rd", imuHeadingInDegrees.thirdAngle);
 
             telemetry.update();
 
