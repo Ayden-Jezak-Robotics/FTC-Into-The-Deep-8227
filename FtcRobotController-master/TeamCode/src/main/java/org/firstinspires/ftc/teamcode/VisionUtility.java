@@ -33,7 +33,11 @@ public class VisionUtility {
         this.myAprilTagProcessor = new AprilTagProcessor.Builder()
                .setCameraPose(cameraPosition, cameraOrientation)
                .setDrawAxes(true)
+               //Need to calibrate and find
+               /*.setCameraIntrinsicMatrix(fx, fy, cx, cy) // Intrinsic matrix for camera calibration
+               .setLensDistortionCoefficients(k1, k2, p1, p2, k3) // Distortion coefficients*/
                .build();
+
         this.myVisionPortal = new VisionPortal.Builder()
                .setShowStatsOverlay(true)
                .setCamera(myHardwareMap.get(WebcamName.class, "Webcam 1"))
@@ -54,6 +58,16 @@ public class VisionUtility {
             return null;
         }
 
+        //NEW for-each loop is only used for iterating, and runs into an error if we try to modify the list
+        Iterator<AprilTagDetection> iterator = myAprilTagDetections.iterator();
+        while (iterator.hasNext()) {
+            AprilTagDetection detection = iterator.next();
+            if (detection.metadata == null || detection.robotPose == null ||
+                currentTime - detection.frameAcquisitionNanoTime >= Constants.MAX_AGE_NANOSECONDS) {
+                iterator.remove(); // Remove invalid detections
+            }
+        }
+        /*
         for (AprilTagDetection detection : myAprilTagDetections) {
             if (detection.metadata != null && detection.robotPose != null) {
 
@@ -66,12 +80,9 @@ public class VisionUtility {
             else {
                 myAprilTagDetections.remove(detection);
             }
-        }
-        if (myAprilTagDetections.isEmpty()) {
-            return null;
-        } else {
-            return myAprilTagDetections;
-        }
+        }*/
+
+        return myAprilTagDetections;
     }
 
     public Pose3D getPose() {
@@ -81,7 +92,7 @@ public class VisionUtility {
 
         if (myAprilTagDetections != null) {
             for (AprilTagDetection detection : myAprilTagDetections) {
-                if (detection != null)
+                if (detection != null && detection.robotPose != null) //NEW sometimes detections are valid and robotPoses if the tag is barely detected at a far distance
                 {
                     robotPosition = detection.robotPose;
                     break; // Assuming you want the position from the first valid detection

@@ -183,6 +183,12 @@ public class Robot {
             currentPosition.y = (1 - aprilTagWeight) * currentPosition.y + aprilTagWeight * currentAprilTagPosition.getPosition().y;
             //currentHeading = (1 - aprilTagWeight) * currentHeading + aprilTagWeight * currentAprilTagPosition.getOrientation().getYaw();
         }
+
+        telemetry.addData("currentPosition.x", currentPosition.x);
+        telemetry.addData("currentAprilPos.x", currentAprilTagPosition.getPosition().x);
+        telemetry.addData("currentPosition.y", currentPosition.y);
+        telemetry.addData("currentAprilPos.y", currentAprilTagPosition.getPosition().y);
+        telemetry.update();
     }
 
     public void checkSensorReadings() {
