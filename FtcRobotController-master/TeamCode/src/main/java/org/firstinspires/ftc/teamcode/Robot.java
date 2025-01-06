@@ -48,9 +48,9 @@ public class Robot {
         this.imu = new IMUUtility(this.hardwareMap, this.telemetry);
 
         //NEW Don't need this
-        xPID.setOriginalError(currentPosition.x, targetPosition.x);
-        yPID.setOriginalError(currentPosition.y, targetPosition.y);
-        turnPID.setOriginalError(currentHeading, targetHeading);
+//        xPID.setOriginalError(currentPosition.x, targetPosition.x);
+//        yPID.setOriginalError(currentPosition.y, targetPosition.y);
+//        turnPID.setOriginalError(currentHeading, targetHeading);
 
        ElapsedTime timer = new ElapsedTime();
 
@@ -129,7 +129,7 @@ public class Robot {
         double deltaLeft = leftEncoder - deadWheels.getPreviousLeft();
         double deltaRight = rightEncoder - deadWheels.getPreviousRight();
         double deltaCenter = centerEncoder - deadWheels.getPreviousCenter();
-        double deltaTheta = Math.toDegrees((deltaRight - deltaLeft)*Constants.DEAD_WHEEL_MM_PER_TICK / Constants.WHEEL_BASE_WIDTH);
+        double deltaTheta = Math.toDegrees((deltaRight - deltaLeft) * Constants.DEAD_WHEEL_MM_PER_TICK / Constants.WHEEL_BASE_WIDTH);
         double deltaIMU = imuHeadingInDegrees - imu.getPreviousHeading();
 
         // Update previous encoder values
@@ -144,16 +144,16 @@ public class Robot {
         // Compare IMU and encoder headings to adjust weights
         double headingDifference = Math.abs(deltaIMU - deltaTheta);
         if (headingDifference > 5) { // Threshold for significant discrepancy
-            imuWeight = 0.3; // Reduce trust in IMU
-            encoderWeight = 0.7; // Increase trust in encoders
+            imuWeight = 0.7; // Reduce trust in IMU
+            encoderWeight = 0.3; // Increase trust in encoders
         } else {
-            imuWeight = 0.5; // Restore balanced trust
-            encoderWeight = 0.5;
+            imuWeight = 0.2; // Restore balanced trust
+            encoderWeight = 0.8;
         }
 
         // Blend IMU and encoder headings
         //NEW telemetry and normalizing currentHeading
-        currentHeading = imu.normalizeHeading(currentHeading + (imuWeight * deltaIMU) + (encoderWeight * deltaTheta));
+        currentHeading = currentHeading + (deltaTheta);
 //        telemetry.addData("deltaTheta", deltaTheta);
 //        telemetry.addData("yPower", deltaIMU);
 //        telemetry.addData("currentHeading", currentHeading);
@@ -197,44 +197,53 @@ public class Robot {
         deadWheels.resetEncoders();
         this.imu = new IMUUtility(this.hardwareMap, this.telemetry);
 
+        double totalDeltaTheta = 0;
+
         while (opMode.opModeIsActive()) {
 
             double leftEncoder = deadWheels.getPosition(DeadWheel.LEFT); //in ticks
             double rightEncoder = deadWheels.getPosition(DeadWheel.RIGHT);
             double centerEncoder = deadWheels.getPosition(DeadWheel.CENTER);
-            Orientation imuHeadingInDegrees = imu.getHeading();
+            double imuHeadingInDegrees = imu.getHeading().firstAngle;
 
             // Get changes in encoder values
             double deltaLeft = leftEncoder - deadWheels.getPreviousLeft();
             double deltaRight = rightEncoder - deadWheels.getPreviousRight();
-            // double deltaCenter = centerEncoder - deadWheels.getPreviousCenter();
-            // double deltaTheta = Math.toDegrees((deltaRight - deltaLeft)*Constants.DEAD_WHEEL_MM_PER_TICK / Constants.WHEEL_BASE_WIDTH);
-
-            double rawTheta = Math.toDegrees((rightEncoder - leftEncoder)*Constants.DEAD_WHEEL_MM_PER_TICK / Constants.WHEEL_BASE_WIDTH);
-
-            final Pose3D currentAprilTagPosition = myAprilTagProcessor.getPose();
+            double deltaCenter = centerEncoder - deadWheels.getPreviousCenter();
+            double deltaTheta = Math.toDegrees((deltaRight - deltaLeft)*Constants.DEAD_WHEEL_MM_PER_TICK / Constants.WHEEL_BASE_WIDTH);
+            double deltaIMU = imuHeadingInDegrees - imu.getPreviousHeading();
 
             // Update previous encoder values
             deadWheels.setPreviousLeft(leftEncoder); //in ticks
             deadWheels.setPreviousRight(rightEncoder);
             deadWheels.setPreviousCenter(centerEncoder);
-            imu.setPreviousHeading(imuHeadingInDegrees.firstAngle);
+            imu.setPreviousHeading(imuHeadingInDegrees);
+
+            double rawTheta = Math.toDegrees((rightEncoder - leftEncoder)*Constants.DEAD_WHEEL_MM_PER_TICK / Constants.WHEEL_BASE_WIDTH);
+
+            final Pose3D currentAprilTagPosition = myAprilTagProcessor.getPose();
+
 
             // Print Out Various Values
 
             telemetry.addData("Current X", currentPosition.x);
-            telemetry.addData("April X", currentAprilTagPosition.getPosition().x);
+            //telemetry.addData("April X", currentAprilTagPosition.getPosition().x);
+            //problem
 
             telemetry.addData("Current Y", currentPosition.y);
-            telemetry.addData("April Y", currentAprilTagPosition.getPosition().y);
+            //telemetry.addData("April Y", currentAprilTagPosition.getPosition().y);
 
             telemetry.addData("Current Heading", currentHeading);
             telemetry.addData("Encoder Raw", rawTheta);
-            telemetry.addData("IMU Raw 1st", imuHeadingInDegrees.firstAngle);
-            telemetry.addData("IMU Raw 2nd", imuHeadingInDegrees.secondAngle);
-            telemetry.addData("IMU Raw 3rd", imuHeadingInDegrees.thirdAngle);
+            telemetry.addData("Total Delta", totalDeltaTheta);
+            telemetry.addData("IMU Raw 1st", imuHeadingInDegrees);
+
+            telemetry.addData("deltaTheta", deltaTheta);
+            telemetry.addData("deltaIMU", deltaIMU);
 
             telemetry.update();
+
+            totalDeltaTheta = totalDeltaTheta + deltaTheta;
 
             updatePosition();
         }

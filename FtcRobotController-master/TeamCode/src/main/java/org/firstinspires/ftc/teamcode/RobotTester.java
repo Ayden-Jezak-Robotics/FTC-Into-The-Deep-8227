@@ -123,7 +123,7 @@ public class RobotTester {
         double leftEncoder = deadWheels.getPosition(DeadWheel.LEFT); //in ticks
         double rightEncoder = deadWheels.getPosition(DeadWheel.RIGHT);
         double centerEncoder = deadWheels.getPosition(DeadWheel.CENTER);
-        double imuHeadingInDegrees = gyros.getHeading();
+        double imuHeadingInDegrees = gyros.getHeading().firstAngle;
 
         // Get changes in encoder values
         double deltaLeft = leftEncoder - deadWheels.getPreviousLeft();
