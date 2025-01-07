@@ -4,18 +4,19 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-
 public class DeadWheelUtility {
     private final HardwareMap hardwareMap;
     private final DcMotor rightDeadWheel, leftDeadWheel, centerDeadWheel;
-    private double previousLeft = 0, previousRight = 0, previousCenter = 0;
+    private double previousLeft, previousRight, previousCenter;
 
     DeadWheelUtility(HardwareMap hardwareMap) {
         this.hardwareMap = hardwareMap;
         this.leftDeadWheel = initializeDeadWheel("leftDeadWheel", DcMotorSimple.Direction.REVERSE);
         this.rightDeadWheel = initializeDeadWheel("rightDeadWheel", DcMotorSimple.Direction.FORWARD);
         this.centerDeadWheel = initializeDeadWheel("centerDeadWheel", DcMotorSimple.Direction.REVERSE);
+        previousLeft = 0;
+        previousRight = 0;
+        previousCenter = 0;
     }
 
     DcMotor initializeDeadWheel(String name, DcMotorSimple.Direction direction) {

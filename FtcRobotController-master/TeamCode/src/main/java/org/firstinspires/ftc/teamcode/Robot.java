@@ -5,15 +5,14 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 
 public class Robot {
 
     private final LinearOpMode opMode;
-    private HardwareMap hardwareMap;
-    private Telemetry telemetry;
+    private final HardwareMap hardwareMap;
+    private final Telemetry telemetry;
 
     private final Position currentPosition;
     private double currentHeading;
@@ -117,13 +116,10 @@ public class Robot {
 
     public void updatePosition() {
 
-        double imuWeight = 0.5; // Initial weight for IMU
-        double encoderWeight = 0.5; // Initial weight for encoder
-
         double leftEncoder = deadWheels.getPosition(DeadWheel.LEFT); //in ticks
         double rightEncoder = deadWheels.getPosition(DeadWheel.RIGHT);
         double centerEncoder = deadWheels.getPosition(DeadWheel.CENTER);
-        double imuHeadingInDegrees = imu.getHeading().firstAngle;
+        double imuHeadingInDegrees = imu.getOrientation().firstAngle;
 
         // Get changes in encoder values
         double deltaLeft = leftEncoder - deadWheels.getPreviousLeft();
@@ -141,18 +137,7 @@ public class Robot {
 
         //double encoderHeadingNormalized = gyros.normalizeHeading(currentHeading + deltaTheta);
 
-        // Compare IMU and encoder headings to adjust weights
-        double headingDifference = Math.abs(deltaIMU - deltaTheta);
-        if (headingDifference > 5) { // Threshold for significant discrepancy
-            imuWeight = 0.7; // Reduce trust in IMU
-            encoderWeight = 0.3; // Increase trust in encoders
-        } else {
-            imuWeight = 0.2; // Restore balanced trust
-            encoderWeight = 0.8;
-        }
-
-        // Blend IMU and encoder headings
-        //NEW telemetry and normalizing currentHeading
+         //NEW telemetry and normalizing currentHeading
         currentHeading = currentHeading + (deltaTheta);
 //        telemetry.addData("deltaTheta", deltaTheta);
 //        telemetry.addData("yPower", deltaIMU);
@@ -173,7 +158,7 @@ public class Robot {
         currentPosition.y += deltaYGlobal/Constants.DEAD_WHEEL_TICKS_PER_INCH;
     }
 
-    public void updateFromAprilTags() {
+    /* public void updateFromAprilTags() {
 
         final double aprilTagWeight = Constants.APRIL_TAG_WEIGHT;
 
@@ -190,7 +175,7 @@ public class Robot {
         telemetry.addData("currentPosition.y", currentPosition.y);
         telemetry.addData("currentAprilPos.y", currentAprilTagPosition.getPosition().y);
         telemetry.update();
-    }
+    }*/
 
     public void checkSensorReadings() {
 
@@ -204,7 +189,7 @@ public class Robot {
             double leftEncoder = deadWheels.getPosition(DeadWheel.LEFT); //in ticks
             double rightEncoder = deadWheels.getPosition(DeadWheel.RIGHT);
             double centerEncoder = deadWheels.getPosition(DeadWheel.CENTER);
-            double imuHeadingInDegrees = imu.getHeading().firstAngle;
+            double imuHeadingInDegrees = imu.getOrientation().firstAngle;
 
             // Get changes in encoder values
             double deltaLeft = leftEncoder - deadWheels.getPreviousLeft();
@@ -227,23 +212,19 @@ public class Robot {
             // Print Out Various Values
 
             telemetry.addData("Current X", currentPosition.x);
-            //telemetry.addData("April X", currentAprilTagPosition.getPosition().x);
-            //problem
+            //telemetry.addData("April X", (currentAprilTagPosition != null) ? currentAprilTagPosition.getPosition().x : "none");
 
             telemetry.addData("Current Y", currentPosition.y);
-            //telemetry.addData("April Y", currentAprilTagPosition.getPosition().y);
+            //telemetry.addData("April Y", (currentAprilTagPosition != null) ? currentAprilTagPosition.getPosition().y : "none");
 
             telemetry.addData("Current Heading", currentHeading);
             telemetry.addData("Encoder Raw", rawTheta);
-            telemetry.addData("Total Delta", totalDeltaTheta);
-            telemetry.addData("IMU Raw 1st", imuHeadingInDegrees);
+            telemetry.addData("IMU Raw", imuHeadingInDegrees);
 
             telemetry.addData("deltaTheta", deltaTheta);
             telemetry.addData("deltaIMU", deltaIMU);
 
             telemetry.update();
-
-            totalDeltaTheta = totalDeltaTheta + deltaTheta;
 
             updatePosition();
         }

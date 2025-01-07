@@ -10,21 +10,22 @@ import org.firstinspires.ftc.robotcore.external.navigation.Position;
 
 public class IMUUtility {
 
-    private BNO055IMU imu;
-    private double previousHeading = 0;
+    private final BNO055IMU imu;
+    private double previousHeading;
 
     IMUUtility(HardwareMap hardwareMap, Telemetry telemetry) {
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
         imu.initialize(parameters);
+        previousHeading = 0;
     }
 
     boolean calibrateIMU() {
         return imu.isGyroCalibrated();
     }
 
-    Orientation getHeading() {
+    Orientation getOrientation() {
         return imu.getAngularOrientation();
     }
 
