@@ -29,7 +29,7 @@ public class PIDUtility {
         this.telemetry = telemetry;
     }
 
-    public PIDUtility(PIDType type) {
+    public PIDUtility(PIDType type, Telemetry telemetry) {
         this.type = type;
         this.telemetry = telemetry;
 
@@ -37,13 +37,13 @@ public class PIDUtility {
 
         switch (type) {
             case STRAIGHT:
-                this.kP = 0.000086;
+                this.kP = 0.000066;
                 this.kI = 0.0000568;
                 this.kD = 0.000002;
                 this.kF = 0; //0.2
                 break;
             case STRAFE:
-                this.kP = 0.000086;
+                this.kP = 0.000066;
                 this.kI = 0.0000568;
                 this.kD = 0.000002;
                 this.kF = 0; //0.22
@@ -138,7 +138,7 @@ public class PIDUtility {
         telemetry.addData("kProportionalValue", kProportionalValue);
         telemetry.update();
 
-        if (type == PIDType.STRAIGHT || type == PIDType.STRAFE) {
+        /*if (type == PIDType.STRAIGHT || type == PIDType.STRAFE) {
             if (Math.abs(baseOutput) < Constants.MINIMUM_POWER_OUTPUT_DRIVE){
                 // Enforce minimum power while maintaining the sign
                 baseOutput = Math.signum(baseOutput) * Constants.MINIMUM_POWER_OUTPUT_DRIVE;
@@ -149,7 +149,9 @@ public class PIDUtility {
                 // Enforce minimum power while maintaining the sign
                 baseOutput = Math.signum(baseOutput) * Constants.MINIMUM_POWER_OUTPUT_TURN;
             }
-        }
+        }*/
+
+
 
         return baseOutput;
     }

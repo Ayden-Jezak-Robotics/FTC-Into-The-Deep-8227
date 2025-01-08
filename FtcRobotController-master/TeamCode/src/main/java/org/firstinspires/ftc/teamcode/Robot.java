@@ -16,6 +16,7 @@ public class Robot {
 
     private final Position currentPosition;
     private double currentHeading;
+    private final double initialHeading;
 
     private final MotorUtility motors;
     private final DeadWheelUtility deadWheels;
@@ -28,6 +29,7 @@ public class Robot {
         this.telemetry = telemetry;
 
         this.currentPosition = initialPosition;
+        this.initialHeading = initialHeading;
         this.currentHeading = initialHeading;
 
         this.motors = new MotorUtility(this.hardwareMap);
@@ -40,20 +42,20 @@ public class Robot {
 
         this.imu = new IMUUtility(this.hardwareMap, this.telemetry);
 
-        PIDUtility yPID = new PIDUtility(PIDType.STRAIGHT);
-        PIDUtility xPID = new PIDUtility(PIDType.STRAFE);
-        PIDUtility turnPID = new PIDUtility(PIDType.TURN);
-        // telemetry.addLine("Starting move");
-        // telemetry.update();
+        PIDUtility yPID = new PIDUtility(PIDType.STRAIGHT, telemetry);
+        PIDUtility xPID = new PIDUtility(PIDType.STRAFE, telemetry);
+        PIDUtility turnPID = new PIDUtility(PIDType.TURN, telemetry);
+        telemetry.addLine("Starting move");
+        telemetry.update();
 
         deadWheels.resetEncoders();
 
-        //NEW Don't need this
-//        xPID.setOriginalError(currentPosition.x, targetPosition.x);
-//        yPID.setOriginalError(currentPosition.y, targetPosition.y);
-//        turnPID.setOriginalError(currentHeading, targetHeading);
+        xPID.setOriginalError(currentPosition.x, targetPosition.x);
+        yPID.setOriginalError(currentPosition.y, targetPosition.y);
+        turnPID.setOriginalError(currentHeading, targetHeading);
 
-       ElapsedTime timer = new ElapsedTime();
+        ElapsedTime timer = new ElapsedTime();
+
 
         while (opMode.opModeIsActive()) {
 
@@ -74,9 +76,11 @@ public class Robot {
             double yPower = yPID.calculatePower(currentPosition.y, timer.seconds());
             double turnPower = turnPID.calculatePower(currentHeading, timer.seconds());
 
+
             telemetry.addData("CurrentX", currentPosition.x);
             telemetry.addData("CurrentY", currentPosition.y);
             telemetry.addData("Current Heading", currentHeading);
+            telemetry.addData("Remaining Theta", remainingTheta);
             telemetry.addData("xPower", xPower);
             telemetry.addData("yPower", yPower);
             telemetry.addData("turnPower", turnPower);
@@ -93,6 +97,7 @@ public class Robot {
         motors.stopMotors();
     }
 
+/*
     private double[] calculateMotorPowers(double xPower, double yPower, double turnPower) {
         double frontLeftPower = yPower + xPower + turnPower;
         double frontRightPower = yPower - xPower - turnPower;
@@ -112,6 +117,7 @@ public class Robot {
 
         return new double[]{frontLeftPower, frontRightPower, backLeftPower, backRightPower};
     }
+*/
 
     public void updatePosition() {
 
@@ -119,27 +125,32 @@ public class Robot {
         int rightEncoder = deadWheels.getCurrentValue(DeadWheel.RIGHT);
         int centerEncoder = deadWheels.getCurrentValue(DeadWheel.CENTER);
 
-        float imuHeadingInDegrees = imu.getOrientation().firstAngle;
+        //float imuHeadingInDegrees = imu.getOrientation().firstAngle;
+        double rawTheta = Math.toDegrees((rightEncoder - leftEncoder)*Constants.DEAD_WHEEL_MM_PER_TICK / Constants.WHEEL_BASE_WIDTH);
+
+        //currentHeading = ((imu.getOrientation().firstAngle + imu.normalizeHeading(rawTheta))/2) + initialHeading;
+        currentHeading = imu.normalizeHeading(rawTheta) + initialHeading;
+
 
         // Get changes in encoder values
         int deltaLeft = leftEncoder - deadWheels.getPreviousValue(DeadWheel.LEFT);
         int deltaRight = rightEncoder - deadWheels.getPreviousValue(DeadWheel.RIGHT);
         int deltaCenter = centerEncoder - deadWheels.getPreviousValue(DeadWheel.CENTER);
 
-        double deltaTheta = Math.toDegrees( (deltaRight - deltaLeft) * (Constants.DEAD_WHEEL_MM_PER_TICK / Constants.WHEEL_BASE_WIDTH));
-        double deltaIMU = imu.normalizeHeading(imuHeadingInDegrees - imu.getPreviousHeading());
+        //double deltaTheta = Math.toDegrees( (deltaRight - deltaLeft) * (Constants.DEAD_WHEEL_MM_PER_TICK / Constants.WHEEL_BASE_WIDTH));
+        //double deltaIMU = imu.normalizeHeading(imuHeadingInDegrees - imu.getPreviousHeading());
 
         // Update previous encoder values
         deadWheels.setPreviousLeft(leftEncoder); //in ticks
         deadWheels.setPreviousRight(rightEncoder);
         deadWheels.setPreviousCenter(centerEncoder);
 
-        imu.setPreviousHeading(imuHeadingInDegrees);
+        //imu.setPreviousHeading(imuHeadingInDegrees);
 
         //double encoderHeadingNormalized = gyros.normalizeHeading(currentHeading + deltaTheta);
 
          //NEW telemetry and normalizing currentHeading
-        currentHeading = imu.normalizeHeading(currentHeading + (deltaIMU));
+         //currentHeading = imu.normalizeHeading(currentHeading + (deltaIMU));
 //        telemetry.addData("deltaTheta", deltaTheta);
 //        telemetry.addData("yPower", deltaIMU);
 //        telemetry.addData("currentHeading", currentHeading);
@@ -217,17 +228,17 @@ public class Robot {
             // Print Out Various Values
 
             telemetry.addData("Current X", currentPosition.x);
-            //telemetry.addData("April X", (currentAprilTagPosition != null) ? currentAprilTagPosition.getPosition().x : "none");
+            telemetry.addData("April X", (currentAprilTagPosition != null) ? currentAprilTagPosition.getPosition().x : "none");
 
             telemetry.addData("Current Y", currentPosition.y);
-            //telemetry.addData("April Y", (currentAprilTagPosition != null) ? currentAprilTagPosition.getPosition().y : "none");
+            telemetry.addData("April Y", (currentAprilTagPosition != null) ? currentAprilTagPosition.getPosition().y : "none");
 
             telemetry.addData("Current Heading", currentHeading);
             telemetry.addData("Encoder Raw", rawTheta);
             telemetry.addData("IMU Raw", imuHeadingInDegrees);
 
-            telemetry.addData("deltaTheta", deltaTheta);
-            telemetry.addData("deltaIMU", deltaIMU);
+            //telemetry.addData("deltaTheta", deltaTheta);
+            //telemetry.addData("deltaIMU", deltaIMU);
 
             telemetry.update();
 

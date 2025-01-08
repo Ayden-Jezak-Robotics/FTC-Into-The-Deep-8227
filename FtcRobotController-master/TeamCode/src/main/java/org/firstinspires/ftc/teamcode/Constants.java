@@ -15,7 +15,7 @@ public class Constants {
 
     public static final double MINIMUM_TIME_IN_SECONDS = 1e-3;
     public static final double CONVERT_TIME_TO_SECONDS = 1000;
-    public static final double MINIMUM_DISTANCE = 500;
+    public static final double MINIMUM_DISTANCE = 1000;
     public static final double TURN_TOLERANCE = 2;
 
     public static final double CONVERT_METERS_TO_INCHES = 39.3701;
@@ -27,7 +27,7 @@ public class Constants {
     public static final double MAX_KP = 0.80;
 
     public static final double MINIMUM_POWER_OUTPUT_DRIVE = 0.20;
-    public static final double MINIMUM_POWER_OUTPUT_TURN = 0.20;
+    public static final double MINIMUM_POWER_OUTPUT_TURN = 0.2;
 
     public static final double MAX_INTEGRAL_XY = 20000;
     public static final double MAX_INTEGRAL_TURN = 100;
