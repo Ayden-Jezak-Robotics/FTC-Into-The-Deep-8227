@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 public class DeadWheelUtility {
     private final HardwareMap hardwareMap;
     private final DcMotor rightDeadWheel, leftDeadWheel, centerDeadWheel;
-    private double previousLeft, previousRight, previousCenter;
+    private int previousLeft, previousRight, previousCenter;
 
     DeadWheelUtility(HardwareMap hardwareMap) {
         this.hardwareMap = hardwareMap;
@@ -26,7 +26,7 @@ public class DeadWheelUtility {
         return motor;
     }
 
-    int getPosition(DeadWheel type) {
+    int getCurrentValue(DeadWheel type) {
 
         switch (type) {
             case CENTER:
@@ -40,35 +40,40 @@ public class DeadWheelUtility {
         }
     }
 
-    void setPreviousLeft(double newValue) {
+    int getPreviousValue(DeadWheel type) {
+
+        switch (type) {
+            case CENTER:
+                return previousCenter;
+            case LEFT:
+                return  previousLeft;
+            case RIGHT:
+                return  previousRight;
+            default:
+                return 0;
+        }
+    }
+
+    void setPreviousLeft(int newValue) {
         previousLeft = newValue;
     }
 
-    public double getPreviousLeft() {
-        return previousLeft;
-    }
-
-    void setPreviousRight(double newValue) {
+    void setPreviousRight(int newValue) {
         previousRight = newValue;
     }
 
-    public double getPreviousRight() {
-        return previousRight;
-    }
-
-    void setPreviousCenter(double newValue) {
+    void setPreviousCenter(int newValue) {
         previousCenter = newValue;
     }
 
-    public double getPreviousCenter() {
-        return previousCenter;
-    }
 
     void resetEncoders() {
         leftDeadWheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         previousLeft = 0;
+
         rightDeadWheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         previousRight = 0;
+
         centerDeadWheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         previousCenter = 0;
     }

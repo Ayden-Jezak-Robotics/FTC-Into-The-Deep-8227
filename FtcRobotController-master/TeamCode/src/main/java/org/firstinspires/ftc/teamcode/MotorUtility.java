@@ -27,15 +27,36 @@ public class MotorUtility {
         return motor;
     }
 
-    void setMotorPowers(double fl, double fr, double bl, double br) {
-        frontLeft.setPower(fl);
-        frontRight.setPower(fr);
-        backLeft.setPower(bl);
-        backRight.setPower(br);
+    void setMotorPowers(double xPower, double yPower, double turnPower) {
+
+        double frontLeftPower = yPower + xPower + turnPower;
+        double frontRightPower = yPower - xPower - turnPower;
+        double backLeftPower = yPower - xPower + turnPower;
+        double backRightPower = yPower + xPower - turnPower;
+
+        // Normalize powers if they exceed 1
+        double max = Math.max(Math.max(Math.abs(frontLeftPower), Math.abs(frontRightPower)),
+                Math.max(Math.abs(backLeftPower), Math.abs(backRightPower)));
+
+        if (max > 1.0) {
+            frontLeftPower /= max;
+            frontRightPower /= max;
+            backLeftPower /= max;
+            backRightPower /= max;
+        }
+
+        frontLeft.setPower(frontLeftPower);
+        frontRight.setPower(frontRightPower);
+        backLeft.setPower(backLeftPower);
+        backRight.setPower(backRightPower);
     }
 
     void stopMotors() {
-        setMotorPowers(0, 0, 0, 0);
+        frontLeft.setPower(0);
+        frontRight.setPower(0);
+        backLeft.setPower(0);
+        backRight.setPower(0);
+
     }
 
 }

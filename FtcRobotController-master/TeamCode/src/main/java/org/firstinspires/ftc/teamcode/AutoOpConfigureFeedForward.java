@@ -15,7 +15,7 @@ public class AutoOpConfigureFeedForward extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         
-        RobotTester robot = new RobotTester(this, hardwareMap, telemetry, initialPosition, initialHeading);
+        Robot robot = new Robot(this, hardwareMap, telemetry, initialPosition, initialHeading);
 
         waitForStart();
 

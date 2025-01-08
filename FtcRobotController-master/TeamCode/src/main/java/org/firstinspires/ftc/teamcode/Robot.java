@@ -32,19 +32,21 @@ public class Robot {
 
         this.motors = new MotorUtility(this.hardwareMap);
         this.deadWheels = new DeadWheelUtility(this.hardwareMap);
-        this.imu = new IMUUtility(this.hardwareMap, this.telemetry);
+        // this.imu = new IMUUtility(this.hardwareMap, this.telemetry);
         this.myAprilTagProcessor = new VisionUtility(this.hardwareMap);
     }
 
     public void moveToPositionAndHeading(Position targetPosition, double targetHeading) {
+
+        this.imu = new IMUUtility(this.hardwareMap, this.telemetry);
+
         PIDUtility yPID = new PIDUtility(PIDType.STRAIGHT);
         PIDUtility xPID = new PIDUtility(PIDType.STRAFE);
         PIDUtility turnPID = new PIDUtility(PIDType.TURN);
-        telemetry.addLine("Starting move");
-        telemetry.update();
+        // telemetry.addLine("Starting move");
+        // telemetry.update();
 
         deadWheels.resetEncoders();
-        this.imu = new IMUUtility(this.hardwareMap, this.telemetry);
 
         //NEW Don't need this
 //        xPID.setOriginalError(currentPosition.x, targetPosition.x);
@@ -81,11 +83,8 @@ public class Robot {
             telemetry.update();
             timer.reset();
 
-            // Convert x, y, and turn power to motor powers
-            double[] motorPowers = calculateMotorPowers(xPower, yPower, turnPower);
-
             // Apply motor powers
-            motors.setMotorPowers(motorPowers[0], motorPowers[1], motorPowers[2], motorPowers[3]);
+            motors.setMotorPowers(xPower, yPower, turnPower);
 
             updatePosition();
 
@@ -116,29 +115,31 @@ public class Robot {
 
     public void updatePosition() {
 
-        double leftEncoder = deadWheels.getPosition(DeadWheel.LEFT); //in ticks
-        double rightEncoder = deadWheels.getPosition(DeadWheel.RIGHT);
-        double centerEncoder = deadWheels.getPosition(DeadWheel.CENTER);
-        double imuHeadingInDegrees = imu.getOrientation().firstAngle;
+        int leftEncoder = deadWheels.getCurrentValue(DeadWheel.LEFT); //in ticks
+        int rightEncoder = deadWheels.getCurrentValue(DeadWheel.RIGHT);
+        int centerEncoder = deadWheels.getCurrentValue(DeadWheel.CENTER);
+
+        float imuHeadingInDegrees = imu.getOrientation().firstAngle;
 
         // Get changes in encoder values
-        double deltaLeft = leftEncoder - deadWheels.getPreviousLeft();
-        double deltaRight = rightEncoder - deadWheels.getPreviousRight();
-        double deltaCenter = centerEncoder - deadWheels.getPreviousCenter();
-        double deltaTheta = Math.toDegrees((deltaRight - deltaLeft) * Constants.DEAD_WHEEL_MM_PER_TICK / Constants.WHEEL_BASE_WIDTH);
-        double deltaIMU = imuHeadingInDegrees - imu.getPreviousHeading();
+        int deltaLeft = leftEncoder - deadWheels.getPreviousValue(DeadWheel.LEFT);
+        int deltaRight = rightEncoder - deadWheels.getPreviousValue(DeadWheel.RIGHT);
+        int deltaCenter = centerEncoder - deadWheels.getPreviousValue(DeadWheel.CENTER);
+
+        double deltaTheta = Math.toDegrees( (deltaRight - deltaLeft) * (Constants.DEAD_WHEEL_MM_PER_TICK / Constants.WHEEL_BASE_WIDTH));
+        double deltaIMU = imu.normalizeHeading(imuHeadingInDegrees - imu.getPreviousHeading());
 
         // Update previous encoder values
         deadWheels.setPreviousLeft(leftEncoder); //in ticks
         deadWheels.setPreviousRight(rightEncoder);
         deadWheels.setPreviousCenter(centerEncoder);
-        imu.setPreviousHeading(imuHeadingInDegrees);
 
+        imu.setPreviousHeading(imuHeadingInDegrees);
 
         //double encoderHeadingNormalized = gyros.normalizeHeading(currentHeading + deltaTheta);
 
          //NEW telemetry and normalizing currentHeading
-        currentHeading = currentHeading + (deltaTheta);
+        currentHeading = imu.normalizeHeading(currentHeading + (deltaIMU));
 //        telemetry.addData("deltaTheta", deltaTheta);
 //        telemetry.addData("yPower", deltaIMU);
 //        telemetry.addData("currentHeading", currentHeading);
@@ -179,29 +180,33 @@ public class Robot {
 
     public void checkSensorReadings() {
 
-        deadWheels.resetEncoders();
         this.imu = new IMUUtility(this.hardwareMap, this.telemetry);
+        deadWheels.resetEncoders();
 
-        double totalDeltaTheta = 0;
+        // double totalDeltaTheta = 0;
 
         while (opMode.opModeIsActive()) {
 
-            double leftEncoder = deadWheels.getPosition(DeadWheel.LEFT); //in ticks
-            double rightEncoder = deadWheels.getPosition(DeadWheel.RIGHT);
-            double centerEncoder = deadWheels.getPosition(DeadWheel.CENTER);
-            double imuHeadingInDegrees = imu.getOrientation().firstAngle;
+            //
+            int leftEncoder = deadWheels.getCurrentValue(DeadWheel.LEFT); //in ticks
+            int rightEncoder = deadWheels.getCurrentValue(DeadWheel.RIGHT);
+            int centerEncoder = deadWheels.getCurrentValue(DeadWheel.CENTER);
 
-            // Get changes in encoder values
-            double deltaLeft = leftEncoder - deadWheels.getPreviousLeft();
-            double deltaRight = rightEncoder - deadWheels.getPreviousRight();
-            double deltaCenter = centerEncoder - deadWheels.getPreviousCenter();
-            double deltaTheta = Math.toDegrees((deltaRight - deltaLeft)*Constants.DEAD_WHEEL_MM_PER_TICK / Constants.WHEEL_BASE_WIDTH);
-            double deltaIMU = imuHeadingInDegrees - imu.getPreviousHeading();
+            float imuHeadingInDegrees = imu.getOrientation().firstAngle;
+
+            // Calculate changes in encoder values
+            int deltaLeft = leftEncoder - deadWheels.getPreviousValue(DeadWheel.LEFT);
+            int deltaRight = rightEncoder - deadWheels.getPreviousValue(DeadWheel.RIGHT);
+            int deltaCenter = centerEncoder - deadWheels.getPreviousValue(DeadWheel.CENTER);
+
+            double deltaTheta = Math.toDegrees( (deltaRight - deltaLeft) * (Constants.DEAD_WHEEL_MM_PER_TICK / Constants.WHEEL_BASE_WIDTH));
+            double deltaIMU = imu.normalizeHeading(imuHeadingInDegrees - imu.getPreviousHeading());
 
             // Update previous encoder values
             deadWheels.setPreviousLeft(leftEncoder); //in ticks
             deadWheels.setPreviousRight(rightEncoder);
             deadWheels.setPreviousCenter(centerEncoder);
+
             imu.setPreviousHeading(imuHeadingInDegrees);
 
             double rawTheta = Math.toDegrees((rightEncoder - leftEncoder)*Constants.DEAD_WHEEL_MM_PER_TICK / Constants.WHEEL_BASE_WIDTH);

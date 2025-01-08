@@ -11,7 +11,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Position;
 public class IMUUtility {
 
     private final BNO055IMU imu;
-    private double previousHeading;
+    private float previousHeading;
 
     IMUUtility(HardwareMap hardwareMap, Telemetry telemetry) {
         imu = hardwareMap.get(BNO055IMU.class, "imu");
@@ -29,17 +29,13 @@ public class IMUUtility {
         return imu.getAngularOrientation();
     }
 
-    Position getIMUPosition() {
-        return  imu.getPosition();
-    }
-
-    public double getPreviousHeading()
+    public float getPreviousHeading()
     {
         return this.previousHeading;
     }
 
-    public void setPreviousHeading(double previousHeading) {
-        this.previousHeading = previousHeading;
+    public void setPreviousHeading(float newValue) {
+        this.previousHeading = newValue;
     }
 
     public double normalizeHeading(double angle) {
