@@ -29,10 +29,10 @@ public class MotorUtility {
 
     void setMotorPowers(double xPower, double yPower, double turnPower) {
 
-        double frontLeftPower = yPower + xPower + turnPower;
-        double frontRightPower = yPower - xPower - turnPower;
-        double backLeftPower = yPower - xPower + turnPower;
-        double backRightPower = yPower + xPower - turnPower;
+        double frontLeftPower = yPower + xPower - turnPower;
+        double frontRightPower = yPower - xPower + turnPower;
+        double backLeftPower = yPower - xPower - turnPower;
+        double backRightPower = yPower + xPower + turnPower;
 
         // Normalize powers if they exceed 1
         double max = Math.max(Math.max(Math.abs(frontLeftPower), Math.abs(frontRightPower)),

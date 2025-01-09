@@ -61,7 +61,6 @@ public class PIDUtility {
         this.priorError = 0;
     }
 
-    //NEW Don't need this. I only needed it for the !isStraightTargetReached method which we don't use anymore
     public void setOriginalError(double initialPosition, double targetPosition) {
         this.initialPosition = initialPosition;
         this.targetPosition = targetPosition;
