@@ -4,6 +4,7 @@ public class Constants {
 
     public static final double DEAD_WHEEL_DIAMETER = 60;
     public static final double WHEEL_BASE_WIDTH = 152;
+    public static final double WHEEL_BASE_LENGTH = FILL;
 
     private static final double DEAD_WHEEL_TICKS_PER_ROTATION = 8192;
     private static final double DEAD_WHEEL_CIRCUMFERENCE = (Math.PI * DEAD_WHEEL_DIAMETER);
