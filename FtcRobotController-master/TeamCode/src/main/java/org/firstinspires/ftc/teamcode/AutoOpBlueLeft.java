@@ -21,7 +21,7 @@ public class AutoOpBlueLeft extends LinearOpMode {
         telemetry.addLine("Began");
         telemetry.update();
 
-        robot.moveToPositionAndHeading(new Position(DistanceUnit.INCH, 0, 0, 0, 0), 135);
+        robot.moveToPositionAndHeading(new Position(DistanceUnit.INCH, 0, 0, 0, 0), 45);
 
         //robot.moveToPositionAndHeading(new Position(DistanceUnit.INCH, 24, -12, 0, 0), 90);
 

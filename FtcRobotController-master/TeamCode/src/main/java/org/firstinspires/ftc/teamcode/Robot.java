@@ -126,18 +126,24 @@ public class Robot {
         int centerEncoder = deadWheels.getCurrentValue(DeadWheel.CENTER);
 
         //float imuHeadingInDegrees = imu.getOrientation().firstAngle;
-        double rawTheta = Math.toDegrees((rightEncoder - leftEncoder)*Constants.DEAD_WHEEL_MM_PER_TICK / Constants.WHEEL_BASE_WIDTH);
 
-        //currentHeading = ((imu.getOrientation().firstAngle + imu.normalizeHeading(rawTheta))/2) + initialHeading;
-        currentHeading = imu.normalizeHeading(rawTheta) + initialHeading;
+        //makes the rawTheta the proper sign because right- left ensures turning left is positive
+        double rawTheta = Math.toDegrees((rightEncoder - leftEncoder)*Constants.DEAD_WHEEL_MM_PER_TICK / Constants.WHEEL_BASE_WIDTH);
 
 
         // Get changes in encoder values
         int deltaLeft = leftEncoder - deadWheels.getPreviousValue(DeadWheel.LEFT);
         int deltaRight = rightEncoder - deadWheels.getPreviousValue(DeadWheel.RIGHT);
         int deltaCenter = centerEncoder - deadWheels.getPreviousValue(DeadWheel.CENTER);
+        double deltaTheta = Math.toDegrees( (deltaRight - deltaLeft) * (Constants.DEAD_WHEEL_MM_PER_TICK / Constants.WHEEL_BASE_WIDTH));
 
-        //double deltaTheta = Math.toDegrees( (deltaRight - deltaLeft) * (Constants.DEAD_WHEEL_MM_PER_TICK / Constants.WHEEL_BASE_WIDTH));
+        //double deltaTheta = (deltaLeft + deltaRight) / Constants.WHEEL_BASE_WIDTH;
+
+        //currentHeading = ((imu.getOrientation().firstAngle + imu.normalizeHeading(rawTheta))/2) + initialHeading;
+        currentHeading = imu.normalizeHeading(rawTheta) + initialHeading;
+        // or
+        // currentHeading = deltaTheta + initialHeading;
+
         //double deltaIMU = imu.normalizeHeading(imuHeadingInDegrees - imu.getPreviousHeading());
 
         // Update previous encoder values
@@ -149,8 +155,8 @@ public class Robot {
 
         //double encoderHeadingNormalized = gyros.normalizeHeading(currentHeading + deltaTheta);
 
-         //NEW telemetry and normalizing currentHeading
-         //currentHeading = imu.normalizeHeading(currentHeading + (deltaIMU));
+        //NEW telemetry and normalizing currentHeading
+        //currentHeading = imu.normalizeHeading(currentHeading + (deltaIMU));
 //        telemetry.addData("deltaTheta", deltaTheta);
 //        telemetry.addData("yPower", deltaIMU);
 //        telemetry.addData("currentHeading", currentHeading);
@@ -158,11 +164,11 @@ public class Robot {
 
         // Local displacements
         double deltaYLocal = (deltaLeft + deltaRight) / 2.0;
-        double deltaXLocal = deltaCenter;
+        double deltaXLocal = (deltaCenter - (Constants.WHEEL_BASE_LENGTH * deltaTheta));
 
         // Transform local displacements to global coordinates
-        // NEW If heading is not calculated properly, the position will be inaccurate
-        double deltaYGlobal = deltaYLocal * Math.cos(Math.toRadians(currentHeading)) + deltaXLocal * Math.sin(Math.toRadians(currentHeading));
+        // changed the signs for globals
+        double deltaYGlobal = deltaXLocal * Math.sin(Math.toRadians(currentHeading)) + deltaYLocal * Math.cos(Math.toRadians(currentHeading));
         double deltaXGlobal = deltaXLocal * Math.cos(Math.toRadians(currentHeading)) - deltaYLocal * Math.sin(Math.toRadians(currentHeading));
 
         // Update global position
