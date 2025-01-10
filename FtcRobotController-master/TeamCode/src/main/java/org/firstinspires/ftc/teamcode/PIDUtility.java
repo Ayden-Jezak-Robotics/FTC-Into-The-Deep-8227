@@ -1,14 +1,16 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.icu.text.Transliterator;
+
 import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
 
 public class PIDUtility {
     private PIDType type;
 
     private double kP, kI, kD, kF;
 
-    private double initialPosition; // in inches
     private double targetPosition; // in inches
     private double originalError; //in ticks
 
@@ -37,22 +39,22 @@ public class PIDUtility {
 
         switch (type) {
             case STRAIGHT:
-                this.kP = 0.000066;
-                this.kI = 0.0000568;
-                this.kD = 0.000002;
-                this.kF = 0; //0.2
+                this.kP = 0.00001; //0.000066
+                this.kI = 0; //0.0000568
+                this.kD = 0; //0.00003
+                this.kF = 0.15; //0.2
                 break;
             case STRAFE:
-                this.kP = 0.000066;
-                this.kI = 0.0000568;
-                this.kD = 0.000002;
-                this.kF = 0; //0.22
+                this.kP = 0.00001;
+                this.kI = 0;
+                this.kD = 0;
+                this.kF = 0.15; //0.22
                 break;
             case TURN:
                 this.kP = 0.015;
                 this.kI = 0.015;
-                this.kD = 0.00025;
-                this.kF = 0;
+                this.kD = 0; //0.00025
+                this.kF = 0.1;
                 break;
             default:
         }
@@ -61,14 +63,30 @@ public class PIDUtility {
         this.priorError = 0;
     }
 
-    public void setOriginalError(double initialPosition, double targetPosition) {
-        this.initialPosition = initialPosition;
-        this.targetPosition = targetPosition;
+    public double calculateLocalError(Position initialPosition, double initialHeading)
+    {
+            if (type == PIDType.STRAIGHT)
+            {
+                this.originalError = (targetPosition - initialPosition.y)* Math.cos(Math.toRadians(initialHeading)) - (targetPosition - initialPosition.x)* Math.sin(Math.toRadians(initialHeading));
+            }
+            else {
+                this.originalError = (targetPosition - initialPosition.x)* Math.cos(Math.toRadians(initialHeading)) + (targetPosition - initialPosition.y)* Math.sin(Math.toRadians(initialHeading));
+            }
+            return this.originalError = this.originalError * Constants.DEAD_WHEEL_TICKS_PER_INCH;
+    }
 
-        this.originalError = (targetPosition - initialPosition);
-
-        if (type == PIDType.STRAIGHT || type == PIDType.STRAFE) {
-            this.originalError = this.originalError * Constants.DEAD_WHEEL_TICKS_PER_INCH;
+    public void setGlobalTargetPosition(Position targetPosition, double targetHeading) {
+        if (type == PIDType.STRAFE)
+        {
+            this.targetPosition = targetPosition.x;
+        }
+        else if (type == PIDType.STRAIGHT)
+        {
+            this.targetPosition = targetPosition.y;
+        }
+        else
+        {
+            this.targetPosition = targetHeading;
         }
     }
 
@@ -79,12 +97,12 @@ public class PIDUtility {
     }
     
 
-    public double calculatePower(double currentPosition, double time) // time is in Seconds
+    public double calculatePower(Position currentPosition, double currentHeading, double time) // time is in Seconds, current position is in inches
     {
         double error;
 
         if (type == PIDType.STRAIGHT || type == PIDType.STRAFE) {
-            error = (targetPosition - currentPosition) * Constants.DEAD_WHEEL_TICKS_PER_INCH;
+            error = calculateLocalError(currentPosition, currentHeading) * Constants.DEAD_WHEEL_TICKS_PER_INCH;
 
             if (Math.abs(error) < Constants.MINIMUM_DISTANCE) {
                 return 0;
@@ -92,7 +110,7 @@ public class PIDUtility {
         }
         else { // For Turn based calculations
             //NEW need to normalize hypothetically what is target = -45 and you are at 180?
-            error = normalizeAngle(targetPosition - currentPosition);
+            error = normalizeAngle(targetPosition - currentHeading);
 
             if (Math.abs(error) < Constants.TURN_TOLERANCE) {
                 return 0;
@@ -126,7 +144,7 @@ public class PIDUtility {
 
         priorError = error;
 
-        double baseOutput = kProportionalValue + kIntegralValue + kDerivativeValue;
+        double baseOutput = kProportionalValue + kIntegralValue + kDerivativeValue + kFeedForwardValue;
 
         telemetry.addData("error", error);
         telemetry.addData("priorError", priorError);

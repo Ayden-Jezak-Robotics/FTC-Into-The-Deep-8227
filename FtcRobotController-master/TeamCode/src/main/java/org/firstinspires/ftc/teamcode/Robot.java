@@ -50,9 +50,9 @@ public class Robot {
 
         deadWheels.resetEncoders();
 
-        xPID.setOriginalError(currentPosition.x, targetPosition.x);
-        yPID.setOriginalError(currentPosition.y, targetPosition.y);
-        turnPID.setOriginalError(currentHeading, targetHeading);
+        xPID.setGlobalTargetPosition(targetPosition, targetHeading);
+        yPID.setGlobalTargetPosition(targetPosition, targetHeading);
+        turnPID.setGlobalTargetPosition(targetPosition, targetHeading);
 
         ElapsedTime timer = new ElapsedTime();
 
@@ -72,9 +72,9 @@ public class Robot {
             double time = timer.seconds();
 
             // Calculate power outputs using PID
-            double xPower = xPID.calculatePower(currentPosition.x, timer.seconds());
-            double yPower = yPID.calculatePower(currentPosition.y, timer.seconds());
-            double turnPower = turnPID.calculatePower(currentHeading, timer.seconds());
+            double xPower = xPID.calculatePower(currentPosition, currentHeading, timer.seconds());
+            double yPower = yPID.calculatePower(currentPosition, currentHeading, timer.seconds());
+            double turnPower = turnPID.calculatePower(currentPosition, currentHeading, timer.seconds());
 
 
             telemetry.addData("CurrentX", currentPosition.x);
