@@ -79,7 +79,6 @@ public class Robot {
             double yPower = yPID.calculatePower(currentPosition, currentHeading, timer.seconds());
             double turnPower = turnPID.calculatePower(currentPosition, currentHeading, timer.seconds());
 
-
             telemetry.addData("CurrentX", currentPosition.x);
             telemetry.addData("CurrentY", currentPosition.y);
             telemetry.addData("Current Heading", currentHeading);
@@ -94,9 +93,7 @@ public class Robot {
             motors.setMotorPowers(xPower, yPower, turnPower);
 
             updatePosition();
-
         }
-
         motors.stopMotors();
     }
 
@@ -143,7 +140,7 @@ public class Robot {
         //double deltaTheta = (deltaLeft + deltaRight) / Constants.WHEEL_BASE_WIDTH;
 
         //currentHeading = ((imu.getOrientation().firstAngle + imu.normalizeHeading(rawTheta))/2) + initialHeading;
-        currentHeading = imu.normalizeHeading(rawTheta) + initialHeading;
+        currentHeading = rawTheta + initialHeading;
         // or
         // currentHeading = deltaTheta + initialHeading;
 
@@ -220,7 +217,7 @@ public class Robot {
             int deltaCenter = centerEncoder - deadWheels.getPreviousValue(DeadWheel.CENTER);
 
             double deltaTheta = Math.toDegrees( (deltaRight - deltaLeft) * (Constants.DEAD_WHEEL_MM_PER_TICK / Constants.WHEEL_BASE_WIDTH));
-            double deltaIMU = imu.normalizeHeading(imuHeadingInDegrees - imu.getPreviousHeading());
+            double deltaIMU = (imuHeadingInDegrees - imu.getPreviousHeading());
 
             // Update previous encoder values
             deadWheels.setPreviousLeft(leftEncoder); //in ticks
