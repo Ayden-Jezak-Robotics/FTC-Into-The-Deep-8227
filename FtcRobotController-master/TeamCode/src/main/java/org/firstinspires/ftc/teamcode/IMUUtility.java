@@ -29,6 +29,16 @@ public class IMUUtility {
         return imu.getAngularOrientation();
     }
 
+    public double getCurrentHeading() {
+        double headingInDegrees = imu.getAngularOrientation().firstAngle;
+
+        if (headingInDegrees < 0) {
+            headingInDegrees += 360;
+        }
+
+        return Math.toRadians(headingInDegrees);
+    }
+
     public float getPreviousHeading()
     {
         return this.previousHeading;
@@ -38,10 +48,10 @@ public class IMUUtility {
         this.previousHeading = newValue;
     }
 
-    public double normalizeHeading(double angle) {
+    /*public double normalizeHeading(double angle) {
         while (angle >= 180) angle -= 360;
         while (angle < -180) angle += 360;
         return angle;
-    }
+    }*/
 
 }

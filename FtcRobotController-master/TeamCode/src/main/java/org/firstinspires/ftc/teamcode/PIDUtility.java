@@ -90,11 +90,11 @@ public class PIDUtility {
         }
     }
 
-    private double normalizeAngle(double angle) {
+   /* private double normalizeAngle(double angle) {
         while (angle >= 180) angle -= 360;
         while (angle < -180) angle += 360;
         return angle;
-    }
+    }*/
     
 
     public double calculatePower(Position currentPosition, double currentHeading, double time) // time is in Seconds, current position is in inches
@@ -110,7 +110,7 @@ public class PIDUtility {
         }
         else { // For Turn based calculations
             //NEW need to normalize hypothetically what is target = -45 and you are at 180?
-            error = normalizeAngle(targetPosition - currentHeading);
+            error = (targetPosition - currentHeading);
 
             if (Math.abs(error) < Constants.TURN_TOLERANCE) {
                 return 0;

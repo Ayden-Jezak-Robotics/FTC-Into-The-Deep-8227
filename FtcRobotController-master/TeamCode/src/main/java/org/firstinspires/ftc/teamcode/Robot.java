@@ -54,6 +54,9 @@ public class Robot {
         yPID.setGlobalTargetPosition(targetPosition, targetHeading);
         turnPID.setGlobalTargetPosition(targetPosition, targetHeading);
 
+        // drivePID.setTargetPosition(targetPosition);
+        // turnPID.setTargetHeading(targetHeading);
+
         ElapsedTime timer = new ElapsedTime();
 
 
