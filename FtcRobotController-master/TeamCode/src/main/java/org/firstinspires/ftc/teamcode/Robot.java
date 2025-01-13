@@ -19,6 +19,7 @@ public class Robot {
     private final double initialHeading;
 
     private final MotorUtility motors;
+    //private final ArmUtility armMotors;
     private final DeadWheelUtility deadWheels;
     private IMUUtility imu;
     private final VisionUtility myAprilTagProcessor;
@@ -35,8 +36,18 @@ public class Robot {
         this.motors = new MotorUtility(this.hardwareMap);
         this.deadWheels = new DeadWheelUtility(this.hardwareMap);
         // this.imu = new IMUUtility(this.hardwareMap, this.telemetry);
+        this.armMotors = new ArmUtility(this.hardwareMap);
         this.myAprilTagProcessor = new VisionUtility(this.hardwareMap);
     }
+
+    /*public void grab()
+    {
+        armMotors.grabObject();
+        opMode.sleep(1000);
+        armMotors.putInBasket();
+        opMode.sleep(1000);
+        armMotors.reset();
+    }*/
 
     public void moveToPositionAndHeading(Position targetPosition, double targetHeading) {
 
