@@ -39,22 +39,22 @@ public class PIDUtility {
 
         switch (type) {
             case STRAIGHT:
-                this.kP = 0.00001; //0.000066
-                this.kI = 0; //0.0000568
-                this.kD = 0; //0.00003
-                this.kF = 0.15; //0.2
+                this.kP = 0.0001; //, 0.00002
+                this.kI = 0.0000568; //0.000001
+                this.kD = 0.00003; //
+                this.kF = 0; //0.15
                 break;
             case STRAFE:
-                this.kP = 0.00001;
-                this.kI = 0;
-                this.kD = 0;
-                this.kF = 0.15; //0.22
+                this.kP = 0.0001;
+                this.kI = 0.0000568;
+                this.kD = 0.00003;
+                this.kF = 0; //0.22
                 break;
             case TURN:
                 this.kP = 0.015;
                 this.kI = 0.015;
                 this.kD = 0; //0.00025
-                this.kF = 0.1;
+                this.kF = 0; //0.11
                 break;
             default:
         }
@@ -143,7 +143,7 @@ public class PIDUtility {
 
         priorError = error;
 
-        double baseOutput = kProportionalValue + kIntegralValue + kDerivativeValue + kFeedForwardValue;
+        double baseOutput = kProportionalValue + kIntegralValue + kDerivativeValue;
 
         telemetry.addData("error", error);
         telemetry.addData("priorError", priorError);
@@ -154,19 +154,18 @@ public class PIDUtility {
         telemetry.addData("kProportionalValue", kProportionalValue);
         telemetry.update();
 
-        /*if (type == PIDType.STRAIGHT || type == PIDType.STRAFE) {
+        if (type == PIDType.STRAIGHT || type == PIDType.STRAFE) {
             if (Math.abs(baseOutput) < Constants.MINIMUM_POWER_OUTPUT_DRIVE){
                 // Enforce minimum power while maintaining the sign
-                baseOutput = Math.signum(baseOutput) * Constants.MINIMUM_POWER_OUTPUT_DRIVE;
+                baseOutput = baseOutput + (Math.signum(baseOutput)*kFeedForwardValue) ; //* Constants.MINIMUM_POWER_OUTPUT_DRIVE
             }
         }
         else {
             if (Math.abs(baseOutput) < Constants.MINIMUM_POWER_OUTPUT_TURN) {
                 // Enforce minimum power while maintaining the sign
-                baseOutput = Math.signum(baseOutput) * Constants.MINIMUM_POWER_OUTPUT_TURN;
+                baseOutput = baseOutput + (Math.signum(baseOutput)*kFeedForwardValue);
             }
-        }*/
-
+        }
 
 
         return baseOutput;

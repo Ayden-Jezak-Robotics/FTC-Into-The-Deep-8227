@@ -36,8 +36,10 @@ public class Robot {
         this.motors = new MotorUtility(this.hardwareMap);
         this.deadWheels = new DeadWheelUtility(this.hardwareMap);
         // this.imu = new IMUUtility(this.hardwareMap, this.telemetry);
-        this.armMotors = new ArmUtility(this.hardwareMap);
+        //this.armMotors = new ArmUtility(this.hardwareMap);
         this.myAprilTagProcessor = new VisionUtility(this.hardwareMap);
+        this.imu = new IMUUtility(this.hardwareMap, this.telemetry);// sai put up here jan 13
+
     }
 
     /*public void grab()
@@ -50,8 +52,8 @@ public class Robot {
     }*/
 
     public void moveToPositionAndHeading(Position targetPosition, double targetHeading) {
-
-        this.imu = new IMUUtility(this.hardwareMap, this.telemetry);
+        telemetry.addLine("new movement");
+        telemetry.update();
 
         PIDUtility yPID = new PIDUtility(PIDType.STRAIGHT, telemetry);
         PIDUtility xPID = new PIDUtility(PIDType.STRAFE, telemetry);
@@ -74,7 +76,7 @@ public class Robot {
             double remainingY = (targetPosition.y - currentPosition.y) * Constants.DEAD_WHEEL_TICKS_PER_INCH;
             double remainingTheta = targetHeading - currentHeading;
 
-            // Break condition
+            // Break condition PROBLEM
             if (Math.abs(remainingX) < Constants.MINIMUM_DISTANCE && Math.abs(remainingY) < Constants.MINIMUM_DISTANCE && Math.abs(remainingTheta) < Constants.TURN_TOLERANCE) {
                 telemetry.addLine("Breaks due to tolerance");
                 telemetry.update();
@@ -139,8 +141,8 @@ public class Robot {
         //float imuHeadingInDegrees = imu.getOrientation().firstAngle;
 
         //makes the rawTheta the proper sign because right- left ensures turning left is positive
-        double rawTheta = Math.toDegrees((rightEncoder - leftEncoder)*Constants.DEAD_WHEEL_MM_PER_TICK / Constants.WHEEL_BASE_WIDTH);
-
+        //double rawTheta = Math.toDegrees((rightEncoder - leftEncoder)*Constants.DEAD_WHEEL_MM_PER_TICK / Constants.WHEEL_BASE_WIDTH);
+        //RAW THETA is causing the PROBLEM
 
         // Get changes in encoder values
         int deltaLeft = leftEncoder - deadWheels.getPreviousValue(DeadWheel.LEFT);
@@ -151,9 +153,11 @@ public class Robot {
         //double deltaTheta = (deltaLeft + deltaRight) / Constants.WHEEL_BASE_WIDTH;
 
         //currentHeading = ((imu.getOrientation().firstAngle + imu.normalizeHeading(rawTheta))/2) + initialHeading;
-        currentHeading = imu.normalizeHeading(rawTheta) + initialHeading;
+        //currentHeading = imu.normalizeHeading(rawTheta) + initialHeading;
+        //RAW THETA = problem
         // or
-        // currentHeading = deltaTheta + initialHeading;
+        currentHeading += deltaTheta;
+        currentHeading = imu.normalizeHeading(currentHeading);
 
         //double deltaIMU = imu.normalizeHeading(imuHeadingInDegrees - imu.getPreviousHeading());
 
