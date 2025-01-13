@@ -14,18 +14,15 @@ public class AutoOpBlueLeft extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        
+
         Robot robot = new Robot(this, hardwareMap, telemetry, initialPosition, initialHeading);
 
         waitForStart();
-        telemetry.addLine("Began");
-        telemetry.update();
 
         robot.moveToPositionAndHeading(new Position(DistanceUnit.INCH, 24, 24, 0, 0), 0);
         robot.moveToPositionAndHeading(new Position(DistanceUnit.INCH, 24, 24, 0, 0), 45);
         robot.moveToPositionAndHeading(new Position(DistanceUnit.INCH, 0, 0, 0, 0), 45);
         robot.moveToPositionAndHeading(new Position(DistanceUnit.INCH, 0, 0, 0, 0), 0);
-
 
 
         //robot.moveToPositionAndHeading(new Position(DistanceUnit.INCH, 24, -12, 0, 0), 90);
