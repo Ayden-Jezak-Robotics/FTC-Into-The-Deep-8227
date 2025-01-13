@@ -24,29 +24,38 @@ public class VisionUtility {
     private final VisionPortal myVisionPortal;
     private final HardwareMap myHardwareMap;
 
-    VisionUtility(HardwareMap hardwareMap) {
+    VisionUtility(HardwareMap hardwareMap, VisionType visionType) {
 
-        Position cameraPosition = new Position(DistanceUnit.MM, 0, 0, 0, 0);
-        YawPitchRollAngles cameraOrientation = new YawPitchRollAngles(AngleUnit.DEGREES, 0, 0, 0, 0);
+
+        Position cameraPosition;
+        YawPitchRollAngles cameraOrientation;
+
+        if (visionType == VisionType.LEFT) {
+            cameraPosition = new Position(DistanceUnit.MM, 0, 0, 0, 0);
+            cameraOrientation = new YawPitchRollAngles(AngleUnit.DEGREES, 0, 0, 0, 0);
+        } else {
+            cameraPosition = new Position(DistanceUnit.MM, 0, 0, 0, 0);
+            cameraOrientation = new YawPitchRollAngles(AngleUnit.DEGREES, 0, 0, 0, 0);
+        }
 
         this.myHardwareMap = hardwareMap;
 
         this.myAprilTagProcessor = new AprilTagProcessor.Builder()
-               .setCameraPose(cameraPosition, cameraOrientation)
-               .setDrawAxes(true)
-               //Need to calibrate and find
-               /*.setCameraIntrinsicMatrix(fx, fy, cx, cy) // Intrinsic matrix for camera calibration
-               .setLensDistortionCoefficients(k1, k2, p1, p2, k3) // Distortion coefficients*/
-               .build();
+                .setCameraPose(cameraPosition, cameraOrientation)
+                .setDrawAxes(true)
+                //Need to calibrate and find
+                /*.setCameraIntrinsicMatrix(fx, fy, cx, cy) // Intrinsic matrix for camera calibration
+                .setLensDistortionCoefficients(k1, k2, p1, p2, k3) // Distortion coefficients*/
+                .build();
 
         this.myVisionPortal = new VisionPortal.Builder()
-               .setShowStatsOverlay(true)
-               .setCamera(myHardwareMap.get(WebcamName.class, "Webcam 1"))
-               .addProcessor(myAprilTagProcessor)
-               .setCameraResolution(new Size(640, 480))
-               .setStreamFormat(VisionPortal.StreamFormat.YUY2)
-               .enableLiveView(true)
-               .build();
+                .setShowStatsOverlay(true)
+                .setCamera(myHardwareMap.get(WebcamName.class, "Webcam 1"))
+                .addProcessor(myAprilTagProcessor)
+                .setCameraResolution(new Size(640, 480))
+                .setStreamFormat(VisionPortal.StreamFormat.YUY2)
+                .enableLiveView(true)
+                .build();
     }
 
     private List<AprilTagDetection> getDetections() {
@@ -64,7 +73,7 @@ public class VisionUtility {
         while (iterator.hasNext()) {
             AprilTagDetection detection = iterator.next();
             if (detection.metadata == null || detection.robotPose == null ||
-                currentTime - detection.frameAcquisitionNanoTime >= Constants.MAX_AGE_NANOSECONDS) {
+                    currentTime - detection.frameAcquisitionNanoTime >= Constants.MAX_AGE_NANOSECONDS) {
                 iterator.remove(); // Remove invalid detections
             }
         }

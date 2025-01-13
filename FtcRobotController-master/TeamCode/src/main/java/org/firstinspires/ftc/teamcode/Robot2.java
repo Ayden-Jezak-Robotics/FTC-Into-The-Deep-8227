@@ -8,57 +8,55 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 
-public class Robot {
+public class Robot2 {
 
     private final LinearOpMode opMode;
     private final HardwareMap hardwareMap;
     private final Telemetry telemetry;
 
-    private final Position currentPosition;
-    private double currentHeading;
-    private final double initialHeading;
+    private final VisionType cameraPosition;
 
     private final MotorUtility motors;
     private final DeadWheelUtility deadWheels;
-    private IMUUtility imu;
     private final VisionUtility myAprilTagProcessor;
 
-    public Robot(LinearOpMode opMode, HardwareMap hardwareMap, Telemetry telemetry, Position initialPosition, double initialHeading) {
+    private IMUUtility imu;
+
+    private final Position currentPosition;
+    private double currentHeading;
+
+    // private final double initialHeading = 0;
+
+    public Robot2(LinearOpMode opMode, HardwareMap hardwareMap, Telemetry telemetry, VisionType cameraPosition, Position initialPosition, double initialHeading) {
         this.opMode = opMode;
         this.hardwareMap = hardwareMap;
         this.telemetry = telemetry;
+        this.cameraPosition = cameraPosition;
 
         this.currentPosition = initialPosition;
-        this.initialHeading = initialHeading;
-        this.currentHeading = initialHeading;
+        // this.initialHeading = Math.toRadians(initialHeading);
+        this.currentHeading = Math.toRadians(initialHeading);
 
         this.motors = new MotorUtility(this.hardwareMap);
         this.deadWheels = new DeadWheelUtility(this.hardwareMap);
-        // this.imu = new IMUUtility(this.hardwareMap, this.telemetry);
-        this.myAprilTagProcessor = new VisionUtility(this.hardwareMap, VisionType.LEFT);
+        this.imu = new IMUUtility(this.hardwareMap);
+        this.myAprilTagProcessor = new VisionUtility(this.hardwareMap, this.cameraPosition);
     }
 
     public void moveToPositionAndHeading(Position targetPosition, double targetHeading) {
 
+        /// Does this wait to initialize?
         this.imu = new IMUUtility(this.hardwareMap);
 
-        PIDUtility yPID = new PIDUtility(PIDType.STRAIGHT, telemetry);
-        PIDUtility xPID = new PIDUtility(PIDType.STRAFE, telemetry);
-        PIDUtility turnPID = new PIDUtility(PIDType.TURN, telemetry);
-        telemetry.addLine("Starting move");
-        telemetry.update();
+        PIDDrive xyPID = new PIDDrive(telemetry);
+        PIDTurn turnPID = new PIDTurn(telemetry);
 
         deadWheels.resetEncoders();
 
-        xPID.setGlobalTargetPosition(targetPosition, targetHeading);
-        yPID.setGlobalTargetPosition(targetPosition, targetHeading);
-        turnPID.setGlobalTargetPosition(targetPosition, targetHeading);
-
-        // drivePID.setTargetPosition(targetPosition);
-        // turnPID.setTargetHeading(targetHeading);
+        xyPID.setTargetPosition(targetPosition);
+        turnPID.setTargetHeading(targetHeading);
 
         ElapsedTime timer = new ElapsedTime();
-
 
         while (opMode.opModeIsActive()) {
 
@@ -75,49 +73,26 @@ public class Robot {
             double time = timer.seconds();
 
             // Calculate power outputs using PID
-            double xPower = xPID.calculatePower(currentPosition, currentHeading, timer.seconds());
-            double yPower = yPID.calculatePower(currentPosition, currentHeading, timer.seconds());
-            double turnPower = turnPID.calculatePower(currentPosition, currentHeading, timer.seconds());
+            XYValue motorPower = xyPID.calculatePower(currentPosition, currentHeading, timer.seconds());
+            double turnPower = turnPID.calculatePower(currentHeading, timer.seconds());
 
             telemetry.addData("CurrentX", currentPosition.x);
             telemetry.addData("CurrentY", currentPosition.y);
             telemetry.addData("Current Heading", currentHeading);
             telemetry.addData("Remaining Theta", remainingTheta);
-            telemetry.addData("xPower", xPower);
-            telemetry.addData("yPower", yPower);
+            telemetry.addData("xPower", motorPower.x);
+            telemetry.addData("yPower", motorPower.y);
             telemetry.addData("turnPower", turnPower);
             telemetry.update();
             timer.reset();
 
             // Apply motor powers
-            motors.setMotorPowers(xPower, yPower, turnPower);
+            motors.setMotorPowers(motorPower.x, motorPower.y, turnPower);
 
             updatePosition();
         }
         motors.stopMotors();
     }
-
-/*
-    private double[] calculateMotorPowers(double xPower, double yPower, double turnPower) {
-        double frontLeftPower = yPower + xPower + turnPower;
-        double frontRightPower = yPower - xPower - turnPower;
-        double backLeftPower = yPower - xPower + turnPower;
-        double backRightPower = yPower + xPower - turnPower;
-
-        // Normalize powers if they exceed 1
-        double max = Math.max(Math.max(Math.abs(frontLeftPower), Math.abs(frontRightPower)),
-                Math.max(Math.abs(backLeftPower), Math.abs(backRightPower)));
-        if (max > 1.0) {
-            frontLeftPower /= max;
-            frontRightPower /= max;
-            backLeftPower /= max;
-            backRightPower /= max;
-        }
-
-
-        return new double[]{frontLeftPower, frontRightPower, backLeftPower, backRightPower};
-    }
-*/
 
     public void updatePosition() {
 
@@ -125,33 +100,30 @@ public class Robot {
         int rightEncoder = deadWheels.getCurrentValue(DeadWheel.RIGHT);
         int centerEncoder = deadWheels.getCurrentValue(DeadWheel.CENTER);
 
-        //float imuHeadingInDegrees = imu.getOrientation().firstAngle;
+        /// IMU Heading in Radians
+        double imuHeadingInRadians = imu.getCurrentHeading();
 
-        //makes the rawTheta the proper sign because right- left ensures turning left is positive
-        double rawTheta = Math.toDegrees((rightEncoder - leftEncoder) * Constants.DEAD_WHEEL_MM_PER_TICK / Constants.WHEEL_BASE_WIDTH);
-
-
-        // Get changes in encoder values
+        /// Get changes in encoder values
         int deltaLeft = leftEncoder - deadWheels.getPreviousValue(DeadWheel.LEFT);
         int deltaRight = rightEncoder - deadWheels.getPreviousValue(DeadWheel.RIGHT);
         int deltaCenter = centerEncoder - deadWheels.getPreviousValue(DeadWheel.CENTER);
-        double deltaTheta = Math.toDegrees((deltaRight - deltaLeft) * (Constants.DEAD_WHEEL_MM_PER_TICK / Constants.WHEEL_BASE_WIDTH));
 
-        //double deltaTheta = (deltaLeft + deltaRight) / Constants.WHEEL_BASE_WIDTH;
+        /// deltaTheta from IMU in Radians
+        double deltaThetaIMU = imuHeadingInRadians - imu.getPreviousHeading();
+        /// deltaTheta from Encoders in Radians
+        double deltaThetaEncoders = (deltaRight - deltaLeft) * (Constants.DEAD_WHEEL_MM_PER_TICK / Constants.WHEEL_BASE_WIDTH);
 
-        //currentHeading = ((imu.getOrientation().firstAngle + imu.normalizeHeading(rawTheta))/2) + initialHeading;
-        currentHeading = rawTheta + initialHeading;
-        // or
-        // currentHeading = deltaTheta + initialHeading;
+        /// Encoder Heading in Radians
+        // double rawTheta = (rightEncoder - leftEncoder) * (Constants.DEAD_WHEEL_MM_PER_TICK / Constants.WHEEL_BASE_WIDTH);
 
-        //double deltaIMU = imu.normalizeHeading(imuHeadingInDegrees - imu.getPreviousHeading());
+        currentHeading = currentHeading + ((deltaThetaIMU + deltaThetaEncoders) / 2);
 
-        // Update previous encoder values
+        /// Update previous encoder values
         deadWheels.setPreviousLeft(leftEncoder); //in ticks
         deadWheels.setPreviousRight(rightEncoder);
         deadWheels.setPreviousCenter(centerEncoder);
 
-        //imu.setPreviousHeading(imuHeadingInDegrees);
+        imu.setPreviousHeading(imuHeadingInRadians);
 
         //double encoderHeadingNormalized = gyros.normalizeHeading(currentHeading + deltaTheta);
 
@@ -164,36 +136,28 @@ public class Robot {
 
         // Local displacements
         double deltaYLocal = (deltaLeft + deltaRight) / 2.0;
-        double deltaXLocal = (deltaCenter - (Constants.WHEEL_BASE_LENGTH * deltaTheta));
+        double deltaXLocal = (deltaCenter - (Constants.WHEEL_BASE_LENGTH * deltaThetaEncoders));
 
         // Transform local displacements to global coordinates
         // changed the signs for globals
         double deltaYGlobal = deltaXLocal * Math.sin(Math.toRadians(currentHeading)) + deltaYLocal * Math.cos(Math.toRadians(currentHeading));
         double deltaXGlobal = deltaXLocal * Math.cos(Math.toRadians(currentHeading)) - deltaYLocal * Math.sin(Math.toRadians(currentHeading));
 
+        final Pose3D currentAprilTagPosition = myAprilTagProcessor.getPose();
+
+        XYValue aprilPosition = new XYValue(0, 0);
+
+        if (currentAprilTagPosition != null) {
+            aprilPosition.x = currentAprilTagPosition.getPosition().x;
+            aprilPosition.y = currentAprilTagPosition.getPosition().y;
+        }
+
         // Update global position
         currentPosition.x += deltaXGlobal / Constants.DEAD_WHEEL_TICKS_PER_INCH;
         currentPosition.y += deltaYGlobal / Constants.DEAD_WHEEL_TICKS_PER_INCH;
+
+
     }
-
-    /* public void updateFromAprilTags() {
-
-        final double aprilTagWeight = Constants.APRIL_TAG_WEIGHT;
-
-        final Pose3D currentAprilTagPosition = myAprilTagProcessor.getPose();
-
-        if (currentAprilTagPosition != null) {
-            currentPosition.x = (1 - aprilTagWeight) * currentPosition.x + aprilTagWeight * currentAprilTagPosition.getPosition().x;
-            currentPosition.y = (1 - aprilTagWeight) * currentPosition.y + aprilTagWeight * currentAprilTagPosition.getPosition().y;
-            //currentHeading = (1 - aprilTagWeight) * currentHeading + aprilTagWeight * currentAprilTagPosition.getOrientation().getYaw();
-        }
-
-        telemetry.addData("currentPosition.x", currentPosition.x);
-        telemetry.addData("currentAprilPos.x", currentAprilTagPosition.getPosition().x);
-        telemetry.addData("currentPosition.y", currentPosition.y);
-        telemetry.addData("currentAprilPos.y", currentAprilTagPosition.getPosition().y);
-        telemetry.update();
-    }*/
 
     public void checkSensorReadings() {
 
