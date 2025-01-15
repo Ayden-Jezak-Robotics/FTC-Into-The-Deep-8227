@@ -12,7 +12,7 @@ public class PIDUtility {
     private double kP, kI, kD, kF;
 
     private double targetPosition; // in inches
-    private double originalError; //in ticks
+    private double error; //in ticks
 
     //private double aMaxPoint; // in ticks
     private double integralSum;
@@ -65,14 +65,16 @@ public class PIDUtility {
 
     public double calculateLocalError(Position initialPosition, double initialHeading)
     {
+        double originalError;
             if (type == PIDType.STRAIGHT)
             {
-                this.originalError = (targetPosition - initialPosition.y)* Math.cos(Math.toRadians(initialHeading)) - (targetPosition - initialPosition.x)* Math.sin(Math.toRadians(initialHeading));
+                originalError = (targetPosition - initialPosition.y)* Math.cos(Math.toRadians(initialHeading)) - (targetPosition - initialPosition.x)* Math.sin(Math.toRadians(initialHeading));
             }
             else {
-                this.originalError = (targetPosition - initialPosition.x)* Math.cos(Math.toRadians(initialHeading)) + (targetPosition - initialPosition.y)* Math.sin(Math.toRadians(initialHeading));
+                originalError = (targetPosition - initialPosition.x)* Math.cos(Math.toRadians(initialHeading)) + (targetPosition - initialPosition.y)* Math.sin(Math.toRadians(initialHeading));
             }
-            return this.originalError = this.originalError * Constants.DEAD_WHEEL_TICKS_PER_INCH;
+            originalError = originalError * Constants.DEAD_WHEEL_TICKS_PER_INCH;
+            return originalError;
     }
 
     public void setGlobalTargetPosition(Position targetPosition, double targetHeading) {
@@ -99,10 +101,9 @@ public class PIDUtility {
 
     public double calculatePower(Position currentPosition, double currentHeading, double time) // time is in Seconds, current position is in inches
     {
-        double error;
 
         if (type == PIDType.STRAIGHT || type == PIDType.STRAFE) {
-            error = calculateLocalError(currentPosition, currentHeading) * Constants.DEAD_WHEEL_TICKS_PER_INCH;
+            error = calculateLocalError(currentPosition, currentHeading);
 
             if (Math.abs(error) < Constants.MINIMUM_DISTANCE) {
                 return 0;

@@ -19,10 +19,16 @@ public class AutoOpBlueLeft extends LinearOpMode {
 
         waitForStart();
 
+        robot.moveToPositionAndHeading(new Position(DistanceUnit.INCH, 0, 24, 0, 0), 0);
         robot.moveToPositionAndHeading(new Position(DistanceUnit.INCH, 24, 24, 0, 0), 0);
-        robot.moveToPositionAndHeading(new Position(DistanceUnit.INCH, 24, 24, 0, 0), 45);
-        robot.moveToPositionAndHeading(new Position(DistanceUnit.INCH, 0, 0, 0, 0), 45);
-        robot.moveToPositionAndHeading(new Position(DistanceUnit.INCH, 0, 0, 0, 0), 0);
+        robot.moveToPositionAndHeading(new Position(DistanceUnit.INCH, 24, 0, 0, 0), 0);
+        robot.moveToPositionAndHeading(new Position(DistanceUnit.INCH, 24, 0, 0, 0), 180);
+        robot.moveToPositionAndHeading(new Position(DistanceUnit.INCH, 24, 0, 0, 0), 0);
+        robot.moveToPositionAndHeading(new Position(DistanceUnit.INCH, 24, 30, 0, 0), 0);
+
+
+
+        //robot.moveToPositionAndHeading(new Position(DistanceUnit.INCH, 0, 0, 0, 0), 0);
 
 
         //robot.moveToPositionAndHeading(new Position(DistanceUnit.INCH, 24, -12, 0, 0), 90);

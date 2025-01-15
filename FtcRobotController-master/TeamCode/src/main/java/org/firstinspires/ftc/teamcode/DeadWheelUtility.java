@@ -11,9 +11,9 @@ public class DeadWheelUtility {
 
     DeadWheelUtility(HardwareMap hardwareMap) {
         this.hardwareMap = hardwareMap;
-        this.leftDeadWheel = initializeDeadWheel("leftDeadWheel", DcMotorSimple.Direction.REVERSE);
-        this.rightDeadWheel = initializeDeadWheel("rightDeadWheel", DcMotorSimple.Direction.FORWARD);
-        this.centerDeadWheel = initializeDeadWheel("centerDeadWheel", DcMotorSimple.Direction.REVERSE);
+        this.leftDeadWheel = initializeDeadWheel("frontLeft", DcMotorSimple.Direction.FORWARD);
+        this.rightDeadWheel = initializeDeadWheel("rightDeadWheel", DcMotorSimple.Direction.REVERSE);
+        this.centerDeadWheel = initializeDeadWheel("centerDeadWheel", DcMotorSimple.Direction.FORWARD);
         previousLeft = 0;
         previousRight = 0;
         previousCenter = 0;

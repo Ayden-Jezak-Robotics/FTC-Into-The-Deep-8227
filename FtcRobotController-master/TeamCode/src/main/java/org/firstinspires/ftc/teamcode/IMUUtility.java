@@ -39,7 +39,7 @@ public class IMUUtility {
         return Math.toRadians(headingInDegrees);
     }
 
-    public float getPreviousHeading() {
+    public double getPreviousHeading() {
         return this.previousHeading;
     }
 
