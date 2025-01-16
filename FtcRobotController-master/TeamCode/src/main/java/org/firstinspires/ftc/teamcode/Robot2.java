@@ -37,7 +37,7 @@ public class Robot2 {
         // this.initialHeading = Math.toRadians(initialHeading);
         this.currentHeading = Math.toRadians(initialHeading);
 
-        this.motors = new MotorUtility(this.hardwareMap);
+        this.motors = new MotorUtility(this.hardwareMap, this.telemetry);
         this.deadWheels = new DeadWheelUtility(this.hardwareMap);
         this.imu = new IMUUtility(this.hardwareMap);
         this.myAprilTagProcessor = new VisionUtility(this.hardwareMap, this.cameraPosition);

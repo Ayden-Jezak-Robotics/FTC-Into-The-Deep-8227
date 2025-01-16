@@ -18,14 +18,27 @@ public class AutoOpBlueLeft extends LinearOpMode {
         Robot robot = new Robot(this, hardwareMap, telemetry, initialPosition, initialHeading);
 
         waitForStart();
-
+        //robot.turnOn();
         robot.moveToPositionAndHeading(new Position(DistanceUnit.INCH, 0, 24, 0, 0), 0);
-        robot.moveToPositionAndHeading(new Position(DistanceUnit.INCH, 24, 24, 0, 0), 0);
+        //sleep(2000);
+        /*robot.moveToPositionAndHeading(new Position(DistanceUnit.INCH, 24, 24, 0, 0), 0);
+        sleep(2000);
         robot.moveToPositionAndHeading(new Position(DistanceUnit.INCH, 24, 0, 0, 0), 0);
+        sleep(2000);
         robot.moveToPositionAndHeading(new Position(DistanceUnit.INCH, 24, 0, 0, 0), 180);
+        sleep(2000);
         robot.moveToPositionAndHeading(new Position(DistanceUnit.INCH, 24, 0, 0, 0), 0);
-        robot.moveToPositionAndHeading(new Position(DistanceUnit.INCH, 24, 30, 0, 0), 0);
-
+        sleep(2000);
+        robot.moveToPositionAndHeading(new Position(DistanceUnit.INCH, 30, 24, 0, 0), 0);
+        sleep(2000);*/
+        /*robot.moveToPositionAndHeading(new Position(DistanceUnit.INCH, 24, 0, 0, 0), 0);
+        sleep(2000);
+        robot.moveToPositionAndHeading(new Position(DistanceUnit.INCH, 24, 0, 0, 0), 180);
+        sleep(2000);
+        robot.moveToPositionAndHeading(new Position(DistanceUnit.INCH, 24, 0, 0, 0), 0);
+        sleep(2000);
+        robot.moveToPositionAndHeading(new Position(DistanceUnit.INCH, 36, 24, 0, 0), 0);
+*/
 
 
         //robot.moveToPositionAndHeading(new Position(DistanceUnit.INCH, 0, 0, 0, 0), 0);

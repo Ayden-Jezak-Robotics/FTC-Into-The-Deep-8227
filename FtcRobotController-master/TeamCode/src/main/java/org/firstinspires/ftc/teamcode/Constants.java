@@ -2,12 +2,12 @@ package org.firstinspires.ftc.teamcode;
 
 public class Constants {
 
-    public static final double DEAD_WHEEL_DIAMETER = 32;
-    public static final double WHEEL_BASE_WIDTH = 187.325;
-    public static final double WHEEL_BASE_LENGTH = 174.625;
+    public static final double DEAD_WHEEL_DIAMETER = 32;//32, 60
+    public static final double WHEEL_BASE_WIDTH = 187.325; //187.325, 152
+    public static final double WHEEL_BASE_LENGTH = 174.625; //174.625, 95
 
 
-    private static final double DEAD_WHEEL_TICKS_PER_ROTATION = 2000;
+    private static final double DEAD_WHEEL_TICKS_PER_ROTATION = 2000;//2000, 8192
     private static final double DEAD_WHEEL_CIRCUMFERENCE = (Math.PI * DEAD_WHEEL_DIAMETER);
     private static final double DEAD_WHEEL_CIRCUMFERENCE_INCH = (Math.PI * DEAD_WHEEL_DIAMETER) / 25.4;
 

@@ -1,23 +1,36 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
 
 public class MotorUtility {
 
     private final HardwareMap hardwareMap;
     private final DcMotor backLeft, backRight, frontRight, frontLeft;
+    private final DcMotor leftDeadWheel, rightDeadWheel, centerDeadWheel;
+    private int previousLeft, previousRight, previousCenter;
 
-    MotorUtility(HardwareMap hardwareMap) {
+    private Telemetry telemetry;
+    MotorUtility(HardwareMap hardwareMap, Telemetry telemetry) {
+        this.telemetry = telemetry;
         this.hardwareMap = hardwareMap;
-        this.frontLeft = initializeMotor("frontLeft", DcMotorSimple.Direction.REVERSE);
-        this.frontRight = initializeMotor("frontRight", DcMotorSimple.Direction.FORWARD);
-        this.backLeft = initializeMotor("backLeft", DcMotorSimple.Direction.REVERSE);
-        this.backRight = initializeMotor("backRight", DcMotorSimple.Direction.FORWARD);
+        this.frontLeft = initializeMotor("frontLeft", DcMotor.Direction.REVERSE);
+        this.frontRight = initializeMotor("frontRight", DcMotor.Direction.FORWARD);
+        this.backLeft = initializeMotor("backLeft", DcMotor.Direction.REVERSE);
+        this.backRight = initializeMotor("backRight", DcMotor.Direction.FORWARD);
+
+        this.leftDeadWheel = initializeMotor("backLeft", DcMotor.Direction.REVERSE);
+        this.rightDeadWheel = initializeMotor("rightDeadWheel", DcMotor.Direction.FORWARD);
+        this.centerDeadWheel = initializeMotor("centerDeadWheel", DcMotor.Direction.REVERSE);
+        previousLeft = 0;
+        previousRight = 0;
+        previousCenter = 0;
     }
 
-    DcMotor initializeMotor(String name, DcMotorSimple.Direction direction) {
+    DcMotor initializeMotor(String name, DcMotor.Direction direction) {
         DcMotor motor = hardwareMap.get(DcMotor.class, name);
 
         motor.setDirection(direction);
@@ -25,6 +38,69 @@ public class MotorUtility {
         motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         return motor;
+    }
+    DcMotor initializeDeadWheel(String name, DcMotor.Direction direction) {
+        DcMotor motor = hardwareMap.get(DcMotor.class, name);
+        motor.setDirection(direction);
+        motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        return motor;
+    }
+    void setMotorPower(double power)
+    {
+        frontRight.setPower(power);
+        frontLeft.setPower(power);
+    }
+
+    int getCurrentValue(DeadWheel type) {
+
+        switch (type) {
+            case CENTER:
+                return centerDeadWheel.getCurrentPosition();
+            case LEFT:
+                return  leftDeadWheel.getCurrentPosition();
+            case RIGHT:
+                return  rightDeadWheel.getCurrentPosition();
+            default:
+                return 0;
+        }
+    }
+
+    int getPreviousValue(DeadWheel type) {
+
+        switch (type) {
+            case CENTER:
+                return previousCenter;
+            case LEFT:
+                return  previousLeft;
+            case RIGHT:
+                return  previousRight;
+            default:
+                return 0;
+        }
+    }
+
+    void setPreviousLeft(int newValue) {
+        previousLeft = newValue;
+    }
+
+    void setPreviousRight(int newValue) {
+        previousRight = newValue;
+    }
+
+    void setPreviousCenter(int newValue) {
+        previousCenter = newValue;
+    }
+
+
+    void resetEncoders() {
+        leftDeadWheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        previousLeft = 0;
+
+        rightDeadWheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        previousRight = 0;
+
+        centerDeadWheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        previousCenter = 0;
     }
 
     void setMotorPowers(double xPower, double yPower, double turnPower) {
@@ -49,6 +125,8 @@ public class MotorUtility {
         frontRight.setPower(frontRightPower);
         backLeft.setPower(backLeftPower);
         backRight.setPower(backRightPower);
+        telemetry.addData("backLeftPower", backLeftPower);
+        telemetry.update();
     }
 
     void stopMotors() {

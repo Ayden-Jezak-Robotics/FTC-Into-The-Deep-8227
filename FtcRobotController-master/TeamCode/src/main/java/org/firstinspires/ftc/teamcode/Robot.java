@@ -20,7 +20,7 @@ public class Robot {
     private double deltaTheta;
 
     private final MotorUtility motors;
-    private final DeadWheelUtility deadWheels;
+    //private final DeadWheelUtility deadWheels;
     private IMUUtility imu;
     //private final VisionUtility myAprilTagProcessor;
 
@@ -34,13 +34,18 @@ public class Robot {
         this.initialHeading = initialHeading;
         this.currentHeading = initialHeading;
 
-        this.motors = new MotorUtility(this.hardwareMap);
-        this.deadWheels = new DeadWheelUtility(this.hardwareMap);
+        this.motors = new MotorUtility(this.hardwareMap, this.telemetry);
+        //this.F+ = new DeadWheelUtility(this.hardwareMap);
         // this.imu = new IMUUtility(this.hardwareMap, this.telemetry);
         //this.myAprilTagProcessor = new VisionUtility(this.hardwareMap, VisionType.LEFT);
         //this.imu = new IMUUtility(this.hardwareMap);
     }
-
+    public void turnOn()
+    {
+        while (opMode.opModeIsActive()) {
+            motors.setMotorPower(1);
+        }
+    }
     public void moveToPositionAndHeading(Position targetPosition, double targetHeading) {
 
         PIDUtility yPID = new PIDUtility(PIDType.STRAIGHT, telemetry);
@@ -49,7 +54,7 @@ public class Robot {
         telemetry.addLine("Starting move");
         telemetry.update();
 
-        deadWheels.resetEncoders();
+        motors.resetEncoders();
 
         xPID.setGlobalTargetPosition(targetPosition, targetHeading);
         yPID.setGlobalTargetPosition(targetPosition, targetHeading);
@@ -79,6 +84,7 @@ public class Robot {
             double xPower = xPID.calculatePower(currentPosition, currentHeading, timer.seconds());
             double yPower = yPID.calculatePower(currentPosition, currentHeading, timer.seconds());
             double turnPower = turnPID.calculatePower(currentPosition, currentHeading, timer.seconds());
+
 
             telemetry.addData("CurrentX", currentPosition.x);
             telemetry.addData("CurrentY", currentPosition.y);
@@ -122,9 +128,9 @@ public class Robot {
 
     public void updatePosition() {
 
-        int leftEncoder = deadWheels.getCurrentValue(DeadWheel.LEFT); //in ticks
-        int rightEncoder = deadWheels.getCurrentValue(DeadWheel.RIGHT);
-        int centerEncoder = deadWheels.getCurrentValue(DeadWheel.CENTER);
+        int leftEncoder = motors.getCurrentValue(DeadWheel.LEFT); //in ticks
+        int rightEncoder = motors.getCurrentValue(DeadWheel.RIGHT);
+        int centerEncoder = motors.getCurrentValue(DeadWheel.CENTER);
 
         //double imuHeadingInDegrees = imu.getOrientation().firstAngle;
 
@@ -133,9 +139,9 @@ public class Robot {
 
 
         // Get changes in encoder values
-        int deltaLeft = leftEncoder - deadWheels.getPreviousValue(DeadWheel.LEFT);
-        int deltaRight = rightEncoder - deadWheels.getPreviousValue(DeadWheel.RIGHT);
-        int deltaCenter = centerEncoder - deadWheels.getPreviousValue(DeadWheel.CENTER);
+        int deltaLeft = leftEncoder - motors.getPreviousValue(DeadWheel.LEFT);
+        int deltaRight = rightEncoder - motors.getPreviousValue(DeadWheel.RIGHT);
+        int deltaCenter = centerEncoder - motors.getPreviousValue(DeadWheel.CENTER);
         deltaTheta = (deltaRight - deltaLeft) * (Constants.DEAD_WHEEL_MM_PER_TICK / Constants.WHEEL_BASE_WIDTH);
         //wouldn't deltaTheta be deltaCenter/B and not deltaRight - deltaLeft
         //double deltaTheta = (deltaLeft + deltaRight) / Constants.WHEEL_BASE_WIDTH;
@@ -148,9 +154,9 @@ public class Robot {
         //double deltaIMU = imu.normalizeHeading(imuHeadingInDegrees - imu.getPreviousHeading());
 
         // Update previous encoder values
-        deadWheels.setPreviousLeft(leftEncoder); //in ticks
-        deadWheels.setPreviousRight(rightEncoder);
-        deadWheels.setPreviousCenter(centerEncoder);
+        motors.setPreviousLeft(leftEncoder); //in ticks
+        motors.setPreviousRight(rightEncoder);
+        motors.setPreviousCenter(centerEncoder);
 
         //imu.setPreviousHeading(imuHeadingInDegrees);
 
@@ -199,31 +205,31 @@ public class Robot {
     public void checkSensorReadings() {
 
         //this.imu = new IMUUtility(this.hardwareMap);
-        deadWheels.resetEncoders();
+        motors.resetEncoders();
 
         // double totalDeltaTheta = 0;
 
         while (opMode.opModeIsActive()) {
 
             //
-            int leftEncoder = deadWheels.getCurrentValue(DeadWheel.LEFT); //in ticks
-            int rightEncoder = deadWheels.getCurrentValue(DeadWheel.RIGHT);
-            int centerEncoder = deadWheels.getCurrentValue(DeadWheel.CENTER);
+            int leftEncoder = motors.getCurrentValue(DeadWheel.LEFT); //in ticks
+            int rightEncoder = motors.getCurrentValue(DeadWheel.RIGHT);
+            int centerEncoder = motors.getCurrentValue(DeadWheel.CENTER);
 
             //float imuHeadingInDegrees = imu.getOrientation().firstAngle;
 
             // Calculate changes in encoder values
-            int deltaLeft = leftEncoder - deadWheels.getPreviousValue(DeadWheel.LEFT);
-            int deltaRight = rightEncoder - deadWheels.getPreviousValue(DeadWheel.RIGHT);
-            int deltaCenter = centerEncoder - deadWheels.getPreviousValue(DeadWheel.CENTER);
+            int deltaLeft = leftEncoder - motors.getPreviousValue(DeadWheel.LEFT);
+            int deltaRight = rightEncoder - motors.getPreviousValue(DeadWheel.RIGHT);
+            int deltaCenter = centerEncoder - motors.getPreviousValue(DeadWheel.CENTER);
 
             double deltaTheta = Math.toDegrees((deltaRight - deltaLeft) * (Constants.DEAD_WHEEL_MM_PER_TICK / Constants.WHEEL_BASE_WIDTH));
             //double deltaIMU = (imuHeadingInDegrees - imu.getPreviousHeading());
 
             // Update previous encoder values
-            deadWheels.setPreviousLeft(leftEncoder); //in ticks
-            deadWheels.setPreviousRight(rightEncoder);
-            deadWheels.setPreviousCenter(centerEncoder);
+            motors.setPreviousLeft(leftEncoder); //in ticks
+            motors.setPreviousRight(rightEncoder);
+            motors.setPreviousCenter(centerEncoder);
 
             //imu.setPreviousHeading(imuHeadingInDegrees);
 
