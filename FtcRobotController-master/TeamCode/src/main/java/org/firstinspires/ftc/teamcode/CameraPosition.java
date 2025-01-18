@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
-public enum VisionType {
+public enum CameraPosition {
     LEFT,
     RIGHT,
 }

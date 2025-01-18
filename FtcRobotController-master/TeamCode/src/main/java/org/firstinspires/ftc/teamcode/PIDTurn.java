@@ -5,10 +5,10 @@ import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class PIDTurn {
-    private static final double kP = 0.00001;
-    private static final double kI = 0;
+    private static final double kP = 0.015;
+    private static final double kI = 0.015;
     private static final double kD = 0;
-    private static final double kF = 0.15;
+    private static final double kF = 0;
 
     private double targetHeading;
 
@@ -28,13 +28,12 @@ public class PIDTurn {
 
     public void setTargetHeading(double newTarget) {
 
-        this.targetHeading = newTarget;
+        this.targetHeading = Math.toRadians(newTarget);
 
     }
 
     /// currentPosition in Inches; currentHeading in Radians; time in Seconds
-    public double calculatePower(double currentHeading, double time)
-    {
+    public double calculatePower(double currentHeading, double time) {
         double error = (targetHeading - currentHeading);
 
         /// Prevent zero or very small time steps

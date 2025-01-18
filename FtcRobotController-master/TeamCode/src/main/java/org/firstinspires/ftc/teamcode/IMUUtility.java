@@ -1,45 +1,51 @@
 package org.firstinspires.ftc.teamcode;
 
 
-import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.bosch.BHI260IMU;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.robotcore.external.navigation.Position;
+
 
 public class IMUUtility {
 
-    private final BNO055IMU imu;
+    private final BHI260IMU imu;
     private double previousHeading;
 
     IMUUtility(HardwareMap hardwareMap) {
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-        imu.initialize(parameters);
+        imu = hardwareMap.get(BHI260IMU.class, "imu");
+
+        RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(
+                RevHubOrientationOnRobot.LogoFacingDirection.UP,
+                RevHubOrientationOnRobot.UsbFacingDirection.FORWARD
+        );
+
+        IMU.Parameters imuParameters = new IMU.Parameters(orientationOnRobot);
+
+        imu.initialize(imuParameters);
+
         previousHeading = 0;
     }
 
-    boolean calibrateIMU() {
-        return imu.isGyroCalibrated();
+    double getCurrentHeading() {
+        double currentHeadingInRadians;
+
+        currentHeadingInRadians = imu.getRobotOrientation(
+                AxesReference.INTRINSIC,
+                AxesOrder.ZYX, // TODO - Is this the right order to get firstAngle?
+                AngleUnit.RADIANS
+        ).firstAngle;
+
+        return (currentHeadingInRadians + (2 * Math.PI)) % (2 * Math.PI);
     }
 
-    Orientation getOrientation() {
-        return imu.getAngularOrientation();
-    }
-
-    public double getCurrentHeading() {
-        double headingInDegrees = imu.getAngularOrientation().firstAngle;
-
-        if (headingInDegrees < 0) {
-            headingInDegrees += 360;
-        }
-
-        return Math.toRadians(headingInDegrees);
-    }
-
-    public float getPreviousHeading() {
+    public double getPreviousHeading() {
         return this.previousHeading;
     }
 
@@ -47,10 +53,7 @@ public class IMUUtility {
         this.previousHeading = newValue;
     }
 
-    /*public double normalizeHeading(double angle) {
-        while (angle >= 180) angle -= 360;
-        while (angle < -180) angle += 360;
-        return angle;
-    }*/
-
+    void resetIMU() {
+        imu.resetYaw();
+    }
 }

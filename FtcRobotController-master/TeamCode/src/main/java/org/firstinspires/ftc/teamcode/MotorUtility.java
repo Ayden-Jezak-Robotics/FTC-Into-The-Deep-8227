@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class MotorUtility {
@@ -11,13 +10,13 @@ public class MotorUtility {
 
     MotorUtility(HardwareMap hardwareMap) {
         this.hardwareMap = hardwareMap;
-        this.frontLeft = initializeMotor("frontLeft", DcMotorSimple.Direction.REVERSE);
-        this.frontRight = initializeMotor("frontRight", DcMotorSimple.Direction.FORWARD);
-        this.backLeft = initializeMotor("backLeft", DcMotorSimple.Direction.REVERSE);
-        this.backRight = initializeMotor("backRight", DcMotorSimple.Direction.FORWARD);
+        this.frontLeft = initializeMotor("frontLeft", DcMotor.Direction.REVERSE);
+        this.frontRight = initializeMotor("frontRight", DcMotor.Direction.FORWARD);
+        this.backLeft = initializeMotor("backLeft", DcMotor.Direction.REVERSE);
+        this.backRight = initializeMotor("backRight", DcMotor.Direction.FORWARD);
     }
 
-    DcMotor initializeMotor(String name, DcMotorSimple.Direction direction) {
+    DcMotor initializeMotor(String name, DcMotor.Direction direction) {
         DcMotor motor = hardwareMap.get(DcMotor.class, name);
 
         motor.setDirection(direction);

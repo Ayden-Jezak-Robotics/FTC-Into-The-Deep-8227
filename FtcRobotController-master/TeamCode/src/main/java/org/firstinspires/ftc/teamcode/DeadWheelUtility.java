@@ -6,17 +6,16 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class DeadWheelUtility {
     private final HardwareMap hardwareMap;
-    private final DcMotor rightDeadWheel, leftDeadWheel, centerDeadWheel;
-    private int previousLeft, previousRight, previousCenter;
+    private final DcMotor deadWheelDrive, deadWheelStrafe;
+    private int previousDrive, previousStrafe;
 
     DeadWheelUtility(HardwareMap hardwareMap) {
         this.hardwareMap = hardwareMap;
-        this.leftDeadWheel = initializeDeadWheel("leftDeadWheel", DcMotorSimple.Direction.REVERSE);
-        this.rightDeadWheel = initializeDeadWheel("rightDeadWheel", DcMotorSimple.Direction.FORWARD);
-        this.centerDeadWheel = initializeDeadWheel("centerDeadWheel", DcMotorSimple.Direction.REVERSE);
-        previousLeft = 0;
-        previousRight = 0;
-        previousCenter = 0;
+        // TODO: Rename DeadWheels in Drive Hub
+        this.deadWheelDrive = initializeDeadWheel("driveDeadWheel", DcMotorSimple.Direction.FORWARD);
+        this.deadWheelStrafe = initializeDeadWheel("strafeDeadWheel", DcMotorSimple.Direction.REVERSE);
+        previousDrive = 0;
+        previousStrafe = 0;
     }
 
     DcMotor initializeDeadWheel(String name, DcMotorSimple.Direction direction) {
@@ -29,12 +28,10 @@ public class DeadWheelUtility {
     int getCurrentValue(DeadWheel type) {
 
         switch (type) {
-            case CENTER:
-                return centerDeadWheel.getCurrentPosition();
-            case LEFT:
-                return  leftDeadWheel.getCurrentPosition();
-            case RIGHT:
-                return  rightDeadWheel.getCurrentPosition();
+            case DRIVE:
+                return deadWheelDrive.getCurrentPosition();
+            case STRAFE:
+                return deadWheelStrafe.getCurrentPosition();
             default:
                 return 0;
         }
@@ -43,38 +40,29 @@ public class DeadWheelUtility {
     int getPreviousValue(DeadWheel type) {
 
         switch (type) {
-            case CENTER:
-                return previousCenter;
-            case LEFT:
-                return  previousLeft;
-            case RIGHT:
-                return  previousRight;
+            case DRIVE:
+                return previousDrive;
+            case STRAFE:
+                return previousStrafe;
             default:
                 return 0;
         }
     }
 
-    void setPreviousLeft(int newValue) {
-        previousLeft = newValue;
+    void setPreviousDrive(int newValue) {
+        previousDrive = newValue;
     }
 
-    void setPreviousRight(int newValue) {
-        previousRight = newValue;
-    }
-
-    void setPreviousCenter(int newValue) {
-        previousCenter = newValue;
+    void setPreviousStrafe(int newValue) {
+        previousStrafe = newValue;
     }
 
 
     void resetEncoders() {
-        leftDeadWheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        previousLeft = 0;
+        deadWheelDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        previousDrive = 0;
 
-        rightDeadWheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        previousRight = 0;
-
-        centerDeadWheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        previousCenter = 0;
+        deadWheelStrafe.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        previousStrafe = 0;
     }
 }

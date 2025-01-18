@@ -24,13 +24,13 @@ public class VisionUtility {
     private final VisionPortal myVisionPortal;
     private final HardwareMap myHardwareMap;
 
-    VisionUtility(HardwareMap hardwareMap, VisionType visionType) {
+    VisionUtility(HardwareMap hardwareMap, CameraPosition visionType) {
 
 
         Position cameraPosition;
         YawPitchRollAngles cameraOrientation;
 
-        if (visionType == VisionType.LEFT) {
+        if (visionType == CameraPosition.LEFT) {
             cameraPosition = new Position(DistanceUnit.MM, 0, 0, 0, 0);
             cameraOrientation = new YawPitchRollAngles(AngleUnit.DEGREES, 0, 0, 0, 0);
         } else {
