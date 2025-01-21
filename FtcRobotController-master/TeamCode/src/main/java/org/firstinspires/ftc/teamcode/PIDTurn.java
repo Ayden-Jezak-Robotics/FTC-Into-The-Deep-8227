@@ -28,7 +28,7 @@ public class PIDTurn {
 
     public void setTargetHeading(double newTarget) {
 
-        this.targetHeading = Math.toRadians(newTarget);
+        this.targetHeading = newTarget;
 
     }
 

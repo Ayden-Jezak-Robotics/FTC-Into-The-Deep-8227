@@ -14,11 +14,11 @@ public class Robot {
     private final HardwareMap hardwareMap;
     private final Telemetry telemetry;
 
-    private final CameraPosition cameraPosition;
+    //private final CameraPosition cameraPosition;
 
     private final MotorUtility motors;
     private final DeadWheelUtility deadWheels;
-    private final VisionUtility myAprilTagProcessor;
+    //private final VisionUtility myAprilTagProcessor;
 
     private IMUUtility imu;
 
@@ -36,15 +36,15 @@ public class Robot {
         this.hardwareMap = hardwareMap;
         this.telemetry = telemetry;
 
-        this.cameraPosition = side;
+        //this.cameraPosition = side;
 
         this.currentPosition = initialState.position;
-        this.currentHeading = Math.toRadians(initialState.heading);
+        this.currentHeading = initialState.heading;
 
         this.motors = new MotorUtility(this.hardwareMap);
         this.deadWheels = new DeadWheelUtility(this.hardwareMap);
         this.imu = new IMUUtility(this.hardwareMap);
-        this.myAprilTagProcessor = new VisionUtility(this.hardwareMap, this.cameraPosition);
+        //this.myAprilTagProcessor = new VisionUtility(this.hardwareMap, this.cameraPosition);
     }
 
     public void moveToPositionAndHeading(RobotState targetState) {
@@ -106,17 +106,17 @@ public class Robot {
         int EncoderDrive = deadWheels.getCurrentValue(DeadWheel.DRIVE); //in ticks
         int EncoderStrafe = deadWheels.getCurrentValue(DeadWheel.STRAFE);
 
-        /// IMU Heading in Radians
-        double imuHeadingInRadians = imu.getCurrentHeading();
+        /// IMU Heading in Degrees
+        double imuHeadingInDegrees = imu.getCurrentHeading();
 
         /// Get changes in encoder values
         int deltaDrive = EncoderDrive - deadWheels.getPreviousValue(DeadWheel.DRIVE);
         int deltaStrafe = EncoderStrafe - deadWheels.getPreviousValue(DeadWheel.STRAFE);
 
-        /// deltaTheta from IMU in Radians
-        double deltaThetaIMU = imuHeadingInRadians - imu.getPreviousHeading();
+        /// deltaTheta from IMU
+        double deltaThetaIMU = imuHeadingInDegrees - imu.getPreviousHeading();
 
-        /// Encoder Heading in Radians
+        /// Encoder Heading
 
         currentHeading = currentHeading + deltaThetaIMU;
 
@@ -124,7 +124,7 @@ public class Robot {
         deadWheels.setPreviousDrive(EncoderDrive); //in ticks
         deadWheels.setPreviousStrafe(EncoderStrafe);
 
-        imu.setPreviousHeading(imuHeadingInRadians);
+        imu.setPreviousHeading(imuHeadingInDegrees);
 
         //double encoderHeadingNormalized = gyros.normalizeHeading(currentHeading + deltaTheta);
 
@@ -136,22 +136,22 @@ public class Robot {
 //        telemetry.update();
 
         // Local displacements
-        double deltaYLocal = (deltaDrive - (Constants.WHEEL_BASE_LENGTH * deltaThetaIMU));
+        double deltaYLocal = (deltaDrive - (Constants.WHEEL_BASE_WIDTH * deltaThetaIMU));
         double deltaXLocal = (deltaStrafe - (Constants.WHEEL_BASE_LENGTH * deltaThetaIMU));
 
         // Transform local displacements to global coordinates
         // changed the signs for globals
-        double deltaYGlobal = deltaXLocal * Math.sin(currentHeading) + deltaYLocal * Math.cos(currentHeading);
-        double deltaXGlobal = deltaXLocal * Math.cos(currentHeading) - deltaYLocal * Math.sin(currentHeading);
+        double deltaYGlobal = deltaXLocal * Math.sin(Math.toRadians(currentHeading)) + deltaYLocal * Math.cos(Math.toRadians(currentHeading));
+        double deltaXGlobal = deltaXLocal * Math.cos(Math.toRadians(currentHeading)) - deltaYLocal * Math.sin(Math.toRadians(currentHeading));
 
-        final Pose3D currentAprilTagPosition = myAprilTagProcessor.getPose();
+        //final Pose3D currentAprilTagPosition = myAprilTagProcessor.getPose();
 
         XYValue aprilPosition = new XYValue(0, 0);
 
-        if (currentAprilTagPosition != null) {
+        /*if (currentAprilTagPosition != null) {
             aprilPosition.x = currentAprilTagPosition.getPosition().x;
             aprilPosition.y = currentAprilTagPosition.getPosition().y;
-        }
+        }*/
 
         // Update global position
         currentPosition.x += deltaXGlobal / Constants.DEAD_WHEEL_TICKS_PER_INCH;
@@ -172,32 +172,32 @@ public class Robot {
             int EncoderDrive = deadWheels.getCurrentValue(DeadWheel.DRIVE); //in ticks
             int EncoderStrafe = deadWheels.getCurrentValue(DeadWheel.STRAFE);
 
-            double imuHeadingInRadians = imu.getCurrentHeading();
+            double imuHeadingInDegrees = imu.getCurrentHeading();
 
             // Calculate changes in encoder values
             int deltaDrive = EncoderDrive - deadWheels.getPreviousValue(DeadWheel.DRIVE);
             int deltaStrafe = EncoderStrafe - deadWheels.getPreviousValue(DeadWheel.STRAFE);
 
-            double deltaIMU = (imuHeadingInRadians - imu.getPreviousHeading());
+            double deltaIMU = (imuHeadingInDegrees - imu.getPreviousHeading());
 
             // Update previous encoder values
             deadWheels.setPreviousDrive(EncoderDrive); //in ticks
             deadWheels.setPreviousStrafe(EncoderStrafe);
 
-            imu.setPreviousHeading(imuHeadingInRadians);
+            imu.setPreviousHeading(imuHeadingInDegrees);
 
-            final Pose3D currentAprilTagPosition = myAprilTagProcessor.getPose();
+            //final Pose3D currentAprilTagPosition = myAprilTagProcessor.getPose();
 
             // Print Out Various Values
 
             telemetry.addData("Current X", currentPosition.x);
-            telemetry.addData("April X", (currentAprilTagPosition != null) ? currentAprilTagPosition.getPosition().x : "none");
+            //telemetry.addData("April X", (currentAprilTagPosition != null) ? currentAprilTagPosition.getPosition().x : "none");
 
             telemetry.addData("Current Y", currentPosition.y);
-            telemetry.addData("April Y", (currentAprilTagPosition != null) ? currentAprilTagPosition.getPosition().y : "none");
+            //telemetry.addData("April Y", (currentAprilTagPosition != null) ? currentAprilTagPosition.getPosition().y : "none");
 
-            telemetry.addData("Current Heading", currentHeading);
-            telemetry.addData("IMU Raw", Math.toDegrees(imuHeadingInRadians));
+            telemetry.addData("Current Heading", Math.toDegrees(currentHeading));
+            telemetry.addData("IMU Raw", imuHeadingInDegrees);
 
             telemetry.update();
 

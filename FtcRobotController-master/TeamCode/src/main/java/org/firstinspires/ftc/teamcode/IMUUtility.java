@@ -22,8 +22,8 @@ public class IMUUtility {
         imu = hardwareMap.get(BHI260IMU.class, "imu");
 
         RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(
-                RevHubOrientationOnRobot.LogoFacingDirection.UP,
-                RevHubOrientationOnRobot.UsbFacingDirection.FORWARD
+                RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
+                RevHubOrientationOnRobot.UsbFacingDirection.UP
         );
 
         IMU.Parameters imuParameters = new IMU.Parameters(orientationOnRobot);
@@ -34,15 +34,15 @@ public class IMUUtility {
     }
 
     double getCurrentHeading() {
-        double currentHeadingInRadians;
+        double currentHeadingInDegrees;
 
-        currentHeadingInRadians = imu.getRobotOrientation(
+        currentHeadingInDegrees = imu.getRobotOrientation(
                 AxesReference.INTRINSIC,
-                AxesOrder.ZYX, // TODO - Is this the right order to get firstAngle?
-                AngleUnit.RADIANS
+                AxesOrder.ZXY, // TODO - Is this the right order to get firstAngle?
+                AngleUnit.DEGREES
         ).firstAngle;
 
-        return (currentHeadingInRadians + (2 * Math.PI)) % (2 * Math.PI);
+        return currentHeadingInDegrees;
     }
 
     public double getPreviousHeading() {
