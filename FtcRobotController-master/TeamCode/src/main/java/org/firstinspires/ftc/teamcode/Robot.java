@@ -197,8 +197,8 @@ public class Robot {
             telemetry.addData("Current Y", currentPosition.y);
             //telemetry.addData("April Y", (currentAprilTagPosition != null) ? currentAprilTagPosition.getPosition().y : "none");
 
-            telemetry.addData("Current Heading", Math.toDegrees(currentHeading));
-            telemetry.addData("IMU Raw", imuHeading);
+            telemetry.addData("Current Heading", LMMHS.reportAngle(currentHeading));
+            telemetry.addData("IMU Raw", LMMHS.reportAngle(imuHeading));
 
             telemetry.update();
 

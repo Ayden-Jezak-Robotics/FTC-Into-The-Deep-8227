@@ -13,7 +13,6 @@ public class LMMHS {
         } else {
             return Math.cos(angle);
         }
-
     }
 
     public static double sin(double angle) {
@@ -23,7 +22,6 @@ public class LMMHS {
         } else {
             return Math.sin(angle);
         }
-
     }
 
     public static AngleUnit getAngleUnit() {
@@ -32,7 +30,6 @@ public class LMMHS {
         } else {
             return AngleUnit.RADIANS;
         }
-
     }
 
     public static double setAngle(double initialAngle) {
@@ -42,6 +39,15 @@ public class LMMHS {
             return Math.toRadians(initialAngle);
         }
     }
+
+    public static double reportAngle(double initialAngle) {
+        if (inDegrees) {
+            return initialAngle;
+        } else {
+            return Math.toDegrees(initialAngle);
+        }
+    }
+
 
     public static double normalizeAngle(double initialAngle) {
         if (inDegrees) {
