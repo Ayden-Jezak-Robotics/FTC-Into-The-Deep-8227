@@ -5,7 +5,6 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 
 public class Robot {
@@ -39,7 +38,7 @@ public class Robot {
         //this.cameraPosition = side;
 
         this.currentPosition = initialState.position;
-        this.currentHeading = initialState.heading;
+        this.currentHeading = LMMHS.setAngle(initialState.heading);
 
         this.motors = new MotorUtility(this.hardwareMap);
         this.deadWheels = new DeadWheelUtility(this.hardwareMap);
@@ -50,7 +49,7 @@ public class Robot {
     public void moveToPositionAndHeading(RobotState targetState) {
 
         Position targetPosition = targetState.position;
-        double targetHeading = targetState.heading;
+        double targetHeading = LMMHS.setAngle(targetState.heading);
 
         PIDDrive xyPID = new PIDDrive(telemetry);
         PIDTurn turnPID = new PIDTurn(telemetry);
@@ -107,14 +106,14 @@ public class Robot {
         int EncoderStrafe = deadWheels.getCurrentValue(DeadWheel.STRAFE);
 
         /// IMU Heading in Degrees
-        double imuHeadingInDegrees = imu.getCurrentHeading();
+        double imuHeading = imu.getCurrentHeading();
 
         /// Get changes in encoder values
         int deltaDrive = EncoderDrive - deadWheels.getPreviousValue(DeadWheel.DRIVE);
         int deltaStrafe = EncoderStrafe - deadWheels.getPreviousValue(DeadWheel.STRAFE);
 
         /// deltaTheta from IMU
-        double deltaThetaIMU = imuHeadingInDegrees - imu.getPreviousHeading();
+        double deltaThetaIMU = imuHeading - imu.getPreviousHeading();
 
         /// Encoder Heading
 
@@ -124,7 +123,7 @@ public class Robot {
         deadWheels.setPreviousDrive(EncoderDrive); //in ticks
         deadWheels.setPreviousStrafe(EncoderStrafe);
 
-        imu.setPreviousHeading(imuHeadingInDegrees);
+        imu.setPreviousHeading(imuHeading);
 
         //double encoderHeadingNormalized = gyros.normalizeHeading(currentHeading + deltaTheta);
 
@@ -141,8 +140,8 @@ public class Robot {
 
         // Transform local displacements to global coordinates
         // changed the signs for globals
-        double deltaYGlobal = deltaXLocal * Math.sin(Math.toRadians(currentHeading)) + deltaYLocal * Math.cos(Math.toRadians(currentHeading));
-        double deltaXGlobal = deltaXLocal * Math.cos(Math.toRadians(currentHeading)) - deltaYLocal * Math.sin(Math.toRadians(currentHeading));
+        double deltaYGlobal = deltaXLocal * LMMHS.sin(currentHeading) + deltaYLocal * LMMHS.cos(currentHeading);
+        double deltaXGlobal = deltaXLocal * LMMHS.cos(currentHeading) - deltaYLocal * LMMHS.sin(currentHeading);
 
         //final Pose3D currentAprilTagPosition = myAprilTagProcessor.getPose();
 
@@ -162,6 +161,8 @@ public class Robot {
     public void checkSensorReadings() {
 
         this.imu = new IMUUtility(this.hardwareMap);
+
+        imu.resetIMU();
         deadWheels.resetEncoders();
 
         // double totalDeltaTheta = 0;
@@ -172,19 +173,19 @@ public class Robot {
             int EncoderDrive = deadWheels.getCurrentValue(DeadWheel.DRIVE); //in ticks
             int EncoderStrafe = deadWheels.getCurrentValue(DeadWheel.STRAFE);
 
-            double imuHeadingInDegrees = imu.getCurrentHeading();
+            double imuHeading = imu.getCurrentHeading();
 
             // Calculate changes in encoder values
             int deltaDrive = EncoderDrive - deadWheels.getPreviousValue(DeadWheel.DRIVE);
             int deltaStrafe = EncoderStrafe - deadWheels.getPreviousValue(DeadWheel.STRAFE);
 
-            double deltaIMU = (imuHeadingInDegrees - imu.getPreviousHeading());
+            double deltaIMU = (imuHeading - imu.getPreviousHeading());
 
             // Update previous encoder values
             deadWheels.setPreviousDrive(EncoderDrive); //in ticks
             deadWheels.setPreviousStrafe(EncoderStrafe);
 
-            imu.setPreviousHeading(imuHeadingInDegrees);
+            imu.setPreviousHeading(imuHeading);
 
             //final Pose3D currentAprilTagPosition = myAprilTagProcessor.getPose();
 
@@ -197,7 +198,7 @@ public class Robot {
             //telemetry.addData("April Y", (currentAprilTagPosition != null) ? currentAprilTagPosition.getPosition().y : "none");
 
             telemetry.addData("Current Heading", Math.toDegrees(currentHeading));
-            telemetry.addData("IMU Raw", imuHeadingInDegrees);
+            telemetry.addData("IMU Raw", imuHeading);
 
             telemetry.update();
 

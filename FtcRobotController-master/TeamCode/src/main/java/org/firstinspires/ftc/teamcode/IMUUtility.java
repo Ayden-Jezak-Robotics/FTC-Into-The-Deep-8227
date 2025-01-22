@@ -34,15 +34,15 @@ public class IMUUtility {
     }
 
     double getCurrentHeading() {
-        double currentHeadingInDegrees;
+        double currentHeading;
 
-        currentHeadingInDegrees = imu.getRobotOrientation(
+        currentHeading = imu.getRobotOrientation(
                 AxesReference.INTRINSIC,
                 AxesOrder.ZXY, // TODO - Is this the right order to get firstAngle?
-                AngleUnit.DEGREES
+                LMMHS.getAngleUnit()
         ).firstAngle;
 
-        return currentHeadingInDegrees;
+        return currentHeading;
     }
 
     public double getPreviousHeading() {

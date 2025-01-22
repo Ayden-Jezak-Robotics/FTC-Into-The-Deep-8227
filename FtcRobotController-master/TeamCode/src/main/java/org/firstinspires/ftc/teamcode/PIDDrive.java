@@ -45,8 +45,8 @@ public class PIDDrive {
     public XYValue calculateLocalError(Position currentPosition, double currentHeading) {
         XYValue localError = new XYValue(0, 0);
 
-        double tempErrorX = (targetPosition.x - currentPosition.x) * Math.cos(currentHeading) + (targetPosition.y - currentPosition.y) * Math.sin(currentHeading);
-        double tempErrorY = (targetPosition.y - currentPosition.y) * Math.cos(currentHeading) - (targetPosition.x - currentPosition.x) * Math.sin(currentHeading);
+        double tempErrorX = (targetPosition.x - currentPosition.x) * LMMHS.cos(currentHeading) + (targetPosition.y - currentPosition.y) * LMMHS.sin(currentHeading);
+        double tempErrorY = (targetPosition.y - currentPosition.y) * LMMHS.cos(currentHeading) - (targetPosition.x - currentPosition.x) * LMMHS.sin(currentHeading);
 
         localError.x = tempErrorX * Constants.DEAD_WHEEL_TICKS_PER_INCH;
         localError.y = tempErrorY * Constants.DEAD_WHEEL_TICKS_PER_INCH;
