@@ -50,5 +50,14 @@ public class LMMHS {
             return ((initialAngle + Math.PI) % (2 * Math.PI) + (2 * Math.PI)) % (2 * Math.PI) - Math.PI;
         }
     }
+
+    public static double turnTolerance() {
+        if (inDegrees) {
+            return Constants.TURN_TOLERANCE_IN_DEGREES;
+        } else {
+            return Constants.TURN_TOLERANCE_IN_RADIANS;
+        }
+
+    }
 }
 

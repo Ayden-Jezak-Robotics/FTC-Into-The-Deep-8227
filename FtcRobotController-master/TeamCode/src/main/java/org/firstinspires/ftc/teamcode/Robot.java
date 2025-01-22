@@ -71,7 +71,7 @@ public class Robot {
             double remainingTheta = targetHeading - currentHeading;
 
             // Break condition
-            if (Math.abs(remainingX) < Constants.MINIMUM_DISTANCE && Math.abs(remainingY) < Constants.MINIMUM_DISTANCE && Math.abs(remainingTheta) < Constants.TURN_TOLERANCE) {
+            if (Math.abs(remainingX) < Constants.MINIMUM_DISTANCE && Math.abs(remainingY) < Constants.MINIMUM_DISTANCE && Math.abs(remainingTheta) < LMMHS.turnTolerance()) {
                 telemetry.addLine("Breaks due to tolerance");
                 telemetry.update();
                 break;

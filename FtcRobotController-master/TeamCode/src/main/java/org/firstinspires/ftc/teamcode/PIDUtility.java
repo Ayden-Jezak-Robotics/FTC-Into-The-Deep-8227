@@ -1,8 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
-import android.icu.text.Transliterator;
-
 import com.qualcomm.robotcore.util.Range;
+
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 
@@ -63,29 +62,21 @@ public class PIDUtility {
         this.priorError = 0;
     }
 
-    public double calculateLocalError(Position initialPosition, double initialHeading)
-    {
-            if (type == PIDType.STRAIGHT)
-            {
-                this.originalError = (targetPosition - initialPosition.y)* Math.cos(Math.toRadians(initialHeading)) - (targetPosition - initialPosition.x)* Math.sin(Math.toRadians(initialHeading));
-            }
-            else {
-                this.originalError = (targetPosition - initialPosition.x)* Math.cos(Math.toRadians(initialHeading)) + (targetPosition - initialPosition.y)* Math.sin(Math.toRadians(initialHeading));
-            }
-            return this.originalError = this.originalError * Constants.DEAD_WHEEL_TICKS_PER_INCH;
+    public double calculateLocalError(Position initialPosition, double initialHeading) {
+        if (type == PIDType.STRAIGHT) {
+            this.originalError = (targetPosition - initialPosition.y) * Math.cos(Math.toRadians(initialHeading)) - (targetPosition - initialPosition.x) * Math.sin(Math.toRadians(initialHeading));
+        } else {
+            this.originalError = (targetPosition - initialPosition.x) * Math.cos(Math.toRadians(initialHeading)) + (targetPosition - initialPosition.y) * Math.sin(Math.toRadians(initialHeading));
+        }
+        return this.originalError = this.originalError * Constants.DEAD_WHEEL_TICKS_PER_INCH;
     }
 
     public void setGlobalTargetPosition(Position targetPosition, double targetHeading) {
-        if (type == PIDType.STRAFE)
-        {
+        if (type == PIDType.STRAFE) {
             this.targetPosition = targetPosition.x;
-        }
-        else if (type == PIDType.STRAIGHT)
-        {
+        } else if (type == PIDType.STRAIGHT) {
             this.targetPosition = targetPosition.y;
-        }
-        else
-        {
+        } else {
             this.targetPosition = targetHeading;
         }
     }
@@ -95,7 +86,7 @@ public class PIDUtility {
         while (angle < -180) angle += 360;
         return angle;
     }*/
-    
+
 
     public double calculatePower(Position currentPosition, double currentHeading, double time) // time is in Seconds, current position is in inches
     {
@@ -107,12 +98,11 @@ public class PIDUtility {
             if (Math.abs(error) < Constants.MINIMUM_DISTANCE) {
                 return 0;
             }
-        }
-        else { // For Turn based calculations
+        } else { // For Turn based calculations
             //NEW need to normalize hypothetically what is target = -45 and you are at 180?
             error = (targetPosition - currentHeading);
 
-            if (Math.abs(error) < Constants.TURN_TOLERANCE) {
+            if (Math.abs(error) < LMMHS.turnTolerance()) {
                 return 0;
             }
         }
@@ -167,7 +157,6 @@ public class PIDUtility {
                 baseOutput = Math.signum(baseOutput) * Constants.MINIMUM_POWER_OUTPUT_TURN;
             }
         }*/
-
 
 
         return baseOutput;
