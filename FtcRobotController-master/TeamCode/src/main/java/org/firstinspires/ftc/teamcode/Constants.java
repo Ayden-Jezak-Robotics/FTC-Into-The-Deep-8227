@@ -3,8 +3,8 @@ package org.firstinspires.ftc.teamcode;
 public class Constants {
 
     public static final double DEAD_WHEEL_DIAMETER = 32;
-    public static final double WHEEL_BASE_WIDTH = 87.5;
-    public static final double WHEEL_BASE_LENGTH = 102;
+    public static final double WHEEL_BASE_WIDTH = 0;
+    public static final double WHEEL_BASE_LENGTH = 165;
 
 
     private static final double DEAD_WHEEL_TICKS_PER_ROTATION = 2000;

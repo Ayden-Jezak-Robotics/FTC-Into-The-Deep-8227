@@ -46,6 +46,23 @@ public class Robot {
         //this.myAprilTagProcessor = new VisionUtility(this.hardwareMap, this.cameraPosition);
     }
 
+    public void turnOn()
+    {
+        /// Reset everything to 0
+        imu.resetIMU();
+        deadWheels.resetEncoders();
+        while (opMode.opModeIsActive()) {
+            motors.setMotorPower(0.6);
+            int EncoderDrive = deadWheels.getCurrentValue(DeadWheel.DRIVE); //in ticks
+            int EncoderStrafe = deadWheels.getCurrentValue(DeadWheel.STRAFE);
+            telemetry.addData("EncoderDrive", EncoderDrive);
+            telemetry.addData("EncoderStrafe", EncoderStrafe);
+            telemetry.update();
+        }
+
+
+    }
+
     public void moveToPositionAndHeading(RobotState targetState) {
 
         Position targetPosition = targetState.position;
@@ -104,6 +121,11 @@ public class Robot {
 
         int EncoderDrive = deadWheels.getCurrentValue(DeadWheel.DRIVE); //in ticks
         int EncoderStrafe = deadWheels.getCurrentValue(DeadWheel.STRAFE);
+
+        telemetry.addData("EncoderDrive", EncoderDrive/Constants.DEAD_WHEEL_TICKS_PER_INCH);
+        telemetry.addData("EncoderStrafe", EncoderStrafe/Constants.DEAD_WHEEL_TICKS_PER_INCH);
+        telemetry.update();
+
 
         /// IMU Heading in Degrees
         double imuHeading = imu.getCurrentHeading();
