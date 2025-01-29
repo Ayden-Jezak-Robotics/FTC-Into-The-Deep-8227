@@ -12,7 +12,7 @@ public class DeadWheelUtility {
     DeadWheelUtility(HardwareMap hardwareMap) {
         this.hardwareMap = hardwareMap;
         // TODO: Rename DeadWheels in Drive Hub
-        this.deadWheelDrive = initializeDeadWheel("driveDeadWheel", DcMotorSimple.Direction.FORWARD);
+        this.deadWheelDrive = initializeDeadWheel("driveDeadWheel", DcMotorSimple.Direction.REVERSE);
         this.deadWheelStrafe = initializeDeadWheel("strafeDeadWheel", DcMotorSimple.Direction.REVERSE);
         previousDrive = 0;
         previousStrafe = 0;

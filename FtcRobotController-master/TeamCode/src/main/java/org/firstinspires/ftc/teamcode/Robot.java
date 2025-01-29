@@ -52,7 +52,7 @@ public class Robot {
         imu.resetIMU();
         deadWheels.resetEncoders();
         while (opMode.opModeIsActive()) {
-            motors.setMotorPower(0.6);
+            motors.setMotorPower(0.3);
             int EncoderDrive = deadWheels.getCurrentValue(DeadWheel.DRIVE); //in ticks
             int EncoderStrafe = deadWheels.getCurrentValue(DeadWheel.STRAFE);
             telemetry.addData("EncoderDrive", EncoderDrive);
@@ -212,7 +212,8 @@ public class Robot {
             //final Pose3D currentAprilTagPosition = myAprilTagProcessor.getPose();
 
             // Print Out Various Values
-
+            telemetry.addData("Encoder Drive", EncoderDrive);
+            telemetry.addData("Encoder Strafe", EncoderStrafe);
             telemetry.addData("Current X", currentPosition.x);
             //telemetry.addData("April X", (currentAprilTagPosition != null) ? currentAprilTagPosition.getPosition().x : "none");
 

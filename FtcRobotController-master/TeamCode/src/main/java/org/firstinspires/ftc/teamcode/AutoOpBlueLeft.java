@@ -15,9 +15,9 @@ public class AutoOpBlueLeft extends LinearOpMode {
 
         waitForStart();
 
-        robot.turnOn();
-        //robot.moveToPositionAndHeading(new RobotState(0, 24, 0));
-        //robot.moveToPositionAndHeading(new RobotState(24, 24, 45));
+        //robot.turnOn();
+        robot.moveToPositionAndHeading(new RobotState(0, 24, 0));
+        robot.moveToPositionAndHeading(new RobotState(24, 24, 0));
         //robot.moveToPositionAndHeading(new RobotState(0, 0, 45));
         //robot.moveToPositionAndHeading(new RobotState(0, 0, 0));
 
