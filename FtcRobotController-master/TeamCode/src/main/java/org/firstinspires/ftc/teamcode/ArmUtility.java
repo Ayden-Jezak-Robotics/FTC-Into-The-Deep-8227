@@ -10,7 +10,7 @@ public class ArmUtility {
     private final DcMotor leftArmMotor, rightArmMotor;
 
     private final Servo leftArmServo, rightArmServo;
-    private final Servo wristServo, grabberServo;
+    private final Servo wristServo, grabberServo, extendServo;
 
     public ArmUtility(HardwareMap hardwareMap) {
         this.hardwareMap = hardwareMap;
@@ -22,6 +22,7 @@ public class ArmUtility {
         this.rightArmServo = initializeServo("rightArmServo");
         this.wristServo = initializeServo("wristServo");
         this.grabberServo = initializeServo("grabberServo");
+        this.extendServo - initializeServo("extendServo");
     }
 
     DcMotor initializeMotor(String name, DcMotor.Direction direction) {
