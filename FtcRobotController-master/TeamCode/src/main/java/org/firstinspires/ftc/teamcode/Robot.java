@@ -157,8 +157,8 @@ public class Robot {
 //        telemetry.update();
 
         // Local displacements
-        double deltaYLocal = (deltaDrive - (Constants.WHEEL_BASE_WIDTH * deltaThetaIMU));
-        double deltaXLocal = (deltaStrafe - (Constants.WHEEL_BASE_LENGTH * deltaThetaIMU));
+        double deltaYLocal = (deltaDrive - (Constants.DRIVE_RADIUS * deltaThetaIMU));
+        double deltaXLocal = (deltaStrafe - (Constants.STRAFE_RADIUS * deltaThetaIMU));
 
         // Transform local displacements to global coordinates
         // changed the signs for globals
