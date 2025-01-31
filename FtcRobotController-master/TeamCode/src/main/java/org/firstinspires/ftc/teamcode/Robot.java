@@ -46,8 +46,7 @@ public class Robot {
         //this.myAprilTagProcessor = new VisionUtility(this.hardwareMap, this.cameraPosition);
     }
 
-    public void turnOn()
-    {
+    public void turnOn() {
         /// Reset everything to 0
         imu.resetIMU();
         deadWheels.resetEncoders();
@@ -122,8 +121,8 @@ public class Robot {
         int EncoderDrive = deadWheels.getCurrentValue(DeadWheel.DRIVE); //in ticks
         int EncoderStrafe = deadWheels.getCurrentValue(DeadWheel.STRAFE);
 
-        telemetry.addData("EncoderDrive", EncoderDrive/Constants.DEAD_WHEEL_TICKS_PER_INCH);
-        telemetry.addData("EncoderStrafe", EncoderStrafe/Constants.DEAD_WHEEL_TICKS_PER_INCH);
+        telemetry.addData("EncoderDrive", EncoderDrive / Constants.DEAD_WHEEL_TICKS_PER_INCH);
+        telemetry.addData("EncoderStrafe", EncoderStrafe / Constants.DEAD_WHEEL_TICKS_PER_INCH);
         telemetry.update();
 
 
@@ -157,8 +156,8 @@ public class Robot {
 //        telemetry.update();
 
         // Local displacements
-        double deltaYLocal = (deltaDrive - ((Constants.DRIVE_RADIUS*Constants.DEAD_WHEEL_TICKS_PER_MM) * deltaThetaIMU));
-        double deltaXLocal = (deltaStrafe - ((Constants.STRAFE_RADIUS*Constants.DEAD_WHEEL_TICKS_PER_MM) * deltaThetaIMU)); //NEW
+        double deltaYLocal = (deltaDrive - (Constants.DRIVE_RADIUS * deltaThetaIMU));
+        double deltaXLocal = (deltaStrafe - (Constants.STRAFE_RADIUS * deltaThetaIMU)); //NEW
 
         // Transform local displacements to global coordinates
         // changed the signs for globals
@@ -175,8 +174,8 @@ public class Robot {
         }*/
 
         // Update global position
-        currentPosition.x += deltaXGlobal / Constants.DEAD_WHEEL_TICKS_PER_INCH;
-        currentPosition.y += deltaYGlobal / Constants.DEAD_WHEEL_TICKS_PER_INCH;
+        currentPosition.x += (deltaXGlobal / Constants.DEAD_WHEEL_TICKS_PER_INCH);
+        currentPosition.y += (deltaYGlobal / Constants.DEAD_WHEEL_TICKS_PER_INCH);
 
     }
 

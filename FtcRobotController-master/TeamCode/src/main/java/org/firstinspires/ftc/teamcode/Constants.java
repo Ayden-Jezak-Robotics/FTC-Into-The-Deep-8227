@@ -3,8 +3,8 @@ package org.firstinspires.ftc.teamcode;
 public class Constants {
 
     public static final double DEAD_WHEEL_DIAMETER = 32;
-    public static final double DRIVE_RADIUS = 77.5;
-    public static final double STRAFE_RADIUS = 160; //Double check the radii
+    public static final double WHEEL_BASE_WIDTH_MM = 77.5;
+    public static final double WHEEL_BASE_LENGTH_MM = 160; //Double check the radii
 
 
     private static final double DEAD_WHEEL_TICKS_PER_ROTATION = 2000;
@@ -23,9 +23,12 @@ public class Constants {
 
     public static final double CONVERT_METERS_TO_INCHES = 39.3701;
 
+    public static final double DRIVE_RADIUS = WHEEL_BASE_WIDTH_MM * DEAD_WHEEL_TICKS_PER_MM;
+    public static final double STRAFE_RADIUS = WHEEL_BASE_LENGTH_MM * DEAD_WHEEL_TICKS_PER_MM;
+
     public static final double APRIL_TAG_WEIGHT = 0.8;
 
-//    public static final double TURN_SPEED = 0.2;
+//  public static final double TURN_SPEED = 0.2;
 
     public static final double MAX_KP = 0.80;
 
