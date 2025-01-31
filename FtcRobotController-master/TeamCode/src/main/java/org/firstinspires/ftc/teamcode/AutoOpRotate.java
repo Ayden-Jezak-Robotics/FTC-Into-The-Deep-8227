@@ -17,7 +17,13 @@ public class AutoOpRotate extends LinearOpMode {
 
         waitForStart();
 
-        robot.turnOn(0.3);
+        ElapsedTime timer = new ElapsedTime();
+
+        while (timer.seconds() <= 25 ) {
+
+            robot.turnOn(0.4);
+        }
+        
 
     }
 }

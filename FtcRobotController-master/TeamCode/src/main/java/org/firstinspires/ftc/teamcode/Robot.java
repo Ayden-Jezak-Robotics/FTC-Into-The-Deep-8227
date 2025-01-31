@@ -46,20 +46,19 @@ public class Robot {
         //this.myAprilTagProcessor = new VisionUtility(this.hardwareMap, this.cameraPosition);
     }
 
-    public void turnOn() {
+    public void turnOn(double powerLevel) {
         /// Reset everything to 0
         imu.resetIMU();
         deadWheels.resetEncoders();
         while (opMode.opModeIsActive()) {
-            motors.setMotorPower(0.3);
+            motors.setMotorPower(powerLevel);
             int EncoderDrive = deadWheels.getCurrentValue(DeadWheel.DRIVE); //in ticks
             int EncoderStrafe = deadWheels.getCurrentValue(DeadWheel.STRAFE);
             telemetry.addData("EncoderDrive", EncoderDrive);
             telemetry.addData("EncoderStrafe", EncoderStrafe);
+            telemetry.addData("IMU Heading", imu.getCurrentHeading)
             telemetry.update();
         }
-
-
     }
 
     public void moveToPositionAndHeading(RobotState targetState) {
@@ -156,8 +155,8 @@ public class Robot {
 //        telemetry.update();
 
         // Local displacements
-        double deltaYLocal = (deltaDrive - (Constants.DRIVE_RADIUS * deltaThetaIMU));
-        double deltaXLocal = (deltaStrafe - (Constants.STRAFE_RADIUS * deltaThetaIMU)); //NEW
+        double deltaYLocal = (deltaDrive - LMMHS.arcLength(Constants.DRIVE_RADIUS, deltaThetaIMU));
+        double deltaXLocal = (deltaStrafe - LMMHS.arcLength(Constants.STRAFE_RADIUS, deltaThetaIMU));
 
         // Transform local displacements to global coordinates
         // changed the signs for globals

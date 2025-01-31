@@ -48,6 +48,13 @@ public class LMMHS {
         }
     }
 
+    public static double arcLength(double radius, double angle) {
+        if (inDegrees) {
+            return (2 * Math.PI * radius * (angle / 360));
+        } else {
+            return (radius * angle);
+        }
+    }
 
     public static double normalizeAngle(double initialAngle) {
         if (inDegrees) {

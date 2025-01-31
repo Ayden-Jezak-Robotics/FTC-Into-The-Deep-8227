@@ -3,8 +3,8 @@ package org.firstinspires.ftc.teamcode;
 public class Constants {
 
     public static final double DEAD_WHEEL_DIAMETER = 32;
-    public static final double WHEEL_BASE_WIDTH_MM = 77.5;
-    public static final double WHEEL_BASE_LENGTH_MM = 160; //Double check the radii
+    public static final double WHEEL_BASE_WIDTH_MM = 90;
+    public static final double WHEEL_BASE_LENGTH_MM = 180; //Double check the radii
 
 
     private static final double DEAD_WHEEL_TICKS_PER_ROTATION = 2000;
