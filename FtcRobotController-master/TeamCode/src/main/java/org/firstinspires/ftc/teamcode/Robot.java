@@ -70,7 +70,6 @@ public class Robot {
         PIDTurn turnPID = new PIDTurn(telemetry);
 
         /// Reset everything to 0
-        imu.resetIMU();
         deadWheels.resetEncoders();
 
         /// Does the PID Controller need to know the target heading, or just the current heading?
