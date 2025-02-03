@@ -3,8 +3,8 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-@Autonomous(name = "AutoOpSpin", group = "Draft")
-public class AutoOpSpin extends LinearOpMode {
+@Autonomous(name = "AutoOpSpinTest", group = "Draft")
+public class AutoOpSpinTest extends LinearOpMode {
 
     RobotState initialState = new RobotState(0, 0, 0);
 

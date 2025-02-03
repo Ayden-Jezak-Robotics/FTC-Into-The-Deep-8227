@@ -22,7 +22,7 @@ public class ArmUtility {
         this.rightArmServo = initializeServo("rightArmServo");
         this.wristServo = initializeServo("wristServo");
         this.grabberServo = initializeServo("grabberServo");
-        this.extendServo - initializeServo("extendServo");
+        this.extendServo = initializeServo("extendServo");
     }
 
     DcMotor initializeMotor(String name, DcMotor.Direction direction) {

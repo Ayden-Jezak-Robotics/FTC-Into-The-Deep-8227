@@ -48,7 +48,7 @@ public class Robot {
 
     public void turnOn(double powerLevel) {
         /// Reset everything to 0
-        imu.resetIMU();
+        //imu.resetIMU();
         deadWheels.resetEncoders();
         while (opMode.opModeIsActive()) {
             motors.setMotorPower(powerLevel);
@@ -56,7 +56,7 @@ public class Robot {
             int EncoderStrafe = deadWheels.getCurrentValue(DeadWheel.STRAFE);
             telemetry.addData("EncoderDrive", EncoderDrive);
             telemetry.addData("EncoderStrafe", EncoderStrafe);
-            telemetry.addData("IMU Heading", imu.getCurrentHeading)
+            telemetry.addData("IMU Heading", imu.getCurrentHeading());
             telemetry.update();
         }
     }
@@ -70,6 +70,7 @@ public class Robot {
         PIDTurn turnPID = new PIDTurn(telemetry);
 
         /// Reset everything to 0
+        //imu.resetIMU(); //PROBLEM
         deadWheels.resetEncoders();
 
         /// Does the PID Controller need to know the target heading, or just the current heading?

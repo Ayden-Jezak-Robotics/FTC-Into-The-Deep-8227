@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 @Autonomous(name = "AutoOpRotate", group = "Draft")
 public class AutoOpRotate extends LinearOpMode {
@@ -23,7 +24,7 @@ public class AutoOpRotate extends LinearOpMode {
 
             robot.turnOn(0.4);
         }
-        
+        sleep(5000);
 
     }
 }
