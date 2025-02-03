@@ -16,20 +16,42 @@ public class AutoOpBlueLeft extends LinearOpMode {
         waitForStart();
 
         //robot.turnOn();
-        robot.moveToPositionAndHeading(new RobotState(24, 24, 0));
+        /*
+        robot.moveToPositionAndHeading(new RobotState(32, 26, 0));
         sleep(1000);
-        robot.moveToPositionAndHeading(new RobotState(-12, 20, 0));
+        robot.moveToPositionAndHeading(new RobotState(-9, 20, 0));
         sleep(1000);
-        robot.moveToPositionAndHeading(new RobotState(-24, 6, -45));
+        robot.moveToPositionAndHeading(new RobotState(-18, 4, -45));
         sleep(1000);
-        robot.moveToPositionAndHeading(new RobotState(-22, 20, 0));
+        robot.moveToPositionAndHeading(new RobotState(-18, 20, 0));
         sleep(1000);
-        robot.moveToPositionAndHeading(new RobotState(-24, 6, -45));
+        robot.moveToPositionAndHeading(new RobotState(-18, 4, -45));
         sleep(1000);
-        robot.moveToPositionAndHeading(new RobotState(-26, 20, 30));
+        robot.moveToPositionAndHeading(new RobotState(-20, 20, 30));
         sleep(1000);
-        robot.moveToPositionAndHeading(new RobotState(-24, 6, -45));
+        robot.moveToPositionAndHeading(new RobotState(-18, 4, -45));
+         */
 
+        //Auto Red
+        robot.moveToPositionAndHeading(new RobotState(-32, 26, 0));
+        sleep(1000);
+        robot.moveToPositionAndHeading(new RobotState(-32, 6, 0));
+        sleep(1000);
+        robot.moveToPositionAndHeading(new RobotState(12, 48, 0));
+        sleep(1000);
+        robot.moveToPositionAndHeading(new RobotState(12, 8, 0));
+        sleep(1000);
+        robot.moveToPositionAndHeading(new RobotState(12, 48, 0));
+        sleep(1000);
+        robot.moveToPositionAndHeading(new RobotState(20, 48, 0));
+        sleep(1000);
+        robot.moveToPositionAndHeading(new RobotState(20, 8, 0));
+        sleep(1000);
+        robot.moveToPositionAndHeading(new RobotState(20, 48, 0));
+        sleep(1000);
+        robot.moveToPositionAndHeading(new RobotState(26, 48, 0));
+        sleep(1000);
+        robot.moveToPositionAndHeading(new RobotState(26, 8, 0));
     }
 
 
