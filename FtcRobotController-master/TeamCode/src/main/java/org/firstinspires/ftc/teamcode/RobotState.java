@@ -10,9 +10,10 @@ public class RobotState {
 
 
     // Constructor to initialize the state
-    public RobotState(int x, int y, int heading) {
+    public RobotState(int x, int y, int heading, double height) {
         this.position = new Position(DistanceUnit.INCH, x, y, 0, System.nanoTime());
         this.heading = heading; // in degrees
+        this.height = height;
     }
 
 }

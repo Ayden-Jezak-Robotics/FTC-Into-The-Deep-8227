@@ -4,13 +4,13 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-public class PIDTurn {
-    private static final double kP = 0.015;
+public class PIDArm {
+    private static final double kP = 0.015; //Fix
     private static final double kI = 0.015;
     private static final double kD = 0;
-    private static final double kF = 0;
+    private static final double kF = 0; //FIND the minimum value needed that equal the force of weight
 
-    private double targetHeading;
+    private double targetHeight;
 
     private double priorError;
     private double integralSum;
@@ -26,15 +26,15 @@ public class PIDTurn {
 
     }
 
-    public void setTargetHeading(double newTarget) {
+    public void setTargetHeight(double newTarget) {
 
-        this.targetHeading = newTarget;
+        this.targetHeight = newTarget;
 
     }
 
-    /// currentPosition in Inches; currentHeading in Radians; time in Seconds
-    public double calculatePower(double currentHeading, double time) {
-        double error = (targetHeading - currentHeading);
+    /// currentPosition in Inches; currentHeight in Radians; time in Seconds
+    public double calculatePower(double currentHeight, double time) {
+        double error = (targetHeight - currentHeight);
 
         /// Prevent zero or very small time steps
         double deltaTime = Math.max(time, Constants.MINIMUM_TIME_IN_SECONDS);
@@ -44,7 +44,7 @@ public class PIDTurn {
         // Decay the Integral Sum over time
         integralSum = (integralSum * 0.98) + (error * deltaTime);
 
-        double kIntegralValue = kI * Range.clip(integralSum, -Constants.MAX_INTEGRAL_TURN, Constants.MAX_INTEGRAL_TURN);
+        double kIntegralValue= kI * Range.clip(integralSum, -Constants.MAX_INTEGRAL_TURN, Constants.MAX_INTEGRAL_TURN);
 
         double kDerivativeValue = kD * ((error - priorError) / deltaTime);
 
@@ -53,18 +53,6 @@ public class PIDTurn {
         priorError = error;
 
         double baseOutput = kProportionalValue + kIntegralValue + kDerivativeValue + kFeedForwardValue;
-
-/*
-
-        if (baseOutput.x < Constants.MINIMUM_POWER_OUTPUT_DRIVE) {
-            baseOutput.x = Math.signum(baseOutput.x) * Constants.MINIMUM_POWER_OUTPUT_DRIVE;
-        }
-
-        if (baseOutput.y < Constants.MINIMUM_POWER_OUTPUT_DRIVE) {
-            baseOutput.y = Math.signum(baseOutput.y) * Constants.MINIMUM_POWER_OUTPUT_DRIVE;
-        }
-
-*/
 
         return baseOutput;
     }

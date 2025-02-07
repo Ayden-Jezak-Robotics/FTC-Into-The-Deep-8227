@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 @Autonomous(name = "AutoOpBlueLeft", group = "Draft")
 public class AutoOpBlueLeft extends LinearOpMode {
 
-    RobotState initialState = new RobotState(0, 0, 0);
+    RobotState initialState = new RobotState(0, 0, 0, 0);
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -15,43 +15,20 @@ public class AutoOpBlueLeft extends LinearOpMode {
 
         waitForStart();
 
-        //robot.turnOn();
-        /*
-        robot.moveToPositionAndHeading(new RobotState(32, 26, 0));
+        robot.moveToPositionAndHeading(new RobotState(32, 26, 0, 0));
         sleep(1000);
-        robot.moveToPositionAndHeading(new RobotState(-9, 20, 0));
+        robot.moveToPositionAndHeading(new RobotState(-9, 20, 0, 0));
         sleep(1000);
-        robot.moveToPositionAndHeading(new RobotState(-18, 4, -45));
+        robot.moveToPositionAndHeading(new RobotState(-18, 4, -45, 0));
         sleep(1000);
-        robot.moveToPositionAndHeading(new RobotState(-18, 20, 0));
+        robot.moveToPositionAndHeading(new RobotState(-18, 20, 0, 0));
         sleep(1000);
-        robot.moveToPositionAndHeading(new RobotState(-18, 4, -45));
+        robot.moveToPositionAndHeading(new RobotState(-18, 4, -45, 0));
         sleep(1000);
-        robot.moveToPositionAndHeading(new RobotState(-20, 20, 30));
+        robot.moveToPositionAndHeading(new RobotState(-20, 20, 30, 0));
         sleep(1000);
-        robot.moveToPositionAndHeading(new RobotState(-18, 4, -45));
-         */
+        robot.moveToPositionAndHeading(new RobotState(-18, 4, -45, 0));
 
-        //Auto Red
-        robot.moveToPositionAndHeading(new RobotState(-32, 26, 0));
-        sleep(1000);
-        robot.moveToPositionAndHeading(new RobotState(-32, 6, 0));
-        sleep(1000);
-        robot.moveToPositionAndHeading(new RobotState(12, 48, 0));
-        sleep(1000);
-        robot.moveToPositionAndHeading(new RobotState(12, 8, 0));
-        sleep(1000);
-        robot.moveToPositionAndHeading(new RobotState(12, 48, 0));
-        sleep(1000);
-        robot.moveToPositionAndHeading(new RobotState(20, 48, 0));
-        sleep(1000);
-        robot.moveToPositionAndHeading(new RobotState(20, 8, 0));
-        sleep(1000);
-        robot.moveToPositionAndHeading(new RobotState(20, 48, 0));
-        sleep(1000);
-        robot.moveToPositionAndHeading(new RobotState(26, 48, 0));
-        sleep(1000);
-        robot.moveToPositionAndHeading(new RobotState(26, 8, 0));
     }
 
 

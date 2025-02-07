@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 public class DeadWheelUtility {
     private final HardwareMap hardwareMap;
     private final DcMotor deadWheelDrive, deadWheelStrafe;
-    private int previousDrive, previousStrafe;
+    private int previousDrive, previousStrafe, previousArm;
 
     DeadWheelUtility(HardwareMap hardwareMap) {
         this.hardwareMap = hardwareMap;

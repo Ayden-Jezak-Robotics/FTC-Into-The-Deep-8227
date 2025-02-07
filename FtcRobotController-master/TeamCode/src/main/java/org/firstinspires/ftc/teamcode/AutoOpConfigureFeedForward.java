@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 @Autonomous(name = "AutoOpConfigureFeedForward", group = "Draft")
 public class AutoOpConfigureFeedForward extends LinearOpMode {
 
-    RobotState initialState = new RobotState(0, 0, 0);
+    RobotState initialState = new RobotState(0, 0, 0, 0);
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -15,11 +15,11 @@ public class AutoOpConfigureFeedForward extends LinearOpMode {
 
         waitForStart();
 
-        robot.moveToPositionAndHeading(new RobotState(0, 24, 0));
+        robot.moveToPositionAndHeading(new RobotState(0, 24, 0, 0));
 
         sleep(2000);
 
-        robot.moveToPositionAndHeading(new RobotState(24, 24, 0));
+        robot.moveToPositionAndHeading(new RobotState(24, 24, 0, 0));
 
     }
 

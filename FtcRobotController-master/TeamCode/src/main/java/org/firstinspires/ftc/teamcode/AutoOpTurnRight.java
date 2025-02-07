@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 @Autonomous(name = "AutoOpTurnRight", group = "Draft")
 public class AutoOpTurnRight extends LinearOpMode {
 
-    RobotState initialState = new RobotState(0, 0, 0);
+    RobotState initialState = new RobotState(0, 0, 0, 0);
 
     /// In Degrees
 
@@ -17,7 +17,7 @@ public class AutoOpTurnRight extends LinearOpMode {
 
         waitForStart();
 
-        robot.moveToPositionAndHeading(new RobotState(0, 0, -53));
+        robot.moveToPositionAndHeading(new RobotState(0, 0, -53, 0));
 
     }
 }

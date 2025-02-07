@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 @Autonomous(name = "AutoOpSpinTest", group = "Draft")
 public class AutoOpSpinTest extends LinearOpMode {
 
-    RobotState initialState = new RobotState(0, 0, 0);
+    RobotState initialState = new RobotState(0, 0, 0, 0);
 
     /// In Degrees
 
@@ -19,7 +19,7 @@ public class AutoOpSpinTest extends LinearOpMode {
 
         waitForStart();
 
-        robot.moveToPositionAndHeading(new RobotState(0, 0, (360 * numberOfSpins)));
+        robot.moveToPositionAndHeading(new RobotState(0, 0, (360 * numberOfSpins), 0));
 
     }
 }

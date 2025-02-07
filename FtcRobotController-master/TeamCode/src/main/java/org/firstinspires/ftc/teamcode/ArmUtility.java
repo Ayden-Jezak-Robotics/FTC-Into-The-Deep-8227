@@ -12,6 +12,9 @@ public class ArmUtility {
     private final Servo leftArmServo, rightArmServo;
     private final Servo wristServo, grabberServo, extendServo;
 
+    private int previousArm;
+    private double previousRightExtend, previousLeftExtend;
+
     public ArmUtility(HardwareMap hardwareMap) {
         this.hardwareMap = hardwareMap;
 
@@ -23,6 +26,10 @@ public class ArmUtility {
         this.wristServo = initializeServo("wristServo");
         this.grabberServo = initializeServo("grabberServo");
         this.extendServo = initializeServo("extendServo");
+
+        previousArm = 0;
+        previousRightExtend = 0.9;
+        previousLeftExtend = 0.65;
     }
 
     DcMotor initializeMotor(String name, DcMotor.Direction direction) {
@@ -53,6 +60,14 @@ public class ArmUtility {
         leftArmServo.setPosition(0.95);
     }
 
+    void extendArmTo(double position)
+    {
+        rightArmServo.setPosition(previousRightExtend - position);
+        leftArmServo.setPosition(previousLeftExtend + position);
+        previousRightExtend -= position;
+        previousLeftExtend += position;
+    }
+
     void retractArm() {
         rightArmServo.setPosition(0.9);
         leftArmServo.setPosition(0.65);
@@ -66,8 +81,22 @@ public class ArmUtility {
         grabberServo.setPosition(0.0);
     }
 
-    void setArmHeight(int targetHeight, int currentHeight) {
+    void setWristPosition(double position){
+        wristServo.setPosition(position);
+    }
 
+    void setArmPowers(double armPower) {
+        
+        leftArmMotor.setPower(armPower); //FILL IN
+        rightArmMotor.setPower(armPower);
+    }
+
+    int getPreviousArm(DeadWheel type) {
+        return previousArm;
+    }
+
+    void setPreviousArm(int newValue) {
+        previousArm = newValue;
     }
 
     void sleep(long milliseconds) {

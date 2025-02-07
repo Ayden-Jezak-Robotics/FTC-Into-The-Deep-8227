@@ -16,6 +16,7 @@ public class Robot {
     //private final CameraPosition cameraPosition;
 
     private final MotorUtility motors;
+    private final ArmUtility arms;
     private final DeadWheelUtility deadWheels;
     //private final VisionUtility myAprilTagProcessor;
 
@@ -38,9 +39,12 @@ public class Robot {
         //this.cameraPosition = side;
 
         this.currentPosition = initialState.position;
+        this.currentHeight = initialState.height;
         this.currentHeading = LMMHS.setAngle(initialState.heading);
+        //this.currentExtend = intitialState.extend;
 
         this.motors = new MotorUtility(this.hardwareMap);
+        this.arms = new ArmUtility(this.hardwareMap);
         this.deadWheels = new DeadWheelUtility(this.hardwareMap);
         this.imu = new IMUUtility(this.hardwareMap);
         //this.myAprilTagProcessor = new VisionUtility(this.hardwareMap, this.cameraPosition);
@@ -65,9 +69,12 @@ public class Robot {
 
         Position targetPosition = targetState.position;
         double targetHeading = LMMHS.setAngle(targetState.heading);
+        double targetHeight = targetState.height;
+        //double targetExtend = targetState.extend;
 
         PIDDrive xyPID = new PIDDrive(telemetry);
         PIDTurn turnPID = new PIDTurn(telemetry);
+        PIDArm armPID = new PIDArm(telemetry);
 
         /// Reset everything to 0
         //imu.resetIMU(); //PROBLEM
@@ -76,8 +83,11 @@ public class Robot {
         /// Does the PID Controller need to know the target heading, or just the current heading?
         xyPID.setTargetPosition(targetPosition);
         turnPID.setTargetHeading(targetHeading);
+        armPID.setTargetHeight(targetHeight);
 
         ElapsedTime timer = new ElapsedTime();
+        ElapsedTime armTimer = new ElapsedTime();
+        double armTime = timer.seconds();
 
         while (opMode.opModeIsActive()) {
 
@@ -96,6 +106,7 @@ public class Robot {
             // Calculate power outputs using PID
             XYValue motorPower = xyPID.calculatePower(currentPosition, currentHeading, timer.seconds());
             double turnPower = turnPID.calculatePower(currentHeading, timer.seconds());
+            double armPower = armPID.calculatePower(currentHeight, timer.seconds());
 
             telemetry.addData("CurrentX", currentPosition.x);
             telemetry.addData("CurrentY", currentPosition.y);
@@ -109,6 +120,16 @@ public class Robot {
 
             // Apply motor powers
             motors.setMotorPowers(motorPower.x, motorPower.y, turnPower);
+            arms.setArmPowers(armPower);
+
+            /*extendTargetTime = 2;
+
+            if (armTime < extendTargetTime)
+            {
+                double ratio = armTime/extendArmTime;
+                currentExtend = ratio * targetExtend;
+                arms.extendArmTo(currentExtend);
+            }*/
 
             updatePosition();
         }
@@ -119,9 +140,11 @@ public class Robot {
 
         int EncoderDrive = deadWheels.getCurrentValue(DeadWheel.DRIVE); //in ticks
         int EncoderStrafe = deadWheels.getCurrentValue(DeadWheel.STRAFE);
+        int EncoderArm = (leftArmMotor.getCurrentPosition() + rightArmMotor.getCurrentPosition())/2;
 
         telemetry.addData("EncoderDrive", EncoderDrive / Constants.DEAD_WHEEL_TICKS_PER_INCH);
         telemetry.addData("EncoderStrafe", EncoderStrafe / Constants.DEAD_WHEEL_TICKS_PER_INCH);
+        telemetry.addData("EncoderArm", EncoderArm / Constants.DEAD_WHEEL_TICKS_PER_INCH);
         telemetry.update();
 
 
@@ -131,17 +154,19 @@ public class Robot {
         /// Get changes in encoder values
         int deltaDrive = EncoderDrive - deadWheels.getPreviousValue(DeadWheel.DRIVE);
         int deltaStrafe = EncoderStrafe - deadWheels.getPreviousValue(DeadWheel.STRAFE);
+        int deltaArm = EncoderArm - arms.getPreviousArm();
 
         /// deltaTheta from IMU
         double deltaThetaIMU = imuHeading - imu.getPreviousHeading();
 
         /// Encoder Heading
-
+        currentHeight = currentHeight + deltaArm;
         currentHeading = currentHeading + deltaThetaIMU;
 
         /// Update previous encoder values
         deadWheels.setPreviousDrive(EncoderDrive); //in ticks
         deadWheels.setPreviousStrafe(EncoderStrafe);
+        arms.setPreviousArm(EncoderArm)
 
         imu.setPreviousHeading(imuHeading);
 
@@ -165,7 +190,7 @@ public class Robot {
 
         //final Pose3D currentAprilTagPosition = myAprilTagProcessor.getPose();
 
-        XYValue aprilPosition = new XYValue(0, 0);
+        //XYValue aprilPosition = new XYValue(0, 0);
 
         /*if (currentAprilTagPosition != null) {
             aprilPosition.x = currentAprilTagPosition.getPosition().x;
@@ -176,6 +201,21 @@ public class Robot {
         currentPosition.x += (deltaXGlobal / Constants.DEAD_WHEEL_TICKS_PER_INCH);
         currentPosition.y += (deltaYGlobal / Constants.DEAD_WHEEL_TICKS_PER_INCH);
 
+    }
+
+    public void pickUpObject(){
+        //FILL IN: can the grabber start open
+        arms.setWristPosition(0.0);
+        arms.
+    }
+
+    public void dropObject(){
+        arms.setWristPosition(0.8);
+        arms.
+    }
+
+    public void hangObject(){
+        arms.
     }
 
     public void checkSensorReadings() {
