@@ -10,10 +10,10 @@ public class ArmUtility {
     private final DcMotor leftArmMotor, rightArmMotor;
 
     private final Servo leftArmServo, rightArmServo;
-    private final Servo wristServo, grabberServo, extendServo;
+    private final Servo wristServo, grabberServo, elbowServo;
 
     private int previousArm;
-    private double previousRightExtend, previousLeftExtend;
+    private double previousRightAngle, previousLeftAngle;
 
     public ArmUtility(HardwareMap hardwareMap) {
         this.hardwareMap = hardwareMap;
@@ -25,11 +25,9 @@ public class ArmUtility {
         this.rightArmServo = initializeServo("rightArmServo");
         this.wristServo = initializeServo("wristServo");
         this.grabberServo = initializeServo("grabberServo");
-        this.extendServo = initializeServo("extendServo");
+        this.elbowServo = initializeServo("elbowServo");
 
         previousArm = 0;
-        previousRightExtend = 0.9;
-        previousLeftExtend = 0.65;
     }
 
     DcMotor initializeMotor(String name, DcMotor.Direction direction) {
@@ -46,7 +44,7 @@ public class ArmUtility {
         return servo;
     }
 
-    void extendArm() {
+    void angleArm() {
         rightArmServo.setPosition(0.8);
         leftArmServo.setPosition(0.75);
         sleep(200);
@@ -60,17 +58,20 @@ public class ArmUtility {
         leftArmServo.setPosition(0.95);
     }
 
-    void extendArmTo(double position)
+    void angleArmTo(double position)
     {
-        rightArmServo.setPosition(previousRightExtend - position);
-        leftArmServo.setPosition(previousLeftExtend + position);
-        previousRightExtend -= position;
-        previousLeftExtend += position;
+        rightArmServo.setPosition(0.9 - position);
+        leftArmServo.setPosition(0.65 + position);
     }
 
-    void retractArm() {
-        rightArmServo.setPosition(0.9);
+    void angleArmToBase() {
+        rightArmServo.setPosition(0.9); //BASE is when it's facing up
         leftArmServo.setPosition(0.65);
+    }
+
+    void extendElbow(double position)
+    {
+        elbowServo.setPosition(position)
     }
 
     void openGrabber() {
@@ -87,7 +88,7 @@ public class ArmUtility {
 
     void setArmPowers(double armPower) {
         
-        leftArmMotor.setPower(armPower); //FILL IN
+        leftArmMotor.setPower(armPower);
         rightArmMotor.setPower(armPower);
     }
 

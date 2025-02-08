@@ -41,7 +41,8 @@ public class Robot {
         this.currentPosition = initialState.position;
         this.currentHeight = initialState.height;
         this.currentHeading = LMMHS.setAngle(initialState.heading);
-        //this.currentExtend = intitialState.extend;
+        this.currentAngle = intitialState.angle;
+        this.currentExtend = intitialState.extend;
 
         this.motors = new MotorUtility(this.hardwareMap);
         this.arms = new ArmUtility(this.hardwareMap);
@@ -65,12 +66,53 @@ public class Robot {
         }
     }
 
+    public void armUp(double target)
+    {
+        PIDArm armPID = new PIDArm(telemetry);
+        armPID.setTargetHeight(target);
+        while (opMode.opModeIsActive()) {
+            double time = timer.seconds();
+            double armPower = armPID.calculatePower(currentHeight, timer.seconds());
+            arms.setArmPowers(armPower);
+            updatePosition();
+        }
+        motors.stopMotors();
+    }
+
+    public void extendWithTime()
+    {
+        ElapsedTime armTimer = new ElapsedTime();
+        double armTime = timer.seconds();
+        angleTargetTime = 2;
+
+        while (opMode.opModeIsActive()) {
+            if (armTime < angleTargetTime)
+            {
+                double ratio = armTime/angleArmTime;
+                currentAngle = ratio * targetAngle;
+                arms.angleArmTo(currentAngle);
+                currentExtend = ratio * targetExtend;
+                arms.extendElbow(currentExtend);
+            }
+        }
+    }
+
+    public void testPick()
+    {
+        arms.openGrabber();
+        arms.angleArmToBase();
+        arms.closeGrabber();
+        arms.angleArmTo(0);
+        arms.setWristPosition(1.0);
+    }
+
     public void moveToPositionAndHeading(RobotState targetState) {
 
         Position targetPosition = targetState.position;
         double targetHeading = LMMHS.setAngle(targetState.heading);
         double targetHeight = targetState.height;
-        //double targetExtend = targetState.extend;
+        double targetAngle = targetState.angle;
+        double targetExtend = targetState.extend;
 
         PIDDrive xyPID = new PIDDrive(telemetry);
         PIDTurn turnPID = new PIDTurn(telemetry);
@@ -122,14 +164,16 @@ public class Robot {
             motors.setMotorPowers(motorPower.x, motorPower.y, turnPower);
             arms.setArmPowers(armPower);
 
-            /*extendTargetTime = 2;
+            angleTargetTime = 2;
 
-            if (armTime < extendTargetTime)
+            if (armTime < angleTargetTime)
             {
-                double ratio = armTime/extendArmTime;
+                double ratio = armTime/angleArmTime;
+                currentAngle = ratio * targetAngle;
+                arms.angleArmTo(currentAngle);
                 currentExtend = ratio * targetExtend;
-                arms.extendArmTo(currentExtend);
-            }*/
+                arms.extendElbow(currentExtend);
+            }
 
             updatePosition();
         }
@@ -206,16 +250,16 @@ public class Robot {
     public void pickUpObject(){
         //FILL IN: can the grabber start open
         arms.setWristPosition(0.0);
-        arms.
+        //arms.angleArmTo();
     }
 
     public void dropObject(){
         arms.setWristPosition(0.8);
-        arms.
+        //arms.
     }
 
     public void hangObject(){
-        arms.
+        //arms.
     }
 
     public void checkSensorReadings() {
