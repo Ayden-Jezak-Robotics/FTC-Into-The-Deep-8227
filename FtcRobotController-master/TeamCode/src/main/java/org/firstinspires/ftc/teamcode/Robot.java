@@ -248,18 +248,20 @@ public class Robot {
     }
 
     public void pickUpObject(){
-        //FILL IN: can the grabber start open
-        arms.setWristPosition(0.0);
-        //arms.angleArmTo();
+        arms.closeGrabber();
     }
 
     public void dropObject(){
-        arms.setWristPosition(0.8);
+        arms.setWristPosition(1.0);
+        arms.openGrabber();
+        arms.setWristPosition(0.0);
         //arms.
     }
 
     public void hangObject(){
-        //arms.
+        arms.setWristPosition(0.0);
+        arms.angleArmTo(0.3); //CHANGE 0.3
+        arms.openGrabber();
     }
 
     public void checkSensorReadings() {
