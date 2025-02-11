@@ -17,7 +17,7 @@ public class PIDArm {
 
     private Telemetry telemetry;
 
-    public PIDTurn(Telemetry telemetry) {
+    public PIDArm(Telemetry telemetry) {
 
         this.priorError = 0;
         this.integralSum = 0;

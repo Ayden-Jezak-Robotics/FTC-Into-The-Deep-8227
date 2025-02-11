@@ -44,6 +44,12 @@ public class ArmUtility {
         return servo;
     }
 
+    int getAverageCurrentPosition()
+    {
+        int average = (leftArmMotor.getCurrentPosition() + rightArmMotor.getCurrentPosition())/2;
+        return average;
+    }
+
     void angleArm() {
         rightArmServo.setPosition(0.8);
         leftArmServo.setPosition(0.75);
@@ -60,8 +66,8 @@ public class ArmUtility {
 
     void angleArmTo(double position)
     {
-        rightArmServo.setPosition(0.9 - position);
-        leftArmServo.setPosition(0.65 + position);
+        rightArmServo.setPosition(position);
+        leftArmServo.setPosition(1-position);
     }
 
     void angleArmToBase() {
@@ -71,7 +77,7 @@ public class ArmUtility {
 
     void extendElbow(double position)
     {
-        elbowServo.setPosition(position)
+        elbowServo.setPosition(position);
     }
 
     void openGrabber() {
@@ -87,12 +93,11 @@ public class ArmUtility {
     }
 
     void setArmPowers(double armPower) {
-        
         leftArmMotor.setPower(armPower);
         rightArmMotor.setPower(armPower);
     }
 
-    int getPreviousArm(DeadWheel type) {
+    int getPreviousArm() {
         return previousArm;
     }
 

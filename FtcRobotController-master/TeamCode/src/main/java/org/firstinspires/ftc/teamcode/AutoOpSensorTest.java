@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 @Autonomous(name = "AutoOpSensorTest", group = "Draft")
 public class AutoOpSensorTest extends LinearOpMode {
 
-    RobotState initialState = new RobotState(0, 0, 0, 0);
+    RobotState initialState = new RobotState(0, 0, 0, 0,0,0);
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -15,7 +15,9 @@ public class AutoOpSensorTest extends LinearOpMode {
 
         waitForStart();
 
-        robot.checkSensorReadings();
+        //robot.checkSensorReadings();
+        //robot.armUp(2000);
+        robot.extendWithTime();
 
     }
 

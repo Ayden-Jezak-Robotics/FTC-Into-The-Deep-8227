@@ -25,6 +25,10 @@ public class Robot {
     private final Position currentPosition;
     private double currentHeading;
 
+    private double currentHeight;
+    private double currentAngle;
+    private double currentExtend;
+
     private int armHeight = 0;
     private boolean armIsExtended = false;
     private boolean wristIsExtended = false;
@@ -37,12 +41,11 @@ public class Robot {
         this.telemetry = telemetry;
 
         //this.cameraPosition = side;
-
         this.currentPosition = initialState.position;
         this.currentHeight = initialState.height;
         this.currentHeading = LMMHS.setAngle(initialState.heading);
-        this.currentAngle = intitialState.angle;
-        this.currentExtend = intitialState.extend;
+        this.currentAngle = initialState.angle;
+        this.currentExtend = initialState.extend;
 
         this.motors = new MotorUtility(this.hardwareMap);
         this.arms = new ArmUtility(this.hardwareMap);
@@ -65,9 +68,15 @@ public class Robot {
             telemetry.update();
         }
     }
+    public void turnOnArm(double powerLevel) {
+        while (opMode.opModeIsActive()) {
+            arms.setArmPowers(powerLevel);
+        }
+    }
 
     public void armUp(double target)
     {
+        ElapsedTime timer = new ElapsedTime();
         PIDArm armPID = new PIDArm(telemetry);
         armPID.setTargetHeight(target);
         while (opMode.opModeIsActive()) {
@@ -75,6 +84,12 @@ public class Robot {
             double armPower = armPID.calculatePower(currentHeight, timer.seconds());
             arms.setArmPowers(armPower);
             updatePosition();
+            double tolerance = target - currentHeight;
+            if (tolerance < 200) {
+                telemetry.addLine("Breaks due to tolerance");
+                telemetry.update();
+                break;
+            }
         }
         motors.stopMotors();
     }
@@ -82,18 +97,24 @@ public class Robot {
     public void extendWithTime()
     {
         ElapsedTime armTimer = new ElapsedTime();
-        double armTime = timer.seconds();
-        angleTargetTime = 2;
+        double angleTargetTime = 2;
+        double targetAngle = 1.0;
+        double targetExtend = 1.0;
+        double armTime = armTimer.seconds();
+
+        double presentAngle = 0;
+        double presentExtend = 0;
 
         while (opMode.opModeIsActive()) {
             if (armTime < angleTargetTime)
             {
-                double ratio = armTime/angleArmTime;
-                currentAngle = ratio * targetAngle;
-                arms.angleArmTo(currentAngle);
-                currentExtend = ratio * targetExtend;
-                arms.extendElbow(currentExtend);
+                double ratio = armTime/angleTargetTime;
+                presentAngle = ratio * targetAngle;
+                arms.angleArmTo(presentAngle);
+                presentExtend = ratio * targetExtend;
+                arms.extendElbow(presentExtend);
             }
+            armTime = armTimer.seconds();
         }
     }
 
@@ -162,13 +183,14 @@ public class Robot {
 
             // Apply motor powers
             motors.setMotorPowers(motorPower.x, motorPower.y, turnPower);
-            arms.setArmPowers(armPower);
 
-            angleTargetTime = 2;
+            arms.setArmPowers(armPower); //need to add something that will keep thhe arm up there when it reaches the tolerance
+
+            double angleTargetTime = 2;
 
             if (armTime < angleTargetTime)
             {
-                double ratio = armTime/angleArmTime;
+                double ratio = armTime/angleTargetTime;
                 currentAngle = ratio * targetAngle;
                 arms.angleArmTo(currentAngle);
                 currentExtend = ratio * targetExtend;
@@ -184,7 +206,7 @@ public class Robot {
 
         int EncoderDrive = deadWheels.getCurrentValue(DeadWheel.DRIVE); //in ticks
         int EncoderStrafe = deadWheels.getCurrentValue(DeadWheel.STRAFE);
-        int EncoderArm = (leftArmMotor.getCurrentPosition() + rightArmMotor.getCurrentPosition())/2;
+        int EncoderArm = arms.getAverageCurrentPosition();
 
         telemetry.addData("EncoderDrive", EncoderDrive / Constants.DEAD_WHEEL_TICKS_PER_INCH);
         telemetry.addData("EncoderStrafe", EncoderStrafe / Constants.DEAD_WHEEL_TICKS_PER_INCH);
@@ -203,14 +225,14 @@ public class Robot {
         /// deltaTheta from IMU
         double deltaThetaIMU = imuHeading - imu.getPreviousHeading();
 
-        /// Encoder Heading
+        /// Encoder Height, Heading
         currentHeight = currentHeight + deltaArm;
         currentHeading = currentHeading + deltaThetaIMU;
 
         /// Update previous encoder values
         deadWheels.setPreviousDrive(EncoderDrive); //in ticks
         deadWheels.setPreviousStrafe(EncoderStrafe);
-        arms.setPreviousArm(EncoderArm)
+        arms.setPreviousArm(EncoderArm);
 
         imu.setPreviousHeading(imuHeading);
 
