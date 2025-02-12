@@ -17,7 +17,8 @@ public class AutoOpSensorTest extends LinearOpMode {
 
         //robot.checkSensorReadings();
         //robot.armUp(2000);
-        robot.extendWithTime();
+        robot.extendWithTime(1.0,1.0,2,1,2);
+        robot.extendWithTime(0.0,1.0,6,2,6);
 
     }
 

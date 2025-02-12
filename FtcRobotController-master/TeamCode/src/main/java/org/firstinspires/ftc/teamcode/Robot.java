@@ -94,27 +94,30 @@ public class Robot {
         motors.stopMotors();
     }
 
-    public void extendWithTime()
+    public void extendWithTime(double givenTargetAngle, double givenTargetExtend, double givenAngleTargetTime, double givenExtendTargetTime, double totalTargetTime)
     {
         ElapsedTime armTimer = new ElapsedTime();
-        double angleTargetTime = 2;
-        double targetAngle = 1.0;
-        double targetExtend = 1.0;
+        double angleTargetTime = givenAngleTargetTime;
+        double extendTargetTime = givenExtendTargetTime;
+        double targetAngle = givenTargetAngle;
+        double targetExtend = givenTargetExtend;
         double armTime = armTimer.seconds();
 
         double presentAngle = 0;
         double presentExtend = 0;
 
         while (opMode.opModeIsActive()) {
-            if (armTime < angleTargetTime)
+            while (armTime < totalTargetTime)
             {
-                double ratio = armTime/angleTargetTime;
-                presentAngle = ratio * targetAngle;
+                double ratioArm = armTime/angleTargetTime;
+                presentAngle = ratioArm * targetAngle;
                 arms.angleArmTo(presentAngle);
-                presentExtend = ratio * targetExtend;
+                double ratioExtend = armTime/extendTargetTime;
+                presentExtend = ratioExtend * targetExtend;
                 arms.extendElbow(presentExtend);
+                armTime = armTimer.seconds();
             }
-            armTime = armTimer.seconds();
+            break;
         }
     }
 
@@ -187,6 +190,7 @@ public class Robot {
             arms.setArmPowers(armPower); //need to add something that will keep thhe arm up there when it reaches the tolerance
 
             double angleTargetTime = 2;
+            double extendTargetTime = 1;
 
             if (armTime < angleTargetTime)
             {
