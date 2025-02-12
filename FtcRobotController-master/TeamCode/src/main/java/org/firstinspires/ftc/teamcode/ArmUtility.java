@@ -50,6 +50,16 @@ public class ArmUtility {
         return average;
     }
 
+    double getCurrentAngledPosition()
+    {
+        return rightArmServo.getPosition();
+    }
+
+    double getCurrentExtend()
+    {
+       return elbowServo.getPosition();
+    }
+
     void angleArm() {
         rightArmServo.setPosition(0.8);
         leftArmServo.setPosition(0.75);

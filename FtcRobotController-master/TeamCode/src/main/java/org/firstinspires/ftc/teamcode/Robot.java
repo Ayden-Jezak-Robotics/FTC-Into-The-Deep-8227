@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
@@ -23,11 +24,7 @@ public class Robot {
     private IMUUtility imu;
 
     private final Position currentPosition;
-    private double currentHeading;
-
-    private double currentHeight;
-    private double currentAngle;
-    private double currentExtend;
+    private double currentHeading, currentHeight, currentAngle, currentExtend;
 
     private int armHeight = 0;
     private boolean armIsExtended = false;
@@ -92,6 +89,47 @@ public class Robot {
             }
         }
         motors.stopMotors();
+    }
+    public void handleArmWithTime(double givenTargetAngle, double givenTargetExtend, double givenTargetAngleTime, double givenTargetExtendTime)
+    {
+        ElapsedTime armTimer = new ElapsedTime();
+        double angleTargetTime = givenTargetAngleTime;
+        double extendTargetTime = givenTargetExtendTime;
+        double targetAngledPosition = givenTargetAngle;
+        double targetExtend = givenTargetExtend;
+        double presentAngle = 0;
+        double presentExtend = 0;
+
+        double boundTime = Math.max(angleTargetTime,extendTargetTime);
+        telemetry.addData("bound time", boundTime);
+        telemetry.update();
+        double armTime = armTimer.seconds();
+
+        while (opMode.opModeIsActive()) {
+            while (armTime < boundTime)
+            {
+                if (arms.getCurrentAngledPosition() != targetAngledPosition)
+                {
+                    double ratioArm = Range.clip((armTime / angleTargetTime),0,1);
+                    presentAngle = ratioArm * targetAngledPosition;
+                    telemetry.addData("ratioArm", ratioArm);
+                    telemetry.addData("presentAngle", presentAngle);
+                    telemetry.update();
+                    arms.angleArmTo(presentAngle);
+                }
+                if (arms.getCurrentExtend() != targetExtend) {
+                    double ratioExtend = Range.clip((armTime / extendTargetTime),0,1);
+                    presentExtend = ratioExtend * targetExtend;
+                    telemetry.addData("ratioExtend", ratioExtend);
+                    telemetry.addData("presentExtend",presentExtend);
+                    telemetry.update();
+                    arms.extendElbow(presentExtend);
+                }
+                armTime = armTimer.seconds();
+            }
+            telemetry.addLine("Breaking out");
+            break;
+        }
     }
 
     public void extendWithTime(double givenTargetAngle, double givenTargetExtend, double givenAngleTargetTime, double givenExtendTargetTime, double totalTargetTime)
