@@ -90,41 +90,49 @@ public class Robot {
         }
         motors.stopMotors();
     }
-    public void handleArmWithTime(double givenTargetAngle, double givenTargetExtend, double givenTargetAngleTime, double givenTargetExtendTime)
+
+    public void lookArm()
+    {
+        while (opMode.opModeIsActive()) {
+            double angledPos = arms.getCurrentAngledPosition();
+            double extendPos = arms.getCurrentExtend();
+            telemetry.addData("angledPos", angledPos);
+            telemetry.addData("extendPos", extendPos);
+            telemetry.update();
+        }
+    }
+    public void handleArmWithTime(double targetAngle, double targetExtend, double targetAngleTime, double targetExtendTime)
     {
         ElapsedTime armTimer = new ElapsedTime();
-        double angleTargetTime = givenTargetAngleTime;
-        double extendTargetTime = givenTargetExtendTime;
-        double targetAngledPosition = givenTargetAngle;
-        double targetExtend = givenTargetExtend;
+        double initialAngle = arms.getCurrentAngledPosition();
+        double initialExtend = arms.getCurrentExtend();
         double presentAngle = 0;
         double presentExtend = 0;
 
-        double boundTime = Math.max(angleTargetTime,extendTargetTime);
+        double boundTime = Math.max(targetAngleTime,targetExtendTime);
         telemetry.addData("bound time", boundTime);
         telemetry.update();
         double armTime = armTimer.seconds();
 
         while (opMode.opModeIsActive()) {
-            while (armTime < boundTime)
+            while (armTime <= boundTime)
             {
-                if (arms.getCurrentAngledPosition() != targetAngledPosition)
+                if (arms.getCurrentAngledPosition() != targetAngle)
                 {
-                    double ratioArm = Range.clip((armTime / angleTargetTime),0,1);
-                    presentAngle = ratioArm * targetAngledPosition;
-                    telemetry.addData("ratioArm", ratioArm);
-                    telemetry.addData("presentAngle", presentAngle);
-                    telemetry.update();
+                    double ratioArm = Range.clip((armTime / targetAngleTime),0,1);
+                    presentAngle = initialAngle + (ratioArm*(targetAngle-initialAngle));
                     arms.angleArmTo(presentAngle);
                 }
                 if (arms.getCurrentExtend() != targetExtend) {
-                    double ratioExtend = Range.clip((armTime / extendTargetTime),0,1);
-                    presentExtend = ratioExtend * targetExtend;
-                    telemetry.addData("ratioExtend", ratioExtend);
-                    telemetry.addData("presentExtend",presentExtend);
-                    telemetry.update();
+
+                    double ratioExtend = Range.clip((armTime / targetExtendTime),0,1);
+                    presentExtend = initialExtend + (ratioExtend * (targetExtend- initialExtend));
                     arms.extendElbow(presentExtend);
                 }
+                telemetry.addData("currentAngle",arms.getCurrentAngledPosition());
+                telemetry.addData("currentExtend",arms.getCurrentExtend());
+                telemetry.update();
+
                 armTime = armTimer.seconds();
             }
             telemetry.addLine("Breaking out");
@@ -145,7 +153,7 @@ public class Robot {
         double presentExtend = 0;
 
         while (opMode.opModeIsActive()) {
-            while (armTime < totalTargetTime)
+            while (armTime <= totalTargetTime)
             {
                 double ratioArm = armTime/angleTargetTime;
                 presentAngle = ratioArm * targetAngle;

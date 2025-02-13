@@ -21,11 +21,11 @@ public class ArmUtility {
         this.leftArmMotor = initializeMotor("armLeft", DcMotor.Direction.FORWARD);
         this.rightArmMotor = initializeMotor("armRight", DcMotor.Direction.REVERSE);
 
-        this.leftArmServo = initializeServo("leftArmServo");
-        this.rightArmServo = initializeServo("rightArmServo");
-        this.wristServo = initializeServo("wristServo");
-        this.grabberServo = initializeServo("grabberServo");
-        this.elbowServo = initializeServo("elbowServo");
+        this.leftArmServo = initializeServo("leftArmServo",1);
+        this.rightArmServo = initializeServo("rightArmServo",0);
+        this.wristServo = initializeServo("wristServo",0);
+        this.grabberServo = initializeServo("grabberServo",0);
+        this.elbowServo = initializeServo("elbowServo",0);
 
         previousArm = 0;
     }
@@ -39,8 +39,9 @@ public class ArmUtility {
         return motor;
     }
 
-    Servo initializeServo(String name) {
+    Servo initializeServo(String name, double position) {
         Servo servo = hardwareMap.get(Servo.class, name);
+        servo.setPosition(position);
         return servo;
     }
 
