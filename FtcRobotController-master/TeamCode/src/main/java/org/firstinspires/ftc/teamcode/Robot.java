@@ -24,7 +24,7 @@ public class Robot {
     private IMUUtility imu;
 
     private final Position currentPosition;
-    private double currentHeading, currentHeight, currentAngle, currentExtend;
+    private double currentHeading, currentHeight, currentArmAngle, currentExtend;
 
     private int armHeight = 0;
     private boolean armIsExtended = false;
@@ -41,7 +41,7 @@ public class Robot {
         this.currentPosition = initialState.position;
         this.currentHeight = initialState.height;
         this.currentHeading = LMMHS.setAngle(initialState.heading);
-        this.currentAngle = initialState.angle;
+        this.currentArmAngle = initialState.armAngle;
         this.currentExtend = initialState.extend;
 
         this.motors = new MotorUtility(this.hardwareMap);
@@ -101,21 +101,16 @@ public class Robot {
             telemetry.update();
         }
     }
-    public void handleArmWithTime(double targetAngle, double targetExtend, double targetAngleTime, double targetExtendTime)
+    public void handleArmWithTime(double initialAngle, double initialExtend, double targetAngle, double targetExtend, double targetAngleTime, double targetExtendTime)
     {
         ElapsedTime armTimer = new ElapsedTime();
-        double initialAngle = arms.getCurrentAngledPosition();
-        double initialExtend = arms.getCurrentExtend();
         double presentAngle = 0;
         double presentExtend = 0;
 
         double boundTime = Math.max(targetAngleTime,targetExtendTime);
-        telemetry.addData("bound time", boundTime);
-        telemetry.update();
         double armTime = armTimer.seconds();
 
-        while (opMode.opModeIsActive()) {
-            while (armTime <= boundTime)
+        if (armTime <= boundTime)
             {
                 if (arms.getCurrentAngledPosition() != targetAngle)
                 {
@@ -135,36 +130,6 @@ public class Robot {
 
                 armTime = armTimer.seconds();
             }
-            telemetry.addLine("Breaking out");
-            break;
-        }
-    }
-
-    public void extendWithTime(double givenTargetAngle, double givenTargetExtend, double givenAngleTargetTime, double givenExtendTargetTime, double totalTargetTime)
-    {
-        ElapsedTime armTimer = new ElapsedTime();
-        double angleTargetTime = givenAngleTargetTime;
-        double extendTargetTime = givenExtendTargetTime;
-        double targetAngle = givenTargetAngle;
-        double targetExtend = givenTargetExtend;
-        double armTime = armTimer.seconds();
-
-        double presentAngle = 0;
-        double presentExtend = 0;
-
-        while (opMode.opModeIsActive()) {
-            while (armTime <= totalTargetTime)
-            {
-                double ratioArm = armTime/angleTargetTime;
-                presentAngle = ratioArm * targetAngle;
-                arms.angleArmTo(presentAngle);
-                double ratioExtend = armTime/extendTargetTime;
-                presentExtend = ratioExtend * targetExtend;
-                arms.extendElbow(presentExtend);
-                armTime = armTimer.seconds();
-            }
-            break;
-        }
     }
 
     public void testPick()
@@ -181,8 +146,13 @@ public class Robot {
         Position targetPosition = targetState.position;
         double targetHeading = LMMHS.setAngle(targetState.heading);
         double targetHeight = targetState.height;
-        double targetAngle = targetState.angle;
+        double targetArmAngle = targetState.armAngle;
         double targetExtend = targetState.extend;
+        double targetArmAngleTime = targetState.armAngleTime;
+        double targetExtendTime = targetState.extendTime;
+
+        double initialArmAngle = currentArmAngle;
+        double initialExtend = currentExtend;
 
         PIDDrive xyPID = new PIDDrive(telemetry);
         PIDTurn turnPID = new PIDTurn(telemetry);
@@ -235,17 +205,7 @@ public class Robot {
 
             arms.setArmPowers(armPower); //need to add something that will keep thhe arm up there when it reaches the tolerance
 
-            double angleTargetTime = 2;
-            double extendTargetTime = 1;
-
-            if (armTime < angleTargetTime)
-            {
-                double ratio = armTime/angleTargetTime;
-                currentAngle = ratio * targetAngle;
-                arms.angleArmTo(currentAngle);
-                currentExtend = ratio * targetExtend;
-                arms.extendElbow(currentExtend);
-            }
+            handleArmWithTime(initialArmAngle,initialExtend,targetArmAngle,targetExtend,targetArmAngleTime,targetExtendTime);
 
             updatePosition();
         }

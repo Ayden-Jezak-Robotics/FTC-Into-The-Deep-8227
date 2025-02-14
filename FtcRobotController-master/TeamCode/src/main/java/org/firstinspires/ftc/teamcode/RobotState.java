@@ -8,17 +8,21 @@ public class RobotState {
     final Position position;
     final double heading; // In Degrees
     final double height;
-    final double angle;
+    final double armAngle;
     final double extend;
+    final double armAngleTime;
+    final double extendTime;
 
 
     // Constructor to initialize the state
-    public RobotState(int x, int y, int heading, double height, double angle, double extend) {
+    public RobotState(int x, int y, int heading, double height, double armAngle, double extend, double armAngleTime, double extendTime) {
         this.position = new Position(DistanceUnit.INCH, x, y, 0, System.nanoTime());
         this.heading = heading; // in degrees
         this.height = height;
-        this.angle = angle;
+        this.armAngle = armAngle;
         this.extend = extend;
+        this.armAngleTime = armAngleTime;
+        this.extendTime = extendTime;
     }
 
 }

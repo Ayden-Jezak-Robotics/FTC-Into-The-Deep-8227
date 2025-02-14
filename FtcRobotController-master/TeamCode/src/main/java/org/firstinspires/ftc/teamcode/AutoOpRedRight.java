@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 @Autonomous(name = "AutoOpBlueLeft", group = "Draft")
 public class AutoOpRedRight extends LinearOpMode {
 
-    RobotState initialState = new RobotState(0, 0, 0, 0,0,0);
+    RobotState initialState = new RobotState(0, 0, 0, 0,0,0,0,0);
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -14,6 +14,7 @@ public class AutoOpRedRight extends LinearOpMode {
         Robot robot = new Robot(this, hardwareMap, telemetry, initialState, CameraPosition.LEFT);
 
         waitForStart();
+        /*
         robot.moveToPositionAndHeading(new RobotState(-32, 26, 0, 0,0,0));
         sleep(1000);
         robot.moveToPositionAndHeading(new RobotState(-32, 6, 0, 0,0,0));
@@ -33,6 +34,8 @@ public class AutoOpRedRight extends LinearOpMode {
         robot.moveToPositionAndHeading(new RobotState(26, 48, 0, 0,0,0));
         sleep(1000);
         robot.moveToPositionAndHeading(new RobotState(26, 8, 0, 0,0,0));
+
+         */
     }
 
 

@@ -17,6 +17,7 @@ public class AutoOpSquare extends LinearOpMode {
 
         waitForStart();
 
+        /*
         robot.moveToPositionAndHeading(new RobotState(0, 24, 0, 0,0,0));
         sleep(sleepTime);
         robot.moveToPositionAndHeading(new RobotState(24, 24, 0, 0,0,0));
@@ -24,6 +25,6 @@ public class AutoOpSquare extends LinearOpMode {
         robot.moveToPositionAndHeading(new RobotState(24, 0, 0, 0,0,0));
         sleep(sleepTime);
         robot.moveToPositionAndHeading(new RobotState(0, 0, 0, 0,0,0));
-
+        */
     }
 }
