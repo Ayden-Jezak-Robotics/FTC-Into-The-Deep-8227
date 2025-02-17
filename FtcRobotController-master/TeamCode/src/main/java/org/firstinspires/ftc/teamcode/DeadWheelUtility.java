@@ -57,7 +57,6 @@ public class DeadWheelUtility {
         previousStrafe = newValue;
     }
 
-
     void resetEncoders() {
         deadWheelDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         previousDrive = 0;
