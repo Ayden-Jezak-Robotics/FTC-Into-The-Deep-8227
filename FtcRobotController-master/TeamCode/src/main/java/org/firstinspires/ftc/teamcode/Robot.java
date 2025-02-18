@@ -30,6 +30,8 @@ public class Robot {
     private boolean armIsExtended = false;
     private boolean wristIsExtended = false;
 
+    private double armTime;
+
     // private final double initialHeading = 0;
 
     public Robot(LinearOpMode opMode, HardwareMap hardwareMap, Telemetry telemetry, RobotState initialState, CameraPosition side) {
@@ -85,30 +87,18 @@ public class Robot {
             if (tolerance < 200) {
                 telemetry.addLine("Breaks due to tolerance");
                 telemetry.update();
-                break;
+                break; //but replace this with a minimum power
             }
         }
         motors.stopMotors();
     }
 
-    public void lookArm()
-    {
-        while (opMode.opModeIsActive()) {
-            double angledPos = arms.getCurrentAngledPosition();
-            double extendPos = arms.getCurrentExtend();
-            telemetry.addData("angledPos", angledPos);
-            telemetry.addData("extendPos", extendPos);
-            telemetry.update();
-        }
-    }
     public void handleArmWithTime(double initialAngle, double initialExtend, double targetAngle, double targetExtend, double targetAngleTime, double targetExtendTime)
     {
-        ElapsedTime armTimer = new ElapsedTime();
         double presentAngle = 0;
         double presentExtend = 0;
 
         double boundTime = Math.max(targetAngleTime,targetExtendTime);
-        double armTime = armTimer.seconds();
 
         if (armTime <= boundTime)
             {
@@ -127,8 +117,6 @@ public class Robot {
                 telemetry.addData("currentAngle",arms.getCurrentAngledPosition());
                 telemetry.addData("currentExtend",arms.getCurrentExtend());
                 telemetry.update();
-
-                armTime = armTimer.seconds();
             }
     }
 
@@ -169,7 +157,7 @@ public class Robot {
 
         ElapsedTime timer = new ElapsedTime();
         ElapsedTime armTimer = new ElapsedTime();
-        double armTime = timer.seconds();
+        armTime = timer.seconds();
 
         while (opMode.opModeIsActive()) {
 
@@ -184,6 +172,7 @@ public class Robot {
                 break;
             }
             double time = timer.seconds();
+            armTime = armTimer.seconds();
 
             // Calculate power outputs using PID
             XYValue motorPower = xyPID.calculatePower(currentPosition, currentHeading, timer.seconds());
