@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-@Autonomous(name = "AutoOpBlueLeft", group = "Draft")
+@Autonomous(name = "AutoOpBlueRight", group = "Draft")
 public class AutoOpRedRight extends LinearOpMode {
 
     RobotState initialState = new RobotState(0, 0, 0, 0,0,0,0,0);

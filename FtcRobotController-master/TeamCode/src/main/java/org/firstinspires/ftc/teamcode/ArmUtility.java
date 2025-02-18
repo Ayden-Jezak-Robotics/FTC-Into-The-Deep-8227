@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class ArmUtility {
 
@@ -10,7 +11,7 @@ public class ArmUtility {
     private final DcMotor leftArmMotor, rightArmMotor;
 
     private final Servo leftArmServo, rightArmServo;
-    private final Servo wristServo, grabberServo, elbowServo;
+    private final Servo elbowServo, grabberServo,wristServo;
 
     private int previousArm;
     private double previousRightAngle, previousLeftAngle;
@@ -23,8 +24,8 @@ public class ArmUtility {
 
         this.leftArmServo = initializeServo("leftArmServo",1);
         this.rightArmServo = initializeServo("rightArmServo",0);
-        this.wristServo = initializeServo("wristServo",0);
-        this.grabberServo = initializeServo("grabberServo",0);
+        this.wristServo = initializeServo("wristServo",0.1);
+        this.grabberServo = initializeServo("grabberServo",0.3);
         this.elbowServo = initializeServo("elbowServo",0);
 
         previousArm = 0;
@@ -92,16 +93,31 @@ public class ArmUtility {
     }
 
     void openGrabber() {
-        grabberServo.setPosition(0.6);
+        grabberServo.setPosition(0.7);
+        sleep(500);
     }
 
     void closeGrabber() {
-        grabberServo.setPosition(0.0);
+        grabberServo.setPosition(0.3);
+        sleep(500);
+
     }
+
 
     void setWristPosition(double position){
         wristServo.setPosition(position);
     }
+
+    void wristDown()
+    {
+        wristServo.setPosition(0.1);
+    }
+
+    void wristUp()
+    {
+        wristServo.setPosition(0.8);
+    }
+
 
     void setArmPowers(double armPower) {
         leftArmMotor.setPower(armPower);

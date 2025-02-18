@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 @Autonomous(name = "AutoOpSquare", group = "Draft")
 public class AutoOpSquare extends LinearOpMode {
 
-    RobotState initialState = new RobotState(0, 0, 0, 0,0,0);
+    RobotState initialState = new RobotState(0, 0, 0, 0,0,0,0,0);
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -17,14 +17,14 @@ public class AutoOpSquare extends LinearOpMode {
 
         waitForStart();
 
-        /*
-        robot.moveToPositionAndHeading(new RobotState(0, 24, 0, 0,0,0));
+
+        robot.moveToPositionAndHeading(new RobotState(0, 24, 0, 0,0,0,2,2));
         sleep(sleepTime);
-        robot.moveToPositionAndHeading(new RobotState(24, 24, 0, 0,0,0));
+        robot.moveToPositionAndHeading(new RobotState(24, 24, 0, 0,0,0,2,2));
         sleep(sleepTime);
-        robot.moveToPositionAndHeading(new RobotState(24, 0, 0, 0,0,0));
+        robot.moveToPositionAndHeading(new RobotState(24, 0, 0, 0,0,0,2,2));
         sleep(sleepTime);
-        robot.moveToPositionAndHeading(new RobotState(0, 0, 0, 0,0,0));
-        */
+        robot.moveToPositionAndHeading(new RobotState(0, 0, 0, 0,0,0,2,2));
+
     }
 }
