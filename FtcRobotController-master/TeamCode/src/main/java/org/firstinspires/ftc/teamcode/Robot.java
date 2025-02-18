@@ -67,11 +67,6 @@ public class Robot {
             telemetry.update();
         }
     }
-    public void turnOnArm(double powerLevel) {
-        while (opMode.opModeIsActive()) {
-            arms.setArmPowers(powerLevel);
-        }
-    }
 
     public void armUp(double target)
     {
@@ -85,9 +80,7 @@ public class Robot {
             updatePosition();
             double tolerance = target - currentHeight;
             if (tolerance < 200) {
-                telemetry.addLine("Breaks due to tolerance");
-                telemetry.update();
-                break; //but replace this with a minimum power
+                arms.setHoldingPower();
             }
         }
         motors.stopMotors();
@@ -192,7 +185,16 @@ public class Robot {
             // Apply motor powers
             motors.setMotorPowers(motorPower.x, motorPower.y, turnPower);
 
-            arms.setArmPowers(armPower); //need to add something that will keep thhe arm up there when it reaches the tolerance
+            double remainingArm = (targetHeight - currentHeight) * Constants.DEAD_WHEEL_TICKS_PER_INCH;
+            
+            if (remainingArm < Constants.MINIMUM_DISTANCE)
+            {
+                arms.setHoldingPower();
+            }
+            else
+            {
+                arms.setArmPowers(armPower); //need to add something that will keep thhe arm up there when it reaches the tolerance
+            }
 
             handleArmWithTime(initialArmAngle,initialExtend,targetArmAngle,targetExtend,targetArmAngleTime,targetExtendTime);
 

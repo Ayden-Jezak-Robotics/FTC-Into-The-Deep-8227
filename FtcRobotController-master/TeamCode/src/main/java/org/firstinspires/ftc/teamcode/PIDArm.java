@@ -36,11 +36,6 @@ public class PIDArm {
     public double calculatePower(double currentHeight, double time) {
         double error = (targetHeight - currentHeight);
 
-        if (error == 0)
-        {
-            baseOutput = FILLIN //minimum output
-        }
-
         /// Prevent zero or very small time steps
         double deltaTime = Math.max(time, Constants.MINIMUM_TIME_IN_SECONDS);
 
