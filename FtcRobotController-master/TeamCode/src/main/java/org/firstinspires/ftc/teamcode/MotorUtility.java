@@ -25,13 +25,15 @@ public class MotorUtility {
 
         return motor;
     }
-    void setMotorPower(double power)
+
+/*     void setMotorPower(double power)
     {
         frontLeft.setPower(-power);
         frontRight.setPower(power);
         backLeft.setPower(-power);
         backRight.setPower(power);
     }
+ */
     void setMotorPowers(double xPower, double yPower, double turnPower) {
 
         double frontLeftPower = yPower + xPower - turnPower;
@@ -54,6 +56,15 @@ public class MotorUtility {
         frontRight.setPower(frontRightPower);
         backLeft.setPower(backLeftPower);
         backRight.setPower(backRightPower);
+    }
+
+    void setPowerDirectly( double fl, double fr, double, bl, double br) {
+        
+        frontLeft.setPower(frontLeftPower);
+        frontRight.setPower(frontRightPower);
+        backLeft.setPower(backLeftPower);
+        backRight.setPower(backRightPower);
+
     }
 
     void stopMotors() {

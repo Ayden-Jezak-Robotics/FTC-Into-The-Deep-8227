@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-@Autonomous(name = "AutoOpSpinTest", group = "Draft")
+@Autonomous(name = "AutoOpSpinTest", group = "Test")
 public class AutoOpSpinTest extends LinearOpMode {
 
     RobotState initialState = new RobotState(0, 0, 0, 0,0,0,0,0);
@@ -19,7 +19,7 @@ public class AutoOpSpinTest extends LinearOpMode {
 
         waitForStart();
 
-        robot.moveToPositionAndHeading(new RobotState(0, 0, (360 * numberOfSpins), 0,0,0,0,0));
+        robot.moveToPositionAndHeading(new RobotState(0, 0, (360 * numberOfSpins), 0, 0, 0, 0, 0));
 
     }
 }
