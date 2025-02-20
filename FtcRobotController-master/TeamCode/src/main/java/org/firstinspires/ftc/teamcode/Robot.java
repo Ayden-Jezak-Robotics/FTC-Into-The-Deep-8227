@@ -15,20 +15,20 @@ public class Robot {
     private final Telemetry telemetry;
 
     //private final CameraPosition cameraPosition;
-
-    private final MotorUtility motors;
-    private final ArmUtility arms;
-    private final DeadWheelUtility deadWheels;
     //private final VisionUtility myAprilTagProcessor;
+    
+    private final MotorUtility motors;
+    private final ArmUtility arm;
+    private final DeadWheelUtility deadWheels;
 
     private IMUUtility imu;
 
     private final Position currentPosition;
-    private double currentHeading, currentHeight, currentArmAngle, currentExtend;
+    private double currentHeading, currentArmHeight, currentArmAngle;
 
-    private int armHeight = 0;
-    private boolean armIsExtended = false;
-    private boolean wristIsExtended = false;
+    private int armHeight;
+    private boolean armIsExtended;
+    private boolean wristIsExtended;
 
     private double armTime;
 
@@ -39,6 +39,11 @@ public class Robot {
         this.hardwareMap = hardwareMap;
         this.telemetry = telemetry;
 
+        this.motors = new MotorUtility(this.hardwareMap);
+        this.arm = new ArmUtility(this.hardwareMap);
+        this.deadWheels = new DeadWheelUtility(this.hardwareMap);
+        this.imu = new IMUUtility(this.hardwareMap);
+
         //this.cameraPosition = side;
         this.currentPosition = initialState.position;
         this.currentHeight = initialState.height;
@@ -46,10 +51,6 @@ public class Robot {
         this.currentArmAngle = initialState.armAngle;
         this.currentExtend = initialState.extend;
 
-        this.motors = new MotorUtility(this.hardwareMap);
-        this.arms = new ArmUtility(this.hardwareMap);
-        this.deadWheels = new DeadWheelUtility(this.hardwareMap);
-        this.imu = new IMUUtility(this.hardwareMap);
         //this.myAprilTagProcessor = new VisionUtility(this.hardwareMap, this.cameraPosition);
     }
 
