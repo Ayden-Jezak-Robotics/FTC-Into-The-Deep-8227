@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class PIDArm {
-    private static final double kP = 0.015; //Fix
+    private static final double kP = 0.015; //Fix, Handling in inches... should I change it
     private static final double kI = 0.015;
     private static final double kD = 0;
     private static final double kF = 0; //FIND the minimum value needed that equal the force of weight

@@ -69,22 +69,18 @@ public class Robot {
         }
     }
 
-    public void armUp(double target)
+    public void armUp(double target) //We can just teste armPID, and see how long it takes, and change kP based on what we need
     {
         ElapsedTime timer = new ElapsedTime();
         PIDArm armPID = new PIDArm(telemetry);
-        armPID.setTargetHeight(target);
-        while (opMode.opModeIsActive()) {
+        armPID.setTargetHeight(target); //in inches
+        while ((target - currentHeight)<200) {
             double time = timer.seconds();
-            double armPower = armPID.calculatePower(currentHeight, timer.seconds());
+            double armPower = armPID.calculatePower(currentHeight, timer.seconds()); //currentHeight in  inches
             arms.setArmPowers(armPower);
             updatePosition();
-            double tolerance = target - currentHeight;
-            if (tolerance < 200) {
-                arms.setHoldingPower();
-            }
         }
-        motors.stopMotors();
+        motors.setHoldingPower();
     }
 
     public void justArm(double targetAngle, double targetExtend, double targetAngleTime, double targetExtendTime, boolean open)    {
@@ -196,16 +192,13 @@ public class Robot {
 
         PIDDrive xyPID = new PIDDrive(telemetry);
         PIDTurn turnPID = new PIDTurn(telemetry);
-        PIDArm armPID = new PIDArm(telemetry);
+        //PIDArm armPID = new PIDArm(telemetry);
 
-        /// Reset everything to 0
-        //imu.resetIMU(); //PROBLEM
         deadWheels.resetEncoders();
 
-        /// Does the PID Controller need to know the target heading, or just the current heading?
         xyPID.setTargetPosition(targetPosition);
         turnPID.setTargetHeading(targetHeading);
-        armPID.setTargetHeight(targetHeight);
+        //armPID.setTargetHeight(targetHeight);
 
         ElapsedTime timer = new ElapsedTime();
         ElapsedTime armTimer = new ElapsedTime();
@@ -229,7 +222,7 @@ public class Robot {
             // Calculate power outputs using PID
             XYValue motorPower = xyPID.calculatePower(currentPosition, currentHeading, timer.seconds());
             double turnPower = turnPID.calculatePower(currentHeading, timer.seconds());
-            double armPower = armPID.calculatePower(currentHeight, timer.seconds());
+            //double armPower = armPID.calculatePower(currentHeight, timer.seconds());
 
             telemetry.addData("CurrentX", currentPosition.x);
             telemetry.addData("CurrentY", currentPosition.y);
@@ -246,7 +239,7 @@ public class Robot {
 
             double remainingArm = (targetHeight - currentHeight) * Constants.DEAD_WHEEL_TICKS_PER_INCH;
             
-            if (remainingArm < Constants.MINIMUM_DISTANCE)
+            /*if (remainingArm < Constants.MINIMUM_DISTANCE)
             {
                 arms.setHoldingPower();
             }
@@ -254,6 +247,7 @@ public class Robot {
             {
                 arms.setArmPowers(armPower); //need to add something that will keep thhe arm up there when it reaches the tolerance
             }
+            */
 
             //handleArmWithTime(initialArmAngle,initialExtend,targetArmAngle,targetExtend,targetArmAngleTime,targetExtendTime);
 
@@ -286,7 +280,8 @@ public class Robot {
         double deltaThetaIMU = imuHeading - imu.getPreviousHeading();
 
         /// Encoder Height, Heading
-        currentHeight = currentHeight + deltaArm;
+        currentHeight = (currentHeight * Constants.DEAD_WHEEL_TICKS_PER_INCH) + deltaArm;
+        currentHeight = currentHeight/Constants.DEAD_WHEEL_TICKS_PER_INCH;
         currentHeading = currentHeading + deltaThetaIMU;
         currentArmAngle = arms.getCurrentAngledPosition();
         currentExtend = arms.getCurrentExtend();

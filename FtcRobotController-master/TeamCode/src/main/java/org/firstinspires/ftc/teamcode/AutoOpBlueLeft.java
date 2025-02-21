@@ -16,6 +16,7 @@ public class AutoOpBlueLeft extends LinearOpMode {
         waitForStart();
 
         robot.moveToPositionAndHeading(new RobotState(-5, -39, 0, 0, 0, 0, 2, 1));
+        robot.armUp(6);
         //robot.justArm(0.8,0.7,2,1);
         sleep(2000);
         robot.moveToPositionAndHeading(new RobotState(-48, -43, 0, 0, 0, 0, 2, 1));
@@ -23,15 +24,16 @@ public class AutoOpBlueLeft extends LinearOpMode {
         robot.justArm(0,0.7,2,1,false);
         robot.wristUp();
         robot.moveToPositionAndHeading(new RobotState(-53, -53, -45, 0, 0, 0, 2, 1));
+        robot.armUp(6);
         robot.justArm(0.8,0.7,2,1,true);
         robot.wristDown();
         robot.moveToPositionAndHeading(new RobotState(-56, -42, 0, 0,0,0,2,1));
         robot.justArm(0,0.7,2,1,false);
         robot.wristUp();
         robot.moveToPositionAndHeading(new RobotState(-53, -53, -45, 0,0,0,2,1));
+        robot.armUp(6);
         robot.justArm(0.8,0.7,2,1,true);
         robot.wristDown();
-        robot.moveToPositionAndHeading(new RobotState(-53, -53, -45, 0,0,0,2,1));
         robot.justArm(0,0.7,2,1,false);
     }
 }
