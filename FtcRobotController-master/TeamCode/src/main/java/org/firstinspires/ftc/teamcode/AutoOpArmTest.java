@@ -20,11 +20,11 @@ public class AutoOpArmTest extends LinearOpMode {
 
         robot.moveToNewRobotState(new RobotState(0, 0, 0, 0, 0, true, false, false));
         sleep(1000);
-        robot.moveToNewRobotState(new RobotState(0, 0, 0, 4000, 0, true, true, false));
+        robot.moveToNewRobotState(new RobotState(0, 0, 0, 0, 0, true, true, false));
         sleep(1000);
-        robot.moveToNewRobotState(new RobotState(0, 0, 0, 1000, 0, true, false, true));
+        robot.moveToNewRobotState(new RobotState(0, 0, 0, 0, 0, true, false, true));
         sleep(1000);
-        robot.moveToNewRobotState(new RobotState(0, 0, 0, 1000, .5, true, false, false));
+        robot.moveToNewRobotState(new RobotState(0, 0, 0, 0, .5, true, false, false));
         sleep(1000);
         robot.moveToNewRobotState(new RobotState(0, 0, 0, 0, 0, true, true, false));
 

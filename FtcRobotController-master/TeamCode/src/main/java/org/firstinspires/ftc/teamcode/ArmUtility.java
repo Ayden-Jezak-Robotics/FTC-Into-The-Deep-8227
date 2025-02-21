@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class ArmUtility {
 
@@ -52,12 +51,12 @@ public class ArmUtility {
         return average;
     }
 
-    double getCurrentAngledPosition()
+    double getShoulderPosition()
     {
         return rightShoulderServo.getPosition();
     }
 
-    double getCurrentExtend()
+    double getElbowPosition()
     {
        return elbowServo.getPosition();
     }
@@ -76,7 +75,7 @@ public class ArmUtility {
         leftShoulderServo.setPosition(0.95);
     }
 
-    void angleArmTo(double position)
+    void rotateArmToAngle(double position)
     {
         rightShoulderServo.setPosition(position);
         leftShoulderServo.setPosition(1-position);

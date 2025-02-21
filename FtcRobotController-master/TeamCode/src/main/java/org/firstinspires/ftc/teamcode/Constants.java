@@ -25,6 +25,8 @@ public class Constants {
 
     public static final double HEIGHT_TOLERANCE = 200;
 
+    public static  final  double ELBOW_EXTEND_SETTING = 0.7;
+
     public static final double CONVERT_METERS_TO_INCHES = 39.3701;
 
     public static final double DRIVE_RADIUS = WHEEL_BASE_WIDTH_MM * DEAD_WHEEL_TICKS_PER_MM;
