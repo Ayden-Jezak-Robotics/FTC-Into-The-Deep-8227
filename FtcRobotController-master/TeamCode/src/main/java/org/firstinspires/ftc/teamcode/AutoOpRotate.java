@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 @Autonomous(name = "AutoOpRotate", group = "Test")
 public class AutoOpRotate extends LinearOpMode {
 
-    RobotState initialState = new RobotState(0, 0, 0, 0, 0, 0, 0, 0);
+    RobotState initialState = new RobotState(0, 0, 0, 0, 0, false, false, false);
 
     /// In Degrees
 
@@ -22,13 +22,13 @@ public class AutoOpRotate extends LinearOpMode {
 
         while (timer.seconds() <= 25 ) {
 
-            robot.motors.setMotorPowers(0, 0, 0.5);
+            robot.spin(.5);
 
         }
+        robot.stop();
 
-        robot.motors.stopMotors();
-        
         sleep(5000);
+
 
     }
 }

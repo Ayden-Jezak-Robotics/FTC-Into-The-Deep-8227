@@ -11,21 +11,21 @@ public class PIDTurn {
     private static final double kF = 0;
 
     private double targetHeading;
-
     private double priorError;
     private double integralSum;
 
-    private Telemetry telemetry;
+    private double error;
 
-    public PIDTurn(Telemetry telemetry) {
+    public PIDTurn() {
 
         this.priorError = 0;
         this.integralSum = 0;
 
-        this.telemetry = telemetry;
-
     }
 
+    boolean arrivedAtTheta() {
+        return Math.abs(error) < LMMHS.turnTolerance();
+    }
     public void setTargetHeading(double newTarget) {
 
         this.targetHeading = newTarget;
@@ -34,7 +34,7 @@ public class PIDTurn {
 
     /// currentPosition in Inches; currentHeading in Radians; time in Seconds
     public double calculatePower(double currentHeading, double time) {
-        double error = (targetHeading - currentHeading);
+        error = (targetHeading - currentHeading);
 
         /// Prevent zero or very small time steps
         double deltaTime = Math.max(time, Constants.MINIMUM_TIME_IN_SECONDS);

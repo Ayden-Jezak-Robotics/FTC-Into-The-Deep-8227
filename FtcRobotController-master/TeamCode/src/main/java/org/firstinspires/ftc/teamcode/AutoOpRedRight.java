@@ -3,10 +3,10 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-@Autonomous(name = "AutoOpBlueRight", group = "Main")
+@Autonomous(name = "AutoOpRedRight", group = "Main")
 public class AutoOpRedRight extends LinearOpMode {
 
-    RobotState initialState = new RobotState(0, 0, 0, 0, 0, 0, 0, 0);
+    RobotState initialState = new RobotState(0, 0, 0, 0, 0, false, false, false);
 
     @Override
     public void runOpMode() throws InterruptedException {

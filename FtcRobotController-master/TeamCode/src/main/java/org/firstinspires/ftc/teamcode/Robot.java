@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.Position;
+
 
 public class Robot {
 
@@ -14,8 +14,8 @@ public class Robot {
     private final HardwareMap hardwareMap;
     private final Telemetry telemetry;
 
-    //private final CameraPosition cameraPosition;
-    //private final VisionUtility myAprilTagProcessor;
+//    private final CameraPosition cameraPosition;
+//    private final VisionUtility myAprilTagProcessor;
     
     private final MotorUtility motors;
     private final ArmUtility arm;
@@ -23,16 +23,9 @@ public class Robot {
 
     private IMUUtility imu;
 
-    private final Position currentPosition;
-    private double currentHeading, currentArmHeight, currentArmAngle;
-
-    private int armHeight;
-    private boolean armIsExtended;
-    private boolean wristIsExtended;
+    private final RobotState currentState;
 
     private double armTime;
-
-    // private final double initialHeading = 0;
 
     public Robot(LinearOpMode opMode, HardwareMap hardwareMap, Telemetry telemetry, RobotState initialState, CameraPosition side) {
         this.opMode = opMode;
@@ -44,53 +37,17 @@ public class Robot {
         this.deadWheels = new DeadWheelUtility(this.hardwareMap);
         this.imu = new IMUUtility(this.hardwareMap);
 
-        //this.cameraPosition = side;
-        this.currentPosition = initialState.position;
-        this.currentHeight = initialState.height;
-        this.currentHeading = LMMHS.setAngle(initialState.heading);
-        this.currentArmAngle = initialState.armAngle;
-        this.currentExtend = initialState.extend;
+        this.currentState = initialState;
+        this.currentState.heading = LMMHS.setAngle(initialState.heading);
 
-        //this.myAprilTagProcessor = new VisionUtility(this.hardwareMap, this.cameraPosition);
-    }
-
-    public void turnOn(double powerLevel) {
-        /// Reset everything to 0
-        //imu.resetIMU();
-        deadWheels.resetEncoders();
-        while (opMode.opModeIsActive()) {
-            motors.setMotorPower(powerLevel);
-            int EncoderDrive = deadWheels.getCurrentValue(DeadWheel.DRIVE); //in ticks
-            int EncoderStrafe = deadWheels.getCurrentValue(DeadWheel.STRAFE);
-            telemetry.addData("EncoderDrive", EncoderDrive);
-            telemetry.addData("EncoderStrafe", EncoderStrafe);
-            telemetry.addData("IMU Heading", imu.getCurrentHeading());
-            telemetry.update();
-        }
-    }
-
-    public void armUp(double target)
-    {
-        ElapsedTime timer = new ElapsedTime();
-        PIDArm armPID = new PIDArm(telemetry);
-        armPID.setTargetHeight(target);
-        while (opMode.opModeIsActive()) {
-            double time = timer.seconds();
-            double armPower = armPID.calculatePower(currentHeight, timer.seconds());
-            arms.setArmPowers(armPower);
-            updatePosition();
-            double tolerance = target - currentHeight;
-            if (tolerance < 200) {
-                arms.setHoldingPower();
-            }
-        }
-        motors.stopMotors();
+//        this.cameraPosition = side;
+//        this.myAprilTagProcessor = new VisionUtility(this.hardwareMap, this.cameraPosition);
     }
 
     public void justArm(double targetAngle, double targetExtend, double targetAngleTime, double targetExtendTime, boolean open)    {
         ElapsedTime armTimer = new ElapsedTime();
-        double initialAngle = arms.getCurrentAngledPosition();
-        double initialExtend = arms.getCurrentExtend();
+        double initialAngle = arm.getCurrentAngledPosition();
+        double initialExtend = arm.getCurrentExtend();
         double presentAngle = 0;
         double presentExtend = 0;
 
@@ -102,20 +59,20 @@ public class Robot {
         while (opMode.opModeIsActive()) {
             while (armTime <= boundTime)
             {
-                if (arms.getCurrentAngledPosition() != targetAngle)
+                if (arm.getCurrentAngledPosition() != targetAngle)
                 {
                     double ratioArm = Range.clip((armTime / targetAngleTime),0,1);
                     presentAngle = initialAngle + (ratioArm*(targetAngle-initialAngle));
-                    arms.angleArmTo(presentAngle);
+                    arm.angleArmTo(presentAngle);
                 }
-                if (arms.getCurrentExtend() != targetExtend) {
+                if (arm.getCurrentExtend() != targetExtend) {
 
                     double ratioExtend = Range.clip((armTime / targetExtendTime),0,1);
                     presentExtend = initialExtend + (ratioExtend * (targetExtend- initialExtend));
-                    arms.extendElbow(presentExtend);
+                    arm.extendElbow(presentExtend);
                 }
-                telemetry.addData("currentAngle",arms.getCurrentAngledPosition());
-                telemetry.addData("currentExtend",arms.getCurrentExtend());
+                telemetry.addData("currentAngle",arm.getCurrentAngledPosition());
+                telemetry.addData("currentExtend",arm.getCurrentExtend());
                 telemetry.addData("presentAngle",presentAngle);
                 telemetry.addData("presentExtend",presentExtend);
                 telemetry.update();
@@ -125,24 +82,15 @@ public class Robot {
             telemetry.addLine("Breaking out");
             break;
         }
-        if (open == true)
+        if (open)
         {
-            arms.openGrabber();
+            arm.openGrabber();
         }
         else{
-            arms.closeGrabber();
+            arm.closeGrabber();
         }
     }
 
-    public void wristUp()
-    {
-        arms.wristUp();
-    }
-
-    public void wristDown()
-    {
-        arms.wristDown();
-    }
     public void handleArmWithTime(double initialAngle, double initialExtend, double targetAngle, double targetExtend, double targetAngleTime, double targetExtendTime)
     {
         double presentAngle = 0;
@@ -152,20 +100,20 @@ public class Robot {
 
         if (armTime <= boundTime)
             {
-                if (arms.getCurrentAngledPosition() != targetAngle)
+                if (arm.getCurrentAngledPosition() != targetAngle)
                 {
                     double ratioArm = Range.clip((armTime / targetAngleTime),0,1);
                     presentAngle = initialAngle + (ratioArm*(targetAngle-initialAngle));
-                    arms.angleArmTo(presentAngle);
+                    arm.angleArmTo(presentAngle);
                 }
-                if (arms.getCurrentExtend() != targetExtend) {
+                if (arm.getCurrentExtend() != targetExtend) {
 
                     double ratioExtend = Range.clip((armTime / targetExtendTime),0,1);
                     presentExtend = initialExtend + (ratioExtend * (targetExtend- initialExtend));
-                    arms.extendElbow(presentExtend);
+                    arm.extendElbow(presentExtend);
                 }
-                telemetry.addData("currentAngle",arms.getCurrentAngledPosition());
-                telemetry.addData("currentExtend",arms.getCurrentExtend());
+                telemetry.addData("currentAngle",arm.getCurrentAngledPosition());
+                telemetry.addData("currentExtend",arm.getCurrentExtend());
                 telemetry.update();
             }
     }
@@ -181,120 +129,151 @@ public class Robot {
 
      */
 
-    public void moveToPositionAndHeading(RobotState targetState) {
+    public void moveToNewRobotState(RobotState targetState) {
 
-        Position targetPosition = targetState.position;
-        double targetHeading = LMMHS.setAngle(targetState.heading);
-        double targetHeight = targetState.height;
-        double targetArmAngle = targetState.armAngle;
-        double targetExtend = targetState.extend;
-        double targetArmAngleTime = targetState.armAngleTime;
-        double targetExtendTime = targetState.extendTime;
+//        Position targetPosition = targetState.position;
+//        double targetHeading = LMMHS.setAngle(targetState.heading);
+//        double targetHeight = targetState.armHeight;
+//        double targetArmAngle = targetState.armAngle;
+//        boolean targetExtend = targetState.elbowIsExtended;
+//        double targetArmAngleTime = targetState.armAngleTime;
+//        double targetExtendTime = targetState.extendTime;
 
-        double initialArmAngle = currentArmAngle;
-        double initialExtend = currentExtend;
+//        double initialArmAngle = currentState.armAngle;
+//        double initialExtend = currentExtend;
 
-        PIDDrive xyPID = new PIDDrive(telemetry);
-        PIDTurn turnPID = new PIDTurn(telemetry);
-        PIDArm armPID = new PIDArm(telemetry);
+        PIDDrive xyPID = new PIDDrive();
+        PIDTurn turnPID = new PIDTurn();
+        PIDArm armPID = new PIDArm();
 
-        /// Reset everything to 0
-        //imu.resetIMU(); //PROBLEM
+        // Reset everything to 0
         deadWheels.resetEncoders();
 
-        /// Does the PID Controller need to know the target heading, or just the current heading?
-        xyPID.setTargetPosition(targetPosition);
-        turnPID.setTargetHeading(targetHeading);
-        armPID.setTargetHeight(targetHeight);
+        // Does the PID Controller need to know the target heading, or just the current heading?
+        xyPID.setTargetPosition(targetState.position);
+        turnPID.setTargetHeading(targetState.heading);
+        armPID.setTargetHeight(targetState.armHeight);
 
-        ElapsedTime timer = new ElapsedTime();
+        ElapsedTime driveTimer = new ElapsedTime();
         ElapsedTime armTimer = new ElapsedTime();
-        armTime = timer.seconds();
 
         while (opMode.opModeIsActive()) {
 
-            double remainingX = (targetPosition.x - currentPosition.x) * Constants.DEAD_WHEEL_TICKS_PER_INCH;
-            double remainingY = (targetPosition.y - currentPosition.y) * Constants.DEAD_WHEEL_TICKS_PER_INCH;
-            double remainingTheta = targetHeading - currentHeading;
+            XYValue motorPower;
+            double turnPower;
 
-            // Break condition
-            if (Math.abs(remainingX) < Constants.MINIMUM_DISTANCE && Math.abs(remainingY) < Constants.MINIMUM_DISTANCE && Math.abs(remainingTheta) < LMMHS.turnTolerance()) {
-                telemetry.addLine("Breaks due to tolerance");
+            do {
+
+                // Calculate power outputs using PID
+                motorPower = xyPID.calculatePower(currentState.position, currentState.heading, driveTimer.seconds());
+                turnPower = turnPID.calculatePower(currentState.heading, driveTimer.seconds());
+
+                driveTimer.reset();
+
+                // Apply motor powers
+                setDriveMotors(motorPower, turnPower);
+                motors.setMotorPowers(motorPower.x, motorPower.y, turnPower);
+
+                updateRobotPosition();
+
+                telemetry.addData("Target X", targetState.position.x);
+                telemetry.addData("CurrentX", currentState.position.x);
+                telemetry.addData("Target Y", targetState.position.y);
+                telemetry.addData("CurrentY", currentState.position.y);
+                telemetry.addData("Target Heading ", targetState.heading);
+                telemetry.addData("Current Heading", currentState.heading);
+                telemetry.addData("xPower", motorPower.x);
+                telemetry.addData("yPower", motorPower.y);
+                telemetry.addData("turnPower", turnPower);
                 telemetry.update();
-                break;
+
+            } while (!xyPID.arrivedAtX() && !xyPID.arrivedAtY() && !turnPID.arrivedAtTheta());
+
+            // Now do all the arm movements
+
+            if (currentState.elbowIsExtended != targetState.elbowIsExtended) {
+
+                // TODO: Extend Elbow Routine
             }
-            double time = timer.seconds();
-            armTime = armTimer.seconds();
 
-            // Calculate power outputs using PID
-            XYValue motorPower = xyPID.calculatePower(currentPosition, currentHeading, timer.seconds());
-            double turnPower = turnPID.calculatePower(currentHeading, timer.seconds());
-            double armPower = armPID.calculatePower(currentHeight, timer.seconds());
+            boolean armSet = false;
+            double armPower;
 
-            telemetry.addData("CurrentX", currentPosition.x);
-            telemetry.addData("CurrentY", currentPosition.y);
-            telemetry.addData("Current Heading", currentHeading);
-            telemetry.addData("Remaining Theta", remainingTheta);
-            telemetry.addData("xPower", motorPower.x);
-            telemetry.addData("yPower", motorPower.y);
-            telemetry.addData("turnPower", turnPower);
-            telemetry.update();
-            timer.reset();
+            do {
 
-            // Apply motor powers
-            motors.setMotorPowers(motorPower.x, motorPower.y, turnPower);
+                armPower = armPID.calculatePower(currentState.armHeight, armTimer.seconds());
 
-            double remainingArm = (targetHeight - currentHeight) * Constants.DEAD_WHEEL_TICKS_PER_INCH;
-            
-            if (remainingArm < Constants.MINIMUM_DISTANCE)
-            {
-                arms.setHoldingPower();
+                double remainingArm = (targetState.armHeight - currentState.armHeight) * Constants.DEAD_WHEEL_TICKS_PER_INCH;
+
+                if (Math.abs(remainingArm) < Constants.MINIMUM_DISTANCE_IN_TICKS)
+                {
+                    arm.setHoldingPower();
+                }
+                else
+                {
+                    arm.setArmPowers(armPower); //need to add something that will keep thhe arm up there when it reaches the tolerance
+                }
+
+                updateArmPosition();
+
+            } while (!armPID.arrivedAtHeight());
+
+            if (currentState.wristIsUp != targetState.wristIsUp) {
+                if (targetState.wristIsUp) {
+                    turnWristUp();
+                } else {
+                    turnWristDown();
+                }
             }
-            else
-            {
-                arms.setArmPowers(armPower); //need to add something that will keep thhe arm up there when it reaches the tolerance
+
+            if (currentState.grabberIsOpen != targetState.grabberIsOpen) {
+                if (targetState.grabberIsOpen) {
+                    openGrabber();
+                } else {
+                    closeGrabber();
+                }
             }
 
             //handleArmWithTime(initialArmAngle,initialExtend,targetArmAngle,targetExtend,targetArmAngleTime,targetExtendTime);
 
-            updatePosition();
+
         }
         motors.stopMotors();
+        arm.stopMotors();
     }
 
-    public void updatePosition() {
 
-        int EncoderDrive = deadWheels.getCurrentValue(DeadWheel.DRIVE); //in ticks
-        int EncoderStrafe = deadWheels.getCurrentValue(DeadWheel.STRAFE);
-        int EncoderArm = arms.getAverageCurrentPosition();
+    public void updateArmPosition() {
+        int encoderArm = arm.getAverageCurrentPosition();
+        int deltaArm = encoderArm - arm.getPreviousArm();
 
-        /*telemetry.addData("EncoderDrive", EncoderDrive / Constants.DEAD_WHEEL_TICKS_PER_INCH);
-        telemetry.addData("EncoderStrafe", EncoderStrafe / Constants.DEAD_WHEEL_TICKS_PER_INCH);
-        telemetry.addData("EncoderArm", EncoderArm / Constants.DEAD_WHEEL_TICKS_PER_INCH);
-        telemetry.update();*/
+        currentState.armHeight = currentState.armHeight + deltaArm;
+        currentState.armAngle = arm.getCurrentAngledPosition();
 
+        arm.setPreviousArm(encoderArm);
+    }
 
-        /// IMU Heading in Degrees
+    public void updateRobotPosition() {
+
+        int encoderDrive = deadWheels.getCurrentValue(DeadWheel.DRIVE); //in ticks
+        int encoderStrafe = deadWheels.getCurrentValue(DeadWheel.STRAFE);
+
+        // IMU Heading in Degrees
         double imuHeading = imu.getCurrentHeading();
 
-        /// Get changes in encoder values
-        int deltaDrive = EncoderDrive - deadWheels.getPreviousValue(DeadWheel.DRIVE);
-        int deltaStrafe = EncoderStrafe - deadWheels.getPreviousValue(DeadWheel.STRAFE);
-        int deltaArm = EncoderArm - arms.getPreviousArm();
+        // Get changes in encoder values
+        int deltaDrive = encoderDrive - deadWheels.getPreviousValue(DeadWheel.DRIVE);
+        int deltaStrafe = encoderStrafe - deadWheels.getPreviousValue(DeadWheel.STRAFE);
 
-        /// deltaTheta from IMU
+        // deltaTheta from IMU
         double deltaThetaIMU = imuHeading - imu.getPreviousHeading();
 
-        /// Encoder Height, Heading
-        currentHeight = currentHeight + deltaArm;
-        currentHeading = currentHeading + deltaThetaIMU;
-        currentArmAngle = arms.getCurrentAngledPosition();
-        currentExtend = arms.getCurrentExtend();
+        // Encoder Height, Heading
+        currentState.heading = currentState.heading + deltaThetaIMU;
 
-        /// Update previous encoder values
-        deadWheels.setPreviousDrive(EncoderDrive); //in ticks
-        deadWheels.setPreviousStrafe(EncoderStrafe);
-        arms.setPreviousArm(EncoderArm);
+        // Update previous encoder values
+        deadWheels.setPreviousDrive(encoderDrive); //in ticks
+        deadWheels.setPreviousStrafe(encoderStrafe);
 
         imu.setPreviousHeading(imuHeading);
 
@@ -313,8 +292,8 @@ public class Robot {
 
         // Transform local displacements to global coordinates
         // changed the signs for globals
-        double deltaYGlobal = deltaXLocal * LMMHS.sin(currentHeading) + deltaYLocal * LMMHS.cos(currentHeading);
-        double deltaXGlobal = deltaXLocal * LMMHS.cos(currentHeading) - deltaYLocal * LMMHS.sin(currentHeading);
+        double deltaYGlobal = deltaXLocal * LMMHS.sin(currentState.heading) + deltaYLocal * LMMHS.cos(currentState.heading);
+        double deltaXGlobal = deltaXLocal * LMMHS.cos(currentState.heading) - deltaYLocal * LMMHS.sin(currentState.heading);
 
         //final Pose3D currentAprilTagPosition = myAprilTagProcessor.getPose();
 
@@ -326,11 +305,27 @@ public class Robot {
         }*/
 
         // Update global position
-        currentPosition.x += (deltaXGlobal / Constants.DEAD_WHEEL_TICKS_PER_INCH);
-        currentPosition.y += (deltaYGlobal / Constants.DEAD_WHEEL_TICKS_PER_INCH);
+        currentState.position.x += (deltaXGlobal / Constants.DEAD_WHEEL_TICKS_PER_INCH);
+        currentState.position.y += (deltaYGlobal / Constants.DEAD_WHEEL_TICKS_PER_INCH);
 
     }
-
+    public void setArmHeight(double target)
+    {
+        ElapsedTime timer = new ElapsedTime();
+        PIDArm armPID = new PIDArm();
+        armPID.setTargetHeight(target);
+        while (opMode.opModeIsActive()) {
+            double time = timer.seconds();
+            double armPower = armPID.calculatePower(currentState.armHeight, timer.seconds());
+            arm.setArmPowers(armPower);
+            updateRobotPosition();
+            double tolerance = target - currentState.armHeight;
+            if (tolerance < 200) {
+                arm.setHoldingPower();
+            }
+        }
+        motors.stopMotors();
+    }
     /*public void pickUpObject(){
         arms.openGrabber();
         arms.closeGrabber();
@@ -360,11 +355,8 @@ public class Robot {
         imu.resetIMU();
         deadWheels.resetEncoders();
 
-        // double totalDeltaTheta = 0;
-
         while (opMode.opModeIsActive()) {
 
-            //
             int EncoderDrive = deadWheels.getCurrentValue(DeadWheel.DRIVE); //in ticks
             int EncoderStrafe = deadWheels.getCurrentValue(DeadWheel.STRAFE);
 
@@ -383,22 +375,76 @@ public class Robot {
             imu.setPreviousHeading(imuHeading);
 
             //final Pose3D currentAprilTagPosition = myAprilTagProcessor.getPose();
+            updateRobotPosition();
 
             // Print Out Various Values
-            /*telemetry.addData("Encoder Drive", EncoderDrive);
-            telemetry.addData("Encoder Strafe", EncoderStrafe);*/
-            telemetry.addData("Current X", currentPosition.x);
+//            telemetry.addData("Encoder Drive", EncoderDrive);
+//            telemetry.addData("Encoder Strafe", EncoderStrafe);
+            telemetry.addData("Current X", currentState.position.x);
             //telemetry.addData("April X", (currentAprilTagPosition != null) ? currentAprilTagPosition.getPosition().x : "none");
 
-            telemetry.addData("Current Y", currentPosition.y);
+            telemetry.addData("Current Y", currentState.position.y);
             //telemetry.addData("April Y", (currentAprilTagPosition != null) ? currentAprilTagPosition.getPosition().y : "none");
 
-            telemetry.addData("Current Heading", LMMHS.reportAngle(currentHeading));
+            telemetry.addData("Current Heading", LMMHS.reportAngle(currentState.heading));
             telemetry.addData("IMU Raw", LMMHS.reportAngle(imuHeading));
 
             telemetry.update();
-
-            updatePosition();
         }
+    }
+
+    public void spin(double powerLevel) {
+
+        deadWheels.resetEncoders();
+
+        while (opMode.opModeIsActive()) {
+            motors.spinInPlace(powerLevel);
+            int EncoderDrive = deadWheels.getCurrentValue(DeadWheel.DRIVE); //in ticks
+            int EncoderStrafe = deadWheels.getCurrentValue(DeadWheel.STRAFE);
+            telemetry.addData("EncoderDrive", EncoderDrive);
+            telemetry.addData("EncoderStrafe", EncoderStrafe);
+            telemetry.addData("IMU Heading", imu.getCurrentHeading());
+            telemetry.update();
+        }
+    }
+
+    public boolean getGrabberState() {
+        return currentState.grabberIsOpen;
+    }
+
+    public void openGrabber() {
+        arm.openGrabber();
+        currentState.grabberIsOpen = true;
+    }
+
+    public void closeGrabber() {
+        arm.closeGrabber();
+        currentState.grabberIsOpen = false;
+    }
+
+    public boolean getWristPosition() {
+        return currentState.wristIsUp;
+    }
+
+    public void turnWristUp() {
+        arm.wristUp();
+        currentState.wristIsUp = true;
+    }
+
+    public void turnWristDown() {
+        arm.wristDown();
+        currentState.wristIsUp = false;
+    }
+
+    public void setDriveMotors(XYValue motorPower, double turnPower) {
+        motors.setMotorPowers(motorPower.x, motorPower.y, turnPower);
+    }
+
+    public void setDriveMotorsDirectly(double fl, double fr, double bl, double br) {
+        motors.setMotorsDirectly(fl, fr, bl, br);
+    }
+
+    public void stop() {
+        motors.stopMotors();
     }
 }

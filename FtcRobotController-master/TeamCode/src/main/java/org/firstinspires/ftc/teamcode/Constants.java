@@ -17,9 +17,13 @@ public class Constants {
 
     public static final double MINIMUM_TIME_IN_SECONDS = 1e-3;
     public static final double CONVERT_TIME_TO_SECONDS = 1000;
-    public static final double MINIMUM_DISTANCE = 1500;
+    public static final double MINIMUM_DISTANCE_IN_TICKS = 1500;
+    public static final double MINIMUM_DISTANCE_IN_INCHES = 0.5;
+
     public static final double TURN_TOLERANCE_IN_DEGREES = 4;
     public static final double TURN_TOLERANCE_IN_RADIANS = .035;
+
+    public static final double HEIGHT_TOLERANCE = 200;
 
     public static final double CONVERT_METERS_TO_INCHES = 39.3701;
 

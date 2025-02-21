@@ -20,18 +20,15 @@ public class PIDDrive {
     private static final kValues strafe = new kValues(STRAFE_KP, STRAFE_KI, STRAFE_KD, STRAFE_KF);
 
     private Position targetPosition;
+    private final XYValue distanceToTarget = new XYValue(0,0);
 
     private XYValue priorError;
     private XYValue integralSum;
 
-    private Telemetry telemetry;
-
-    public PIDDrive(Telemetry telemetry) {
+    public PIDDrive() {
 
         this.priorError = new XYValue(0, 0);
         this.integralSum = new XYValue(0, 0);
-
-        this.telemetry = telemetry;
 
     }
 
@@ -41,12 +38,23 @@ public class PIDDrive {
 
     }
 
-    /// currentPosition in Inches; currentHeading in Radians
+    public boolean arrivedAtX() {
+        return Math.abs(distanceToTarget.x) < Constants.MINIMUM_DISTANCE_IN_INCHES;
+    }
+
+    public boolean arrivedAtY() {
+        return Math.abs(distanceToTarget.y) < Constants.MINIMUM_DISTANCE_IN_INCHES;
+    }
+
+    /// currentPosition in Inches
     public XYValue calculateLocalError(Position currentPosition, double currentHeading) {
         XYValue localError = new XYValue(0, 0);
 
-        double tempErrorX = (targetPosition.x - currentPosition.x) * LMMHS.cos(currentHeading) + (targetPosition.y - currentPosition.y) * LMMHS.sin(currentHeading);
-        double tempErrorY = (targetPosition.y - currentPosition.y) * LMMHS.cos(currentHeading) - (targetPosition.x - currentPosition.x) * LMMHS.sin(currentHeading);
+        distanceToTarget.x = targetPosition.x - currentPosition.x;
+        distanceToTarget.y = targetPosition.y - currentPosition.y;
+
+        double tempErrorX = (distanceToTarget.x) * LMMHS.cos(currentHeading) + (distanceToTarget.y) * LMMHS.sin(currentHeading);
+        double tempErrorY = (distanceToTarget.y) * LMMHS.cos(currentHeading) - (distanceToTarget.x) * LMMHS.sin(currentHeading);
 
         localError.x = tempErrorX * Constants.DEAD_WHEEL_TICKS_PER_INCH;
         localError.y = tempErrorY * Constants.DEAD_WHEEL_TICKS_PER_INCH;
@@ -54,7 +62,6 @@ public class PIDDrive {
         return localError;
     }
 
-    /// currentPosition in Inches; currentHeading in Radians; time in Seconds
     public XYValue calculatePower(Position currentPosition, double currentHeading, double time) {
         XYValue error = calculateLocalError(currentPosition, currentHeading);
 
@@ -85,7 +92,6 @@ public class PIDDrive {
         baseOutputXY.y = kProportionalValueY + kIntegralValueY + kDerivativeValueY + kFeedForwardValueY;
 
 /*
-
         if (baseOutput.x < Constants.MINIMUM_POWER_OUTPUT_DRIVE) {
             baseOutput.x = Math.signum(baseOutput.x) * Constants.MINIMUM_POWER_OUTPUT_DRIVE;
         }
@@ -93,7 +99,6 @@ public class PIDDrive {
         if (baseOutput.y < Constants.MINIMUM_POWER_OUTPUT_DRIVE) {
             baseOutput.y = Math.signum(baseOutput.y) * Constants.MINIMUM_POWER_OUTPUT_DRIVE;
         }
-
 */
 
         return baseOutputXY;

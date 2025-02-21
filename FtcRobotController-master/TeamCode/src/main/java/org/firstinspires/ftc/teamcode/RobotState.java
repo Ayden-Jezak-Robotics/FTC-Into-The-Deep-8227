@@ -6,12 +6,12 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 public class RobotState {
 
     final Position position;
-    final double heading; // In Degrees
-    final double armHeight;
-    final double armAngle; // What units here?
-    final boolean elbowIsExtended;
-    final boolean wristIsUp;
-    final boolean grabberIsOpen;
+    double heading; // In Degrees
+    double armHeight;
+    double armAngle; // What units here?
+    boolean elbowIsExtended;
+    boolean wristIsUp;
+    boolean grabberIsOpen;
     // final double armAngleTime;
     // final double extendTime;
 

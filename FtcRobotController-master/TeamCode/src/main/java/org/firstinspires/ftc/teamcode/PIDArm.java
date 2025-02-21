@@ -12,17 +12,14 @@ public class PIDArm {
 
     private double targetHeight;
 
+    private double  error;
     private double priorError;
     private double integralSum;
 
-    private Telemetry telemetry;
-
-    public PIDArm(Telemetry telemetry) {
+    public PIDArm() {
 
         this.priorError = 0;
         this.integralSum = 0;
-
-        this.telemetry = telemetry;
 
     }
 
@@ -32,11 +29,15 @@ public class PIDArm {
 
     }
 
+    public boolean arrivedAtHeight() {
+        return Math.abs(error) < Constants.HEIGHT_TOLERANCE;
+    }
+
     /// currentPosition in Inches; currentHeight in Radians; time in Seconds
     public double calculatePower(double currentHeight, double time) {
-        double error = (targetHeight - currentHeight);
+        error = (targetHeight - currentHeight);
 
-        /// Prevent zero or very small time steps
+        // Prevent zero or very small time steps
         double deltaTime = Math.max(time, Constants.MINIMUM_TIME_IN_SECONDS);
 
         double kProportionalValue = Range.clip(kP * error, -Constants.MAX_KP, Constants.MAX_KP);

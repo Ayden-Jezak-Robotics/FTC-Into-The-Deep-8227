@@ -10,8 +10,8 @@ public class ArmUtility {
     private final HardwareMap hardwareMap;
     private final DcMotor leftArmMotor, rightArmMotor;
 
-    private final Servo leftArmServo, rightArmServo;
-    private final Servo elbowServo, grabberServo,wristServo;
+    private final Servo leftShoulderServo, rightShoulderServo;
+    private final Servo elbowServo, grabberServo, wristServo;
 
     private int previousArm;
     private double previousRightAngle, previousLeftAngle;
@@ -19,19 +19,19 @@ public class ArmUtility {
     public ArmUtility(HardwareMap hardwareMap) {
         this.hardwareMap = hardwareMap;
 
-        this.leftArmMotor = initializeMotor("armLeft", DcMotor.Direction.FORWARD);
-        this.rightArmMotor = initializeMotor("armRight", DcMotor.Direction.REVERSE);
+        this.leftArmMotor = initializeArmMotor("armLeft", DcMotor.Direction.FORWARD);
+        this.rightArmMotor = initializeArmMotor("armRight", DcMotor.Direction.REVERSE);
 
-        this.leftArmServo = initializeServo("leftArmServo",1);
-        this.rightArmServo = initializeServo("rightArmServo",0);
+        this.leftShoulderServo = initializeServo("leftArmServo",1);
+        this.rightShoulderServo = initializeServo("rightArmServo",0);
+        this.elbowServo = initializeServo("elbowServo",0);
         this.wristServo = initializeServo("wristServo",0.1);
         this.grabberServo = initializeServo("grabberServo",0.3);
-        this.elbowServo = initializeServo("elbowServo",0);
 
         previousArm = 0;
     }
 
-    DcMotor initializeMotor(String name, DcMotor.Direction direction) {
+    DcMotor initializeArmMotor(String name, DcMotor.Direction direction) {
         DcMotor motor = hardwareMap.get(DcMotor.class, name);
         motor.setDirection(direction);
         motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -54,7 +54,7 @@ public class ArmUtility {
 
     double getCurrentAngledPosition()
     {
-        return rightArmServo.getPosition();
+        return rightShoulderServo.getPosition();
     }
 
     double getCurrentExtend()
@@ -63,28 +63,28 @@ public class ArmUtility {
     }
 
     void angleArm() {
-        rightArmServo.setPosition(0.8);
-        leftArmServo.setPosition(0.75);
+        rightShoulderServo.setPosition(0.8);
+        leftShoulderServo.setPosition(0.75);
         sleep(200);
-        rightArmServo.setPosition(0.7);
-        leftArmServo.setPosition(0.85);
+        rightShoulderServo.setPosition(0.7);
+        leftShoulderServo.setPosition(0.85);
         sleep(200);
-        rightArmServo.setPosition(0.65);
-        leftArmServo.setPosition(0.9);
+        rightShoulderServo.setPosition(0.65);
+        leftShoulderServo.setPosition(0.9);
         sleep(200);
-        rightArmServo.setPosition(0.6);
-        leftArmServo.setPosition(0.95);
+        rightShoulderServo.setPosition(0.6);
+        leftShoulderServo.setPosition(0.95);
     }
 
     void angleArmTo(double position)
     {
-        rightArmServo.setPosition(position);
-        leftArmServo.setPosition(1-position);
+        rightShoulderServo.setPosition(position);
+        leftShoulderServo.setPosition(1-position);
     }
 
     void angleArmToBase() {
-        rightArmServo.setPosition(0.9); //BASE is when it's facing up
-        leftArmServo.setPosition(0.65);
+        rightShoulderServo.setPosition(0.9); //BASE is when it's facing up
+        leftShoulderServo.setPosition(0.65);
     }
 
     void extendElbow(double position)
@@ -94,12 +94,12 @@ public class ArmUtility {
 
     void openGrabber() {
         grabberServo.setPosition(0.7);
-        sleep(500);
+//        sleep(500);
     }
 
     void closeGrabber() {
         grabberServo.setPosition(0.3);
-        sleep(500);
+//        sleep(500);
 
     }
 
@@ -144,5 +144,10 @@ public class ArmUtility {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
+    }
+
+    public void stopMotors() {
+        leftArmMotor.setPower(0);
+        rightArmMotor.setPower(0);
     }
 }

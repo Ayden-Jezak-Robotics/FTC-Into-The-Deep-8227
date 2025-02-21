@@ -3,32 +3,17 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 
 import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("FieldCanBeLocal")
-@TeleOp(name = "Teleop", group = "Main")
-public class IntoTheDeepTeleop extends LinearOpMode
+@TeleOp(name = "TeleOpBlueLeft", group = "Main")
+public class TeleOpBlueLeft extends LinearOpMode
 {
+    RobotState initialState = new RobotState(-53, -53, -45, 0, 0, true, false, false);
 
-    // TODO: What will the initial state of the robot be when TeleOp starts?
-    RobotState initialState = new RobotState(0, 0, 0, 0, 0, 0, 0, 0);
-
-    // private double r;
-    // private double robotAngle;
-    // private double rightX;
-    // private double v1, v2, v3, v4;
     private double speedMultiplier = 4;
-    private boolean grabberClosed = false;
-    private boolean wristPositionIsUp = true;
-    private int armUpFlag = 0;
-    private double armCurrentHeight, armCurrentHeightFlag;
-    // private String wristPosition;
     private boolean movingForward = true;
     private boolean isMovingUp, isMovingDown = false;
     private double leftStartPosition, rightStartPosition, progress;
@@ -43,41 +28,23 @@ public class IntoTheDeepTeleop extends LinearOpMode
 
         waitForStart();
 
-        // TODO: What position should servos initialize to at start of TeleOp?
-
-        wristServo.setPosition(0.1);
-        wristPosition = "DOWN";
-        leftArmServo.setPosition(1);
-        rightArmServo.setPosition(0);
-        armUpFlag = 0;
-        rightArmServo.setPosition(.25);
-        leftArmServo.setPosition(.75);
-        sleep(750);
-        elbowServo.setPosition(1);
-        sleep(750);
-        rightArmServo.setPosition(1);
-        leftArmServo.setPosition(0);
-        sleep(500);
-        wristServo.setPosition(0.8);
-        wristPosition = "UP";
-
-
         while (opModeIsActive()){
 
-            driveWheels();
-            decreaseSpeed();
+            driveWheels(robot);
+            changeSpeed();
             switchDirection();
-            openGrabber();
+            openGrabber(robot);
             spinArmServosPrecise();
             spinArmServosNonprecise();
-            spinWrist();
+            spinWrist(robot);
             armMovement();
             //armBrake();
 
-            updateTelemetry();
+            updateTelemetry(robot);
         }
     }
-    private void decreaseSpeed() {
+
+    private void changeSpeed() {
         if (gamepad1.triangle) {
             speedMultiplier += 2;
             if (speedMultiplier > 4) {
@@ -101,7 +68,33 @@ public class IntoTheDeepTeleop extends LinearOpMode
         }
     }
 
-    private void driveWheels(){
+    private void openGrabber(Robot robot){
+        if (gamepad2.square){
+            if (robot.getGrabberState()){
+                robot.closeGrabber();
+            }
+            else{
+                robot.openGrabber();
+            }
+            while (gamepad2.square == true) {
+            }
+        }
+    }
+
+    private void spinWrist(Robot robot){
+        if (gamepad2.circle) {
+            if (robot.getWristPosition()) {
+                robot.turnWristDown();
+            }
+            else{
+                robot.turnWristUp();
+            }
+            while (gamepad2.circle) {
+            }
+        }
+    }
+
+    private void driveWheels(Robot robot){
 
         double r = Math.sqrt(Math.pow(gamepad1.left_stick_x, 2) + Math.pow(gamepad1.left_stick_y, 2));
         double robotAngle = Math.atan2(-1 * gamepad1.left_stick_y, gamepad1.left_stick_x) / Math.PI * 180 - 45;
@@ -112,9 +105,10 @@ public class IntoTheDeepTeleop extends LinearOpMode
         double br = (r * Math.cos(robotAngle / 180 * Math.PI) - rightX) / speedMultiplier;
 
         if (movingForward) {
-            robot.motors.setPowerDirectly(fl, fr, bl, br);
+
+            robot.setDriveMotorsDirectly(fl, fr, bl, br);
         } else {
-            robot.motors.setPowerDirectly(-fl, -fr, -bl, -br);
+            robot.setDriveMotorsDirectly(-fl, -fr, -bl, -br);
         }
     }
 
@@ -124,30 +118,6 @@ public class IntoTheDeepTeleop extends LinearOpMode
         }
     }
 
-    private void spinWrist(){
-        if (gamepad2.circle) {
-            if (wristPositionIsUp){
-                robot.arms.wristDown();
-                wristPositionIsUp = false;
-            }
-            else{
-                robot.arms.wristUp();
-                wristPositionIsUp = true;
-            }
-            while (gamepad2.circle) {
-            }
-        }
-    }
-
-    private double getArmSpeed(){
-        if (armLeft.getCurrentPosition() > 3500 && armRight.getCurrentPosition() > 3500){
-            return 0.75 * map(3500, 4300, 1, 0.1, armLeft.getCurrentPosition());
-        }
-        else{
-            return 0.75;
-        }
-
-    }
     private void armMovement(){
         if (armLeft.getCurrentPosition() >= 0 && armRight.getCurrentPosition() >= 0) {
             armLeft.setPower(-gamepad2.right_stick_y * getArmSpeed());
@@ -170,20 +140,7 @@ public class IntoTheDeepTeleop extends LinearOpMode
             armRight.setPower(0.1);
         }
     }
-    private void openGrabber(){
-        if (gamepad2.square){
-            if (grabberClosed == false){
-                grabberServo.setPosition(0);
-                grabberClosed = true;
-            }
-            else{
-                grabberServo.setPosition(0.6);
-                grabberClosed = false;
-            }
-            while (gamepad2.square == true) {
-            }
-        }
-    }
+
 
     private void spinArmServosNonprecise(){
         if (gamepad2.dpad_down && !isMovingUp && !isMovingDown) {
@@ -237,11 +194,11 @@ public class IntoTheDeepTeleop extends LinearOpMode
         }
     }
 
-    private void updateTelemetry(){
-        telemetry.addData("Speed", speedMulti);
+    private void updateTelemetry(Robot robot){
+        telemetry.addData("Speed", speedMultiplier);
         telemetry.addData("Arm Position", rightArmServo.getPosition());
         telemetry.addData("Arm Height", armLeft.getCurrentPosition());
-        telemetry.addData("Ideal Arm Height", armCurrentHeight);
+        telemetry.addData("Ideal Arm Height", robot.getArmHeight());
         telemetry.addData("Grabber Position", grabberServo.getPosition());
         telemetry.addData("armSpeed", getArmSpeed());
         telemetry.addData("leftArmServo Position", leftArmServo.getPosition());
@@ -249,7 +206,7 @@ public class IntoTheDeepTeleop extends LinearOpMode
         telemetry.addData("Arm Progress", progress);
         telemetry.addData("Moving down?", isMovingDown);
         telemetry.addData("Moving up?", isMovingUp);
-        telemetry.addData("Direction", direction);
+        telemetry.addData("Direction", movingForward ? "Forward" : "Reverse");
         telemetry.update();
     }
     private double map(double in1, double in2, double out1, double out2, double value){
