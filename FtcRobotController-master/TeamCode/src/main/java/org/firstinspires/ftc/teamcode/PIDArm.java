@@ -5,10 +5,10 @@ import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class PIDArm {
-    private static final double kP = 0.015; //Fix, Handling in inches... should I change it
-    private static final double kI = 0.015;
+    private static final double kP = 0.0005; //Fix, Handling in inches... should I change it
+    private static final double kI = 0;
     private static final double kD = 0;
-    private static final double kF = 0; //FIND the minimum value needed that equal the force of weight
+    private static final double kF = 0.1; //FIND the minimum value needed that equal the force of weight
 
     private double targetHeight;
 
@@ -34,7 +34,7 @@ public class PIDArm {
 
     /// currentPosition in Inches; currentHeight in Radians; time in Seconds
     public double calculatePower(double currentHeight, double time) {
-        double error = (targetHeight - currentHeight);
+        double error = (targetHeight - currentHeight) * Constants.MOTOR_TICKS_PER_INCH;
 
         /// Prevent zero or very small time steps
         double deltaTime = Math.max(time, Constants.MINIMUM_TIME_IN_SECONDS);

@@ -177,13 +177,13 @@ public class Robot {
 
         PIDDrive xyPID = new PIDDrive(telemetry);
         PIDTurn turnPID = new PIDTurn(telemetry);
-        //PIDArm armPID = new PIDArm(telemetry);
+        PIDArm armPID = new PIDArm(telemetry);
 
         deadWheels.resetEncoders();
 
         xyPID.setTargetPosition(targetPosition);
         turnPID.setTargetHeading(targetHeading);
-        //armPID.setTargetHeight(targetHeight);
+        armPID.setTargetHeight(targetArmHeight);
 
         ElapsedTime timer = new ElapsedTime();
         ElapsedTime armTimer = new ElapsedTime();
@@ -194,9 +194,10 @@ public class Robot {
             double remainingX = (targetPosition.x - currentPosition.x) * Constants.DEAD_WHEEL_TICKS_PER_INCH;
             double remainingY = (targetPosition.y - currentPosition.y) * Constants.DEAD_WHEEL_TICKS_PER_INCH;
             double remainingTheta = targetHeading - currentHeading;
+            double remainingArmHeight = (targetArmHeight - currentArmHeight) * Constants.MOTOR_TICKS_PER_INCH;
 
             // Break condition
-            if (Math.abs(remainingX) < Constants.MINIMUM_DISTANCE && Math.abs(remainingY) < Constants.MINIMUM_DISTANCE && Math.abs(remainingTheta) < LMMHS.turnTolerance()) {
+            if (Math.abs(remainingX) < Constants.MINIMUM_DISTANCE && Math.abs(remainingY) < Constants.MINIMUM_DISTANCE && Math.abs(remainingTheta) < LMMHS.turnTolerance() && Math.abs(remainingArmHeight) < 166) {
                 telemetry.addLine("Breaks due to tolerance");
                 telemetry.update();
                 break;
@@ -207,7 +208,7 @@ public class Robot {
             // Calculate power outputs using PID
             XYValue motorPower = xyPID.calculatePower(currentPosition, currentHeading, timer.seconds());
             double turnPower = turnPID.calculatePower(currentHeading, timer.seconds());
-            //double armPower = armPID.calculatePower(currentHeight, timer.seconds());
+            double armPower = armPID.calculatePower(currentArmHeight, timer.seconds());
 
             telemetry.addData("CurrentX", currentPosition.x);
             telemetry.addData("CurrentY", currentPosition.y);
@@ -224,15 +225,8 @@ public class Robot {
 
             double remainingArm = (targetArmHeight - currentArmHeight) * Constants.DEAD_WHEEL_TICKS_PER_INCH;
             
-            /*if (remainingArm < Constants.MINIMUM_DISTANCE)
-            {
-                arms.setHoldingPower();
-            }
-            else
-            {
-                arms.setArmPowers(armPower); //need to add something that will keep thhe arm up there when it reaches the tolerance
-            }
-            */
+
+            arm.setArmPowers(armPower); //need to add something that will keep thhe arm up there when it reaches the tolerance
 
             //handleArmWithTime(initialArmAngle,initialExtend,targetArmAngle,targetExtend,targetArmAngleTime,targetExtendTime);
 
@@ -265,8 +259,8 @@ public class Robot {
         double deltaThetaIMU = imuHeading - imu.getPreviousHeading();
 
         /// Encoder Height, Heading
-        currentArmHeight = (currentArmHeight * Constants.DEAD_WHEEL_TICKS_PER_INCH) + deltaArm;
-        currentArmHeight = currentArmHeight/Constants.DEAD_WHEEL_TICKS_PER_INCH;
+        currentArmHeight = (currentArmHeight * Constants.MOTOR_TICKS_PER_INCH) + deltaArm;
+        currentArmHeight = currentArmHeight/Constants.MOTOR_TICKS_PER_INCH;
         currentHeading = currentHeading + deltaThetaIMU;
         currentArmAngle = arm.getCurrentAngledPosition();
         currentExtend = arm.getCurrentExtend();

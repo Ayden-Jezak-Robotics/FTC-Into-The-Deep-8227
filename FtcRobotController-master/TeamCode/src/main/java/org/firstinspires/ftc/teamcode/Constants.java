@@ -15,6 +15,8 @@ public class Constants {
     public static final double DEAD_WHEEL_TICKS_PER_MM = DEAD_WHEEL_TICKS_PER_ROTATION / DEAD_WHEEL_CIRCUMFERENCE;
     public static final double DEAD_WHEEL_MM_PER_TICK = DEAD_WHEEL_CIRCUMFERENCE / DEAD_WHEEL_TICKS_PER_ROTATION;
 
+    public static final double MOTOR_TICKS_PER_INCH = 166;
+
     public static final double MINIMUM_TIME_IN_SECONDS = 1e-3;
     public static final double CONVERT_TIME_TO_SECONDS = 1000;
     public static final double MINIMUM_DISTANCE = 1500;

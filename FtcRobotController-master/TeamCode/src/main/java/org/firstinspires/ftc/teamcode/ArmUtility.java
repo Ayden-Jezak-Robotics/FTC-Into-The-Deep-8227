@@ -126,8 +126,10 @@ public class ArmUtility {
 
     void setHoldingPower()
     {
-        leftArmMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightArmMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftArmMotor.setPower(0.1);
+        rightArmMotor.setPower(0.1);
+        //leftArmMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        //rightArmMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
     int getPreviousArm() {
