@@ -13,7 +13,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("FieldCanBeLocal")
-@TeleOp(name = "Into The Deep Teleop", group = "Main")
+@TeleOp(name = "IntoTheDeepTeleop", group = "Main")
 public class IntoTheDeepTeleop extends LinearOpMode
 {
 
