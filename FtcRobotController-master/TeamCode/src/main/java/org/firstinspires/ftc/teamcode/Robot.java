@@ -24,7 +24,7 @@ public class Robot {
     private IMUUtility imu;
 
     private final Position currentPosition;
-    private double currentHeading, currentArmHeight, currentArmAngle;
+    private double currentHeading, currentArmHeight, currentArmAngle, currentExtend;
 
     private int armHeight;
     private boolean armIsExtended;
@@ -46,7 +46,7 @@ public class Robot {
 
         //this.cameraPosition = side;
         this.currentPosition = initialState.position;
-        this.currentHeight = initialState.height;
+        this.currentArmHeight = initialState.armHeight;
         this.currentHeading = LMMHS.setAngle(initialState.heading);
         this.currentArmAngle = initialState.armAngle;
         this.currentExtend = initialState.extend;
@@ -54,39 +54,24 @@ public class Robot {
         //this.myAprilTagProcessor = new VisionUtility(this.hardwareMap, this.cameraPosition);
     }
 
-    public void turnOn(double powerLevel) {
-        /// Reset everything to 0
-        //imu.resetIMU();
-        deadWheels.resetEncoders();
-        while (opMode.opModeIsActive()) {
-            motors.setMotorPower(powerLevel);
-            int EncoderDrive = deadWheels.getCurrentValue(DeadWheel.DRIVE); //in ticks
-            int EncoderStrafe = deadWheels.getCurrentValue(DeadWheel.STRAFE);
-            telemetry.addData("EncoderDrive", EncoderDrive);
-            telemetry.addData("EncoderStrafe", EncoderStrafe);
-            telemetry.addData("IMU Heading", imu.getCurrentHeading());
-            telemetry.update();
-        }
-    }
-
     public void armUp(double target) //We can just teste armPID, and see how long it takes, and change kP based on what we need
     {
         ElapsedTime timer = new ElapsedTime();
         PIDArm armPID = new PIDArm(telemetry);
         armPID.setTargetHeight(target); //in inches
-        while ((target - currentHeight)<200) {
+        while ((target - currentArmHeight)<200) {
             double time = timer.seconds();
-            double armPower = armPID.calculatePower(currentHeight, timer.seconds()); //currentHeight in  inches
-            arms.setArmPowers(armPower);
+            double armPower = armPID.calculatePower(currentArmHeight, timer.seconds()); //currentHeight in  inches
+            arm.setArmPowers(armPower);
             updatePosition();
         }
-        motors.setHoldingPower();
+        arm.setHoldingPower();
     }
 
     public void justArm(double targetAngle, double targetExtend, double targetAngleTime, double targetExtendTime, boolean open)    {
         ElapsedTime armTimer = new ElapsedTime();
-        double initialAngle = arms.getCurrentAngledPosition();
-        double initialExtend = arms.getCurrentExtend();
+        double initialAngle = arm.getCurrentAngledPosition();
+        double initialExtend = arm.getCurrentExtend();
         double presentAngle = 0;
         double presentExtend = 0;
 
@@ -98,20 +83,20 @@ public class Robot {
         while (opMode.opModeIsActive()) {
             while (armTime <= boundTime)
             {
-                if (arms.getCurrentAngledPosition() != targetAngle)
+                if (arm.getCurrentAngledPosition() != targetAngle)
                 {
                     double ratioArm = Range.clip((armTime / targetAngleTime),0,1);
                     presentAngle = initialAngle + (ratioArm*(targetAngle-initialAngle));
-                    arms.angleArmTo(presentAngle);
+                    arm.angleArmTo(presentAngle);
                 }
-                if (arms.getCurrentExtend() != targetExtend) {
+                if (arm.getCurrentExtend() != targetExtend) {
 
                     double ratioExtend = Range.clip((armTime / targetExtendTime),0,1);
                     presentExtend = initialExtend + (ratioExtend * (targetExtend- initialExtend));
-                    arms.extendElbow(presentExtend);
+                    arm.extendElbow(presentExtend);
                 }
-                telemetry.addData("currentAngle",arms.getCurrentAngledPosition());
-                telemetry.addData("currentExtend",arms.getCurrentExtend());
+                telemetry.addData("currentAngle",arm.getCurrentAngledPosition());
+                telemetry.addData("currentExtend",arm.getCurrentExtend());
                 telemetry.addData("presentAngle",presentAngle);
                 telemetry.addData("presentExtend",presentExtend);
                 telemetry.update();
@@ -123,21 +108,21 @@ public class Robot {
         }
         if (open == true)
         {
-            arms.openGrabber();
+            arm.openGrabber();
         }
         else{
-            arms.closeGrabber();
+            arm.closeGrabber();
         }
     }
 
     public void wristUp()
     {
-        arms.wristUp();
+        arm.wristUp();
     }
 
     public void wristDown()
     {
-        arms.wristDown();
+        arm.wristDown();
     }
     public void handleArmWithTime(double initialAngle, double initialExtend, double targetAngle, double targetExtend, double targetAngleTime, double targetExtendTime)
     {
@@ -148,20 +133,20 @@ public class Robot {
 
         if (armTime <= boundTime)
             {
-                if (arms.getCurrentAngledPosition() != targetAngle)
+                if (arm.getCurrentAngledPosition() != targetAngle)
                 {
                     double ratioArm = Range.clip((armTime / targetAngleTime),0,1);
                     presentAngle = initialAngle + (ratioArm*(targetAngle-initialAngle));
-                    arms.angleArmTo(presentAngle);
+                    arm.angleArmTo(presentAngle);
                 }
-                if (arms.getCurrentExtend() != targetExtend) {
+                if (arm.getCurrentExtend() != targetExtend) {
 
                     double ratioExtend = Range.clip((armTime / targetExtendTime),0,1);
                     presentExtend = initialExtend + (ratioExtend * (targetExtend- initialExtend));
-                    arms.extendElbow(presentExtend);
+                    arm.extendElbow(presentExtend);
                 }
-                telemetry.addData("currentAngle",arms.getCurrentAngledPosition());
-                telemetry.addData("currentExtend",arms.getCurrentExtend());
+                telemetry.addData("currentAngle",arm.getCurrentAngledPosition());
+                telemetry.addData("currentExtend",arm.getCurrentExtend());
                 telemetry.update();
             }
     }
@@ -181,7 +166,7 @@ public class Robot {
 
         Position targetPosition = targetState.position;
         double targetHeading = LMMHS.setAngle(targetState.heading);
-        double targetHeight = targetState.height;
+        double targetArmHeight = targetState.armHeight;
         double targetArmAngle = targetState.armAngle;
         double targetExtend = targetState.extend;
         double targetArmAngleTime = targetState.armAngleTime;
@@ -237,7 +222,7 @@ public class Robot {
             // Apply motor powers
             motors.setMotorPowers(motorPower.x, motorPower.y, turnPower);
 
-            double remainingArm = (targetHeight - currentHeight) * Constants.DEAD_WHEEL_TICKS_PER_INCH;
+            double remainingArm = (targetArmHeight - currentArmHeight) * Constants.DEAD_WHEEL_TICKS_PER_INCH;
             
             /*if (remainingArm < Constants.MINIMUM_DISTANCE)
             {
@@ -260,7 +245,7 @@ public class Robot {
 
         int EncoderDrive = deadWheels.getCurrentValue(DeadWheel.DRIVE); //in ticks
         int EncoderStrafe = deadWheels.getCurrentValue(DeadWheel.STRAFE);
-        int EncoderArm = arms.getAverageCurrentPosition();
+        int EncoderArm = arm.getAverageCurrentPosition();
 
         /*telemetry.addData("EncoderDrive", EncoderDrive / Constants.DEAD_WHEEL_TICKS_PER_INCH);
         telemetry.addData("EncoderStrafe", EncoderStrafe / Constants.DEAD_WHEEL_TICKS_PER_INCH);
@@ -274,22 +259,22 @@ public class Robot {
         /// Get changes in encoder values
         int deltaDrive = EncoderDrive - deadWheels.getPreviousValue(DeadWheel.DRIVE);
         int deltaStrafe = EncoderStrafe - deadWheels.getPreviousValue(DeadWheel.STRAFE);
-        int deltaArm = EncoderArm - arms.getPreviousArm();
+        int deltaArm = EncoderArm - arm.getPreviousArm();
 
         /// deltaTheta from IMU
         double deltaThetaIMU = imuHeading - imu.getPreviousHeading();
 
         /// Encoder Height, Heading
-        currentHeight = (currentHeight * Constants.DEAD_WHEEL_TICKS_PER_INCH) + deltaArm;
-        currentHeight = currentHeight/Constants.DEAD_WHEEL_TICKS_PER_INCH;
+        currentArmHeight = (currentArmHeight * Constants.DEAD_WHEEL_TICKS_PER_INCH) + deltaArm;
+        currentArmHeight = currentArmHeight/Constants.DEAD_WHEEL_TICKS_PER_INCH;
         currentHeading = currentHeading + deltaThetaIMU;
-        currentArmAngle = arms.getCurrentAngledPosition();
-        currentExtend = arms.getCurrentExtend();
+        currentArmAngle = arm.getCurrentAngledPosition();
+        currentExtend = arm.getCurrentExtend();
 
         /// Update previous encoder values
         deadWheels.setPreviousDrive(EncoderDrive); //in ticks
         deadWheels.setPreviousStrafe(EncoderStrafe);
-        arms.setPreviousArm(EncoderArm);
+        arm.setPreviousArm(EncoderArm);
 
         imu.setPreviousHeading(imuHeading);
 

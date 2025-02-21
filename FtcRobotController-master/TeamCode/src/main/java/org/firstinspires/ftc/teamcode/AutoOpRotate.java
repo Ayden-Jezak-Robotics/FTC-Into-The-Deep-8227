@@ -22,11 +22,11 @@ public class AutoOpRotate extends LinearOpMode {
 
         while (timer.seconds() <= 25 ) {
 
-            robot.motors.setMotorPowers(0, 0, 0.5);
+            //robot.motors.setMotorPowers(0, 0, 0.5);
 
         }
 
-        robot.motors.stopMotors();
+        //robot.motors.stopMotors();
         
         sleep(5000);
 

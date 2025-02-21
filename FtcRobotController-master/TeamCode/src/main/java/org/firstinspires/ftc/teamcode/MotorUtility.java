@@ -58,12 +58,12 @@ public class MotorUtility {
         backRight.setPower(backRightPower);
     }
 
-    void setPowerDirectly( double fl, double fr, double, bl, double br) {
+    void setPowerDirectly( double fl, double fr, double bl, double br) {
         
-        frontLeft.setPower(frontLeftPower);
-        frontRight.setPower(frontRightPower);
-        backLeft.setPower(backLeftPower);
-        backRight.setPower(backRightPower);
+        frontLeft.setPower(fl);
+        frontRight.setPower(fr);
+        backLeft.setPower(bl);
+        backRight.setPower(br);
 
     }
 

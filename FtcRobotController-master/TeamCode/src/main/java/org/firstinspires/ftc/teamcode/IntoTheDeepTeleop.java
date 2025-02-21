@@ -6,13 +6,14 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 
 import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("FieldCanBeLocal")
-@TeleOp(name = "Into The Deep Teleop", group = "Main")
+@TeleOp(name = "IntoTheDeepTeleop", group = "Main")
 public class IntoTheDeepTeleop extends LinearOpMode
 {
 
@@ -63,21 +64,24 @@ public class IntoTheDeepTeleop extends LinearOpMode
         armLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         armRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         waitForStart();
+
         wristServo.setPosition(0.1);
         wristPosition = "DOWN";
         leftArmServo.setPosition(1);
         rightArmServo.setPosition(0);
+        elbowServo.setPosition(0.7);
         armUpFlag = 0;
+        /*
         rightArmServo.setPosition(.25);
         leftArmServo.setPosition(.75);
         sleep(750);
-        elbowServo.setPosition(1);
+        elbowServo.setPosition(0.7);
         sleep(750);
         rightArmServo.setPosition(1);
         leftArmServo.setPosition(0);
         sleep(500);
         wristServo.setPosition(0.8);
-        wristPosition = "UP";
+        wristPosition = "UP";*/
         while (opModeIsActive()){
             driveWheels();
             speedMulti();
@@ -94,9 +98,9 @@ public class IntoTheDeepTeleop extends LinearOpMode
     }
     private void speedMulti() {
         if (gamepad1.circle == true) {
-            speedMulti += 2;
-            if (speedMulti > 4) {
-                speedMulti = 1;
+            speedMulti += 1;
+            if (speedMulti > 3) {
+                speedMulti = 1.5;
             }
             while (gamepad1.circle == true) {
             }
@@ -217,14 +221,16 @@ public class IntoTheDeepTeleop extends LinearOpMode
         }
         if (isMovingDown) {
             long elapsedTime = moveTimer.time(TimeUnit.MILLISECONDS);
-            progress = (double) elapsedTime / 1500;
+            progress = (double) elapsedTime / 500;
             if (progress >= 1.0) {
                 progress = 1.0;
                 isMovingDown = false;
             }
             //Max left position = 0.8
-            double newLeftPosition = leftStartPosition + progress * (0.8 - leftStartPosition);
-            double newRightPosition = rightStartPosition - progress * (0 + rightStartPosition);
+            double newLeftPosition = leftStartPosition + progress * (1 - leftStartPosition);
+            double newRightPosition = rightStartPosition - progress * (rightStartPosition);
+            newLeftPosition = Range.clip(newLeftPosition,0,0.8);
+            newRightPosition = Range.clip(newRightPosition,0.2,1);
             leftArmServo.setPosition(newLeftPosition);
             rightArmServo.setPosition(newRightPosition);
         }
@@ -244,7 +250,9 @@ public class IntoTheDeepTeleop extends LinearOpMode
             }
             //Max right is 0.8
             double newLeftPosition = leftStartPosition - progress * (0 + leftStartPosition);
-            double newRightPosition = rightStartPosition + progress * (0.8 - rightStartPosition);
+            double newRightPosition = rightStartPosition + progress * (1 - rightStartPosition);
+            newLeftPosition = Range.clip(newLeftPosition,0,0.8);
+            newRightPosition = Range.clip(newRightPosition,0.2,1);
             leftArmServo.setPosition(newLeftPosition);
             rightArmServo.setPosition(newRightPosition);
         }
