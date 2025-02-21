@@ -34,11 +34,11 @@ public class TeleOpBlueLeft extends LinearOpMode
             changeSpeed();
             switchDirection();
             openGrabber(robot);
-//            spinArmServosPrecise();
-//            spinArmServosNonprecise();
+            spinArmServosPrecise();
+            spinArmServosNonprecise();
             spinWrist(robot);
-//            armMovement();
-            //armBrake();
+            armMovement();
+            armBrake(robot);
 
             updateTelemetry(robot);
         }
@@ -112,87 +112,87 @@ public class TeleOpBlueLeft extends LinearOpMode
         }
     }
 
-//    private void armBrake(){
+    private void armBrake(Robot robot){
 //        if (armLeft.getCurrentPosition() < armCurrentHeight || armLeft.getCurrentPosition() > armCurrentHeight && gamepad2.right_stick_y == 0){
 //            armLeft.setPower(0.001 * (armCurrentHeight - armLeft.getCurrentPosition()));
 //        }
-//    }
+    }
 
-//    private void armMovement(){
+    private void armMovement(){
 //        if (armLeft.getCurrentPosition() >= 0 && armRight.getCurrentPosition() >= 0) {
 //            armLeft.setPower(-gamepad2.right_stick_y * getArmSpeed());
 //            armRight.setPower(-gamepad2.right_stick_y * getArmSpeed());
 //            armCurrentHeight = armLeft.getCurrentPosition();
 //        }
-//        if( gamepad2.right_bumper) {
+        if( gamepad2.right_bumper) {
 //            armLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 //            armRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//            while(gamepad2.right_bumper){
-//
-//            }
+            while(gamepad2.right_bumper){
+
+            }
 //            armLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 //            armLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-//        }
+        }
 //        if (armLeft.getCurrentPosition() < 0 && gamepad2.right_stick_y == 0){
 //            armLeft.setPower(0.1);
 //        }
 //        if (armRight.getCurrentPosition() < 0 && gamepad2.right_stick_y == 0){
 //            armRight.setPower(0.1);
 //        }
-//    }
+    }
 
 
-//    private void spinArmServosNonprecise(){
-//        if (gamepad2.dpad_down && !isMovingUp && !isMovingDown) {
-//            isMovingDown = true;
-//            moveTimer.reset();
+    private void spinArmServosNonprecise(){
+        if (gamepad2.dpad_down && !isMovingUp && !isMovingDown) {
+            isMovingDown = true;
+            moveTimer.reset();
 //            leftStartPosition = leftArmServo.getPosition();
 //            rightStartPosition = rightArmServo.getPosition();
-//        }
-//        if (isMovingDown) {
-//            long elapsedTime = moveTimer.time(TimeUnit.MILLISECONDS);
-//            progress = (double) elapsedTime / 1500;
-//            if (progress >= 1.0) {
-//                progress = 1.0;
-//                isMovingDown = false;
-//            }
-//            //Max left position = 0.8
-//            double newLeftPosition = leftStartPosition + progress * (0.8 - leftStartPosition);
-//            double newRightPosition = rightStartPosition - progress * (0 + rightStartPosition);
+        }
+        if (isMovingDown) {
+            long elapsedTime = moveTimer.time(TimeUnit.MILLISECONDS);
+            progress = (double) elapsedTime / 1500;
+            if (progress >= 1.0) {
+                progress = 1.0;
+                isMovingDown = false;
+            }
+            //Max left position = 0.8
+            double newLeftPosition = leftStartPosition + progress * (0.8 - leftStartPosition);
+            double newRightPosition = rightStartPosition - progress * (0 + rightStartPosition);
 //            leftArmServo.setPosition(newLeftPosition);
 //            rightArmServo.setPosition(newRightPosition);
-//        }
+        }
 
-//        if (gamepad2.dpad_up && !isMovingDown && !isMovingUp) {
-//            isMovingUp = true;
-//            moveTimer.reset();
+        if (gamepad2.dpad_up && !isMovingDown && !isMovingUp) {
+            isMovingUp = true;
+            moveTimer.reset();
 //            leftStartPosition = leftArmServo.getPosition();
 //            rightStartPosition = rightArmServo.getPosition();
-//        }
-//        if (isMovingUp) {
-//            long elapsedTime = moveTimer.time(TimeUnit.MILLISECONDS);
-//            progress = (double) elapsedTime / 500;
-//            if (progress >= 1.0) {
-//                progress = 1.0;
-//                isMovingUp = false;
-//            }
-//            //Max right is 0.8
-//            double newLeftPosition = leftStartPosition - progress * (0 + leftStartPosition);
-//            double newRightPosition = rightStartPosition + progress * (0.8 - rightStartPosition);
+        }
+        if (isMovingUp) {
+            long elapsedTime = moveTimer.time(TimeUnit.MILLISECONDS);
+            progress = (double) elapsedTime / 500;
+            if (progress >= 1.0) {
+                progress = 1.0;
+                isMovingUp = false;
+            }
+            //Max right is 0.8
+            double newLeftPosition = leftStartPosition - progress * (0 + leftStartPosition);
+            double newRightPosition = rightStartPosition + progress * (0.8 - rightStartPosition);
 //            leftArmServo.setPosition(newLeftPosition);
 //            rightArmServo.setPosition(newRightPosition);
-//        }
-//
-//    }
+        }
 
-//    private void spinArmServosPrecise(){
-//        if (Math.abs(gamepad2.left_stick_y) > 0.05) { // Deadzone
+    }
+
+    private void spinArmServosPrecise(){
+        if (Math.abs(gamepad2.left_stick_y) > 0.05) { // Deadzone
 //            isMovingUp = false;
 //            isMovingDown = false;
 //            leftArmServo.setPosition(leftArmServo.getPosition() + gamepad2.left_stick_y * 0.01);
 //            rightArmServo.setPosition(rightArmServo.getPosition() + -gamepad2.left_stick_y * 0.01);
-//        }
-//    }
+        }
+    }
 
     private void updateTelemetry(Robot robot){
         telemetry.addData("Speed", speedMultiplier);

@@ -26,4 +26,17 @@ public class RobotState {
         this.wristIsUp = wristIsUp;
         this.grabberIsOpen = grabberIsOpen;
     }
+
+    public RobotState(RobotState state) {
+        this.position = new Position(DistanceUnit.INCH,
+                state.position.x,
+                state.position.y,
+                0, System.nanoTime());
+        this.heading = state.heading;
+        this.armHeight = state.armHeight;
+        this.armAngle = state.armAngle;
+        this.elbowIsExtended = state.elbowIsExtended;
+        this.wristIsUp = state.wristIsUp;
+        this.grabberIsOpen = state.grabberIsOpen;
+    }
 }

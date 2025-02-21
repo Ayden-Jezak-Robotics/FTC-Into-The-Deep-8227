@@ -36,7 +36,7 @@ public class Robot {
         this.deadWheels = new DeadWheelUtility(this.hardwareMap);
         this.imu = new IMUUtility(this.hardwareMap);
 
-        this.currentState = initialState;
+        this.currentState = new RobotState(initialState);
         this.currentState.heading = LMMHS.setAngle(initialState.heading);
 
 //        this.cameraPosition = side;
