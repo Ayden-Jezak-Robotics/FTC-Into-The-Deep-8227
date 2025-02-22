@@ -327,7 +327,7 @@ public class Robot {
             double armPower = armPID.calculatePower(currentState.armHeight, timer.seconds());
             arm.setArmPowers(armPower);
             updateRobotPosition();
-            double tolerance = target - currentState.armHeight;
+            double tolerance = targetState.armHeight - currentState.armHeight;
             if (tolerance < 200) {
                 arm.setHoldingPower();
             }
