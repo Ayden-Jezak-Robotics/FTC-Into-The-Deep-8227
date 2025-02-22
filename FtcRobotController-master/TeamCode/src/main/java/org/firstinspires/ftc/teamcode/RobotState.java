@@ -9,20 +9,16 @@ public class RobotState {
     double heading; // In Degrees
     double armHeight;
     double armAngle; // What units here?
-    boolean elbowIsExtended;
     boolean wristIsUp;
     boolean grabberIsOpen;
-    // final double armAngleTime;
-    // final double extendTime;
-
 
     // Constructor to initialize the state
-    public RobotState(int x, int y, int heading, double armHeight, double armAngle, boolean elbowIsExtended, boolean wristIsUp, boolean grabberIsOpen) {
+    public RobotState(int x, int y, int heading, double armHeight, double armAngle, boolean wristIsUp, boolean grabberIsOpen) {
         this.position = new Position(DistanceUnit.INCH, x, y, 0, System.nanoTime()); // z is always 0 
         this.heading = heading; // in degrees
         this.armHeight = armHeight;
         this.armAngle = armAngle;
-        this.elbowIsExtended = elbowIsExtended;
+
         this.wristIsUp = wristIsUp;
         this.grabberIsOpen = grabberIsOpen;
     }
@@ -35,7 +31,6 @@ public class RobotState {
         this.heading = state.heading;
         this.armHeight = state.armHeight;
         this.armAngle = state.armAngle;
-        this.elbowIsExtended = state.elbowIsExtended;
         this.wristIsUp = state.wristIsUp;
         this.grabberIsOpen = state.grabberIsOpen;
     }

@@ -16,8 +16,10 @@ public class PIDTurn {
 
     private double error;
 
-    public PIDTurn() {
+    public PIDTurn(RobotState currentState, RobotState targetState) {
 
+        this.targetHeading = targetState.heading;
+        this.error = targetState.heading - currentState.heading;
         this.priorError = 0;
         this.integralSum = 0;
 
@@ -25,11 +27,6 @@ public class PIDTurn {
 
     boolean arrivedAtTheta() {
         return Math.abs(error) < LMMHS.turnTolerance();
-    }
-    public void setTargetHeading(double newTarget) {
-
-        this.targetHeading = newTarget;
-
     }
 
     /// currentPosition in Inches; currentHeading in Radians; time in Seconds
@@ -52,9 +49,7 @@ public class PIDTurn {
 
         priorError = error;
 
-        double baseOutput = kProportionalValue + kIntegralValue + kDerivativeValue + kFeedForwardValue;
-
-/*
+        /*
 
         if (baseOutput.x < Constants.MINIMUM_POWER_OUTPUT_DRIVE) {
             baseOutput.x = Math.signum(baseOutput.x) * Constants.MINIMUM_POWER_OUTPUT_DRIVE;
@@ -66,6 +61,6 @@ public class PIDTurn {
 
 */
 
-        return baseOutput;
+        return kProportionalValue + kIntegralValue + kDerivativeValue + kFeedForwardValue;
     }
 }

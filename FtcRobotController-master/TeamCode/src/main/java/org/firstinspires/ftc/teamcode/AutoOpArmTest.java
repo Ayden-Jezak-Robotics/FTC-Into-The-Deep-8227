@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 @Autonomous(name = "AutoOpArmTest", group = "Test")
 public class AutoOpArmTest extends LinearOpMode {
 
-    RobotState initialState = new RobotState(0, 0, 0, 0, 0, false, false, false);
+    RobotState initialState = new RobotState(0, 0, 0, 0, 0, false, false);
 
     /// In Degrees
 
@@ -18,15 +18,15 @@ public class AutoOpArmTest extends LinearOpMode {
 
         waitForStart();
 
-        robot.moveToNewRobotState(new RobotState(0, 0, 0, 0, 0, true, false, false));
+        robot.moveToNewRobotState(new RobotState(0, 0, 0, 0, 0, false, false));
         sleep(1000);
-        robot.moveToNewRobotState(new RobotState(0, 0, 0, 0, 0, true, true, false));
+        robot.moveToNewRobotState(new RobotState(0, 0, 0, 0, 0, true, false));
         sleep(1000);
-        robot.moveToNewRobotState(new RobotState(0, 0, 0, 0, 0, true, false, true));
+        robot.moveToNewRobotState(new RobotState(0, 0, 0, 0, 0, false, true));
         sleep(1000);
-        robot.moveToNewRobotState(new RobotState(0, 0, 0, 0, .5, true, false, false));
+        robot.moveToNewRobotState(new RobotState(0, 0, 0, 0, .5, false, false));
         sleep(1000);
-        robot.moveToNewRobotState(new RobotState(0, 0, 0, 0, 0, true, true, false));
+        robot.moveToNewRobotState(new RobotState(0, 0, 0, 0, 0, true, false));
 
     }
 }

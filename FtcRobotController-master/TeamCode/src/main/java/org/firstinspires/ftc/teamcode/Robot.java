@@ -16,7 +16,7 @@ public class Robot {
 
 //    private final CameraPosition cameraPosition;
 //    private final VisionUtility myAprilTagProcessor;
-    
+
     private final MotorUtility motors;
     private final ArmUtility arm;
     private final DeadWheelUtility deadWheels;
@@ -25,6 +25,10 @@ public class Robot {
     private final RobotState currentState;
 
     private double armTime;
+
+    //------------------------------------------------------------------------------------------------
+    // Construction
+    //------------------------------------------------------------------------------------------------
 
     public Robot(LinearOpMode opMode, HardwareMap hardwareMap, Telemetry telemetry, RobotState initialState, CameraPosition side) {
         this.opMode = opMode;
@@ -43,152 +47,33 @@ public class Robot {
 //        this.myAprilTagProcessor = new VisionUtility(this.hardwareMap, this.cameraPosition);
     }
 
-    public void extendElbow() {
-        ElapsedTime armTimer = new ElapsedTime();
-        double initialShoulderAngle = arm.getShoulderPosition();
-        double initialElbowAngle = 0;
-        double elapsedTime = 1.5;
-        double targetAngle = 0.5;
-
-        while (armTimer.seconds() < elapsedTime) {
-
-            if (arm.getShoulderPosition() != targetAngle) {
-                double ratioArm = Range.clip((armTimer.seconds() / elapsedTime),0,1);
-                arm.rotateArmToAngle(initialShoulderAngle + (ratioArm * (targetAngle - initialShoulderAngle)));
-            }
-            if (arm.getElbowPosition() < Constants.ELBOW_EXTEND_SETTING) {
-                double ratioElbow = Range.clip((armTimer.seconds() / elapsedTime),0,1);
-                arm.extendElbow(initialElbowAngle + (ratioElbow * (Constants.ELBOW_EXTEND_SETTING - initialElbowAngle)));
-            }
-        }
-        currentState.armAngle = arm.getShoulderPosition();
-        currentState.elbowIsExtended = true;
-    }
-
-    public void justArm(double targetAngle, double targetExtend, double targetAngleTime, double targetExtendTime, boolean open)    {
-        ElapsedTime armTimer = new ElapsedTime();
-        double initialAngle = arm.getShoulderPosition();
-        double initialExtend = arm.getElbowPosition();
-        double presentAngle = 0;
-        double presentExtend = 0;
-
-        double boundTime = Math.max(targetAngleTime,targetExtendTime);
-        telemetry.addData("bound time", boundTime);
-        telemetry.update();
-        double armTime = armTimer.seconds();
-
-        while (opMode.opModeIsActive()) {
-            while (armTime <= boundTime)
-            {
-                if (arm.getShoulderPosition() != targetAngle)
-                {
-                    double ratioArm = Range.clip((armTime / targetAngleTime),0,1);
-                    presentAngle = initialAngle + (ratioArm*(targetAngle-initialAngle));
-                    arm.rotateArmToAngle(presentAngle);
-                }
-                if (arm.getElbowPosition() != targetExtend) {
-
-                    double ratioExtend = Range.clip((armTime / targetExtendTime),0,1);
-                    presentExtend = initialExtend + (ratioExtend * (targetExtend- initialExtend));
-                    arm.extendElbow(presentExtend);
-                }
-                telemetry.addData("currentAngle",arm.getShoulderPosition());
-                telemetry.addData("currentExtend",arm.getElbowPosition());
-                telemetry.addData("presentAngle",presentAngle);
-                telemetry.addData("presentExtend",presentExtend);
-                telemetry.update();
-
-                armTime = armTimer.seconds();
-            }
-            telemetry.addLine("Breaking out");
-            break;
-        }
-        if (open)
-        {
-            arm.openGrabber();
-        }
-        else{
-            arm.closeGrabber();
-        }
-    }
-
-    public void handleArmWithTime(double initialAngle, double initialExtend, double targetAngle, double targetExtend, double targetAngleTime, double targetExtendTime)
-    {
-        double presentAngle = 0;
-        double presentExtend = 0;
-
-        double boundTime = Math.max(targetAngleTime,targetExtendTime);
-
-        if (armTime <= boundTime)
-            {
-                if (arm.getShoulderPosition() != targetAngle)
-                {
-                    double ratioArm = Range.clip((armTime / targetAngleTime),0,1);
-                    presentAngle = initialAngle + (ratioArm*(targetAngle-initialAngle));
-                    arm.rotateArmToAngle(presentAngle);
-                }
-                if (arm.getElbowPosition() != targetExtend) {
-
-                    double ratioExtend = Range.clip((armTime / targetExtendTime),0,1);
-                    presentExtend = initialExtend + (ratioExtend * (targetExtend- initialExtend));
-                    arm.extendElbow(presentExtend);
-                }
-                telemetry.addData("currentAngle",arm.getShoulderPosition());
-                telemetry.addData("currentExtend",arm.getElbowPosition());
-                telemetry.update();
-            }
-    }
-
-    /*public void testPick()
-    {
-        arms.openGrabber();
-        arms.angleArmToBase();
-        arms.closeGrabber();
-        arms.angleArmTo(0);
-        arms.setWristPosition(1.0);
-    }
-
-     */
+    //------------------------------------------------------------------------------------------------
+    // Primary Drive Function
+    //------------------------------------------------------------------------------------------------
 
     public void moveToNewRobotState(RobotState targetState) {
 
-//        Position targetPosition = targetState.position;
-//        double targetHeading = LMMHS.setAngle(targetState.heading);
-//        double targetHeight = targetState.armHeight;
-//        double targetArmAngle = targetState.armAngle;
-//        boolean targetExtend = targetState.elbowIsExtended;
-//        double targetArmAngleTime = targetState.armAngleTime;
-//        double targetExtendTime = targetState.extendTime;
+        PIDDrive xyPID = new PIDDrive(currentState, targetState);
+        PIDTurn turnPID = new PIDTurn(currentState, targetState);
+        PIDArm armPID = new PIDArm(currentState, targetState);
 
-//        double initialArmAngle = currentState.armAngle;
-//        double initialExtend = currentExtend;
-
-        PIDDrive xyPID = new PIDDrive();
-        PIDTurn turnPID = new PIDTurn();
-        PIDArm armPID = new PIDArm();
-
-        // Reset everything to 0
         deadWheels.resetEncoders();
-
-        // Does the PID Controller need to know the target heading, or just the current heading?
-        xyPID.setTargetPosition(targetState.position);
-        turnPID.setTargetHeading(targetState.heading);
-        armPID.setTargetHeight(targetState.armHeight);
 
         while (opMode.opModeIsActive()) {
 
-            do {
+            ElapsedTime driveTimer = new ElapsedTime();
+            XYValue motorPower;
+            double turnPower;
 
-                ElapsedTime driveTimer = new ElapsedTime();
+            while (!xyPID.arrivedAtX() && !xyPID.arrivedAtY() && !turnPID.arrivedAtTheta()) {
+
                 // Calculate power outputs using PID
-                XYValue motorPower = xyPID.calculatePower(currentState.position, currentState.heading, driveTimer.seconds());
-                double turnPower = turnPID.calculatePower(currentState.heading, driveTimer.seconds());
+                motorPower = xyPID.calculatePower(currentState.position, currentState.heading, driveTimer.seconds());
+                turnPower = turnPID.calculatePower(currentState.heading, driveTimer.seconds());
 
                 driveTimer.reset();
 
-                // Apply motor powers
                 setDriveMotors(motorPower, turnPower);
-                motors.setMotorPowers(motorPower.x, motorPower.y, turnPower);
 
                 updateRobotPosition();
 
@@ -203,15 +88,9 @@ public class Robot {
                 telemetry.addData("turnPower", turnPower);
                 telemetry.update();
 
-            } while (!xyPID.arrivedAtX() && !xyPID.arrivedAtY() && !turnPID.arrivedAtTheta());
-
+            }
 
             // Now do all the arm movements
-
-            if (!currentState.elbowIsExtended && targetState.elbowIsExtended) {
-                extendElbow();
-                arm.sleep(500);
-            }
 
             ElapsedTime armTimer = new ElapsedTime();
             double initialShoulderAngle = arm.getShoulderPosition();
@@ -220,7 +99,7 @@ public class Robot {
             while (armTimer.seconds() < elapsedTime) {
 
                 if (arm.getShoulderPosition() != targetState.armAngle) {
-                    double ratioArm = Range.clip((armTimer.seconds() / elapsedTime),0,1);
+                    double ratioArm = Range.clip((armTimer.seconds() / elapsedTime), 0, 1);
                     arm.rotateArmToAngle(initialShoulderAngle + (ratioArm * (targetState.armAngle - initialShoulderAngle)));
                 }
             }
@@ -231,12 +110,9 @@ public class Robot {
                 double armPower = armPID.calculatePower(currentState.armHeight, armTimer.seconds());
                 double remainingArm = (targetState.armHeight - currentState.armHeight) * Constants.DEAD_WHEEL_TICKS_PER_INCH;
 
-                if (Math.abs(remainingArm) < Constants.MINIMUM_DISTANCE_IN_TICKS)
-                {
+                if (Math.abs(remainingArm) < Constants.MINIMUM_DISTANCE_IN_TICKS) {
                     arm.setHoldingPower();
-                }
-                else
-                {
+                } else {
                     arm.setArmPowers(armPower); //need to add something that will keep thhe arm up there when it reaches the tolerance
                 }
 
@@ -269,6 +145,110 @@ public class Robot {
         motors.stopMotors();
         arm.stopMotors();
     }
+
+    //------------------------------------------------------------------------------------------------
+    // Arm Functions
+    //------------------------------------------------------------------------------------------------
+
+    public void extendElbow() {
+        ElapsedTime armTimer = new ElapsedTime();
+        double initialShoulderAngle = arm.getShoulderPosition();
+        double initialElbowAngle = 0;
+        double elapsedTime = 1.5;
+        double targetAngle = 0.5;
+
+        while (armTimer.seconds() < elapsedTime) {
+
+            if (arm.getShoulderPosition() != targetAngle) {
+                double ratioArm = Range.clip((armTimer.seconds() / elapsedTime), 0, 1);
+                arm.rotateArmToAngle(initialShoulderAngle + (ratioArm * (targetAngle - initialShoulderAngle)));
+            }
+            if (arm.getElbowPosition() < Constants.ELBOW_EXTEND_SETTING) {
+                double ratioElbow = Range.clip((armTimer.seconds() / elapsedTime), 0, 1);
+                arm.extendElbow(initialElbowAngle + (ratioElbow * (Constants.ELBOW_EXTEND_SETTING - initialElbowAngle)));
+            }
+        }
+        currentState.armAngle = arm.getShoulderPosition();
+    }
+
+    public void justArm(double targetAngle, double targetExtend, double targetAngleTime, double targetExtendTime, boolean open) {
+        ElapsedTime armTimer = new ElapsedTime();
+        double initialAngle = arm.getShoulderPosition();
+        double initialExtend = arm.getElbowPosition();
+        double presentAngle = 0;
+        double presentExtend = 0;
+
+        double boundTime = Math.max(targetAngleTime, targetExtendTime);
+        telemetry.addData("bound time", boundTime);
+        telemetry.update();
+        double armTime = armTimer.seconds();
+
+        while (opMode.opModeIsActive()) {
+            while (armTime <= boundTime) {
+                if (arm.getShoulderPosition() != targetAngle) {
+                    double ratioArm = Range.clip((armTime / targetAngleTime), 0, 1);
+                    presentAngle = initialAngle + (ratioArm * (targetAngle - initialAngle));
+                    arm.rotateArmToAngle(presentAngle);
+                }
+                if (arm.getElbowPosition() != targetExtend) {
+
+                    double ratioExtend = Range.clip((armTime / targetExtendTime), 0, 1);
+                    presentExtend = initialExtend + (ratioExtend * (targetExtend - initialExtend));
+                    arm.extendElbow(presentExtend);
+                }
+                telemetry.addData("currentAngle", arm.getShoulderPosition());
+                telemetry.addData("currentExtend", arm.getElbowPosition());
+                telemetry.addData("presentAngle", presentAngle);
+                telemetry.addData("presentExtend", presentExtend);
+                telemetry.update();
+
+                armTime = armTimer.seconds();
+            }
+            telemetry.addLine("Breaking out");
+            break;
+        }
+
+        if (open) {
+            arm.openGrabber();
+        } else {
+            arm.closeGrabber();
+        }
+    }
+
+    public void handleArmWithTime(double initialAngle, double initialExtend, double targetAngle, double targetExtend, double targetAngleTime, double targetExtendTime) {
+        double presentAngle = 0;
+        double presentExtend = 0;
+
+        double boundTime = Math.max(targetAngleTime, targetExtendTime);
+
+        if (armTime <= boundTime) {
+            if (arm.getShoulderPosition() != targetAngle) {
+                double ratioArm = Range.clip((armTime / targetAngleTime), 0, 1);
+                presentAngle = initialAngle + (ratioArm * (targetAngle - initialAngle));
+                arm.rotateArmToAngle(presentAngle);
+            }
+            if (arm.getElbowPosition() != targetExtend) {
+
+                double ratioExtend = Range.clip((armTime / targetExtendTime), 0, 1);
+                presentExtend = initialExtend + (ratioExtend * (targetExtend - initialExtend));
+                arm.extendElbow(presentExtend);
+            }
+            telemetry.addData("currentAngle", arm.getShoulderPosition());
+            telemetry.addData("currentExtend", arm.getElbowPosition());
+            telemetry.update();
+        }
+    }
+
+    /*public void testPick()
+    {
+        arms.openGrabber();
+        arms.angleArmToBase();
+        arms.closeGrabber();
+        arms.angleArmTo(0);
+        arms.setWristPosition(1.0);
+    }
+
+     */
 
 
     public void updateArmPosition() {
@@ -337,11 +317,11 @@ public class Robot {
         currentState.position.y += (deltaYGlobal / Constants.DEAD_WHEEL_TICKS_PER_INCH);
 
     }
-    public void setArmHeight(double target)
-    {
+
+    public void setArmHeight(RobotState targetState) {
         ElapsedTime timer = new ElapsedTime();
-        PIDArm armPID = new PIDArm();
-        armPID.setTargetHeight(target);
+        PIDArm armPID = new PIDArm(currentState, targetState);
+
         while (opMode.opModeIsActive()) {
             double time = timer.seconds();
             double armPower = armPID.calculatePower(currentState.armHeight, timer.seconds());

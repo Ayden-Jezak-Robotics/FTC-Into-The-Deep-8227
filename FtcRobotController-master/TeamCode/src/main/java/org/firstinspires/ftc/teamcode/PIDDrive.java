@@ -19,22 +19,18 @@ public class PIDDrive {
     private static final kValues straight = new kValues(STRAIGHT_KP, STRAIGHT_KI, STRAIGHT_KD, STRAIGHT_KF);
     private static final kValues strafe = new kValues(STRAFE_KP, STRAFE_KI, STRAFE_KD, STRAFE_KF);
 
-    private Position targetPosition;
-    private final XYValue distanceToTarget = new XYValue(0,0);
+    private final XYValue targetPosition;
+    private final XYValue distanceToTarget;
 
     private XYValue priorError;
-    private XYValue integralSum;
+    private final XYValue integralSum;
 
-    public PIDDrive() {
+    public PIDDrive(RobotState currentState, RobotState targetState) {
+        this.targetPosition = new XYValue(targetState.position.x, targetState.position.y);
+        this.distanceToTarget = new XYValue(currentState.position.x - targetPosition.x, currentState.position.y - targetPosition.y);
 
         this.priorError = new XYValue(0, 0);
         this.integralSum = new XYValue(0, 0);
-
-    }
-
-    public void setTargetPosition(Position newTarget) {
-
-        this.targetPosition = newTarget;
 
     }
 

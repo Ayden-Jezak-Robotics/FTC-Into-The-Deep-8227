@@ -12,20 +12,16 @@ public class PIDArm {
 
     private double targetHeight;
 
-    private double  error;
+    private double error;
     private double priorError;
     private double integralSum;
 
-    public PIDArm() {
+    public PIDArm(RobotState currentState, RobotState targetState) {
 
+        this.error = targetState.armHeight - currentState.armHeight;
+        this.targetHeight = targetState.armHeight;
         this.priorError = 0;
         this.integralSum = 0;
-
-    }
-
-    public void setTargetHeight(double newTarget) {
-
-        this.targetHeight = newTarget;
 
     }
 
@@ -45,7 +41,7 @@ public class PIDArm {
         // Decay the Integral Sum over time
         integralSum = (integralSum * 0.98) + (error * deltaTime);
 
-        double kIntegralValue= kI * Range.clip(integralSum, -Constants.MAX_INTEGRAL_TURN, Constants.MAX_INTEGRAL_TURN);
+        double kIntegralValue = kI * Range.clip(integralSum, -Constants.MAX_INTEGRAL_TURN, Constants.MAX_INTEGRAL_TURN);
 
         double kDerivativeValue = kD * ((error - priorError) / deltaTime);
 
