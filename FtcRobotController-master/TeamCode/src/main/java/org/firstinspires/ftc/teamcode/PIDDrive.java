@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 
 public class PIDDrive {
@@ -31,7 +30,6 @@ public class PIDDrive {
 
         this.priorError = new XYValue(0, 0);
         this.integralSum = new XYValue(0, 0);
-
     }
 
     public boolean arrivedAtX() {
