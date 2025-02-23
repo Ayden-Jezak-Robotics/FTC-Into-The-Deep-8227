@@ -45,13 +45,13 @@ public class ArmUtility {
         return servo;
     }
 
-    int getAverageCurrentPosition()
+    int getArmHeight()
     {
         int average = (leftArmMotor.getCurrentPosition() + rightArmMotor.getCurrentPosition())/2;
         return average;
     }
 
-    double getShoulderPosition()
+    double getShoulderAngle()
     {
         return rightShoulderServo.getPosition();
     }
@@ -133,8 +133,8 @@ public class ArmUtility {
         return previousArm;
     }
 
-    void setPreviousArm(int newValue) {
-        previousArm = newValue;
+    void setPreviousArm(int value) {
+        previousArm = value;
     }
 
     void sleep(long milliseconds) {
