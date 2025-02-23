@@ -20,6 +20,7 @@ public class TeleOpBlueLeft extends LinearOpMode
     private ElapsedTime moveTimer = new ElapsedTime();
     private boolean grabberToggle = false;
     private boolean wristToggle = false;
+    private boolean directionToggle = false;
 
     @Override
     public void runOpMode(){
@@ -31,7 +32,6 @@ public class TeleOpBlueLeft extends LinearOpMode
         while (opModeIsActive()){
 
             driveWheels(robot);
-            changeSpeed();
             switchDirection();
             openGrabber(robot);
             spinArmServosPrecise();
@@ -50,44 +50,36 @@ public class TeleOpBlueLeft extends LinearOpMode
 
     private void driveWheels(Robot robot){
 
+        double triggerMultiplier = (1.0/3.0) + ((2.0/3.0) * (1.0 - gamepad1.left_trigger));
+
         double r = Math.sqrt(Math.pow(gamepad1.left_stick_x, 2) + Math.pow(gamepad1.left_stick_y, 2));
         double robotAngle = Math.atan2(-1 * gamepad1.left_stick_y, gamepad1.left_stick_x) / Math.PI * 180 - 45;
         double rightX = gamepad1.right_stick_x * 0.75;
-        double fl = (r * Math.cos(robotAngle / 180 * Math.PI) + rightX) / speedMultiplier;
-        double fr = (r * Math.sin(robotAngle / 180 * Math.PI) - rightX) / speedMultiplier;
-        double bl = (r * Math.sin(robotAngle / 180 * Math.PI) + rightX) / speedMultiplier;
-        double br = (r * Math.cos(robotAngle / 180 * Math.PI) - rightX) / speedMultiplier;
+        double fl = (r * Math.cos(robotAngle / 180 * Math.PI) + rightX) * triggerMultiplier;
+        double fr = (r * Math.sin(robotAngle / 180 * Math.PI) - rightX) * triggerMultiplier;
+        double bl = (r * Math.sin(robotAngle / 180 * Math.PI) + rightX) * triggerMultiplier;
+        double br = (r * Math.cos(robotAngle / 180 * Math.PI) - rightX) * triggerMultiplier;
 
         if (movingForward) {
-
             robot.setDriveMotorsDirectly(fl, fr, bl, br);
         } else {
             robot.setDriveMotorsDirectly(-fl, -fr, -bl, -br);
         }
     }
 
-
-    private void changeSpeed() {
-        if (gamepad1.triangle) {
-            speedMultiplier += 2;
-            if (speedMultiplier > 4) {
-                speedMultiplier = 1;
-            }
-            while (gamepad1.triangle) {
-            }
-        }
-    }
-
     private void switchDirection() {
-        if (gamepad1.cross) {
+        if (gamepad1.cross && !directionToggle) {
+            directionToggle = true;
+
             if (movingForward){
                 movingForward = false;
             }
             else{
                 movingForward = true;
             }
-            while (gamepad1.cross) {
-            }
+        }
+        if (!gamepad1.cross) { // Reset toggle when button is released
+            directionToggle = false;
         }
     }
 
