@@ -61,17 +61,18 @@ public class Robot {
 
         while (opMode.opModeIsActive()) {
 
-            ElapsedTime driveTimer = new ElapsedTime();
+            ElapsedTime timer = new ElapsedTime();
+
             XYValue motorPower;
             double turnPower;
+            boolean driveLoop = true;
 
-            while (!xyPID.arrivedAtX() && !xyPID.arrivedAtY() && !turnPID.arrivedAtTheta()) {
+            while (driveLoop) {
 
                 // Calculate power outputs using PID
-                motorPower = xyPID.calculatePower(currentState.position, currentState.heading, driveTimer.seconds());
-                turnPower = turnPID.calculatePower(currentState.heading, driveTimer.seconds());
-
-                driveTimer.reset();
+                motorPower = xyPID.calculatePower(currentState.position, currentState.heading, timer.seconds());
+                turnPower = turnPID.calculatePower(currentState.heading, timer.seconds());
+                timer.reset();
 
                 setDriveMotors(motorPower, turnPower);
 
@@ -88,18 +89,21 @@ public class Robot {
                 telemetry.addData("turnPower", turnPower);
                 telemetry.update();
 
+                if (xyPID.arrivedAtX() && xyPID.arrivedAtY() && turnPID.arrivedAtTheta()) {
+                    driveLoop = false;
+                }
             }
 
             // Now do all the arm movements
 
-            ElapsedTime armTimer = new ElapsedTime();
             double initialShoulderAngle = arm.getShoulderPosition();
             double elapsedTime = 2.0;
+            timer.reset();
 
-            while (armTimer.seconds() < elapsedTime) {
+            while (timer.seconds() < elapsedTime) {
 
                 if (arm.getShoulderPosition() != targetState.armAngle) {
-                    double ratioArm = Range.clip((armTimer.seconds() / elapsedTime), 0, 1);
+                    double ratioArm = Range.clip((timer.seconds() / elapsedTime), 0, 1);
                     arm.rotateArmToAngle(initialShoulderAngle + (ratioArm * (targetState.armAngle - initialShoulderAngle)));
                 }
             }
@@ -140,10 +144,11 @@ public class Robot {
 
             //handleArmWithTime(initialArmAngle,initialExtend,targetArmAngle,targetExtend,targetArmAngleTime,targetExtendTime);
 
-
+            motors.stopMotors();
+            arm.stopMotors();
+            break;
         }
-        motors.stopMotors();
-        arm.stopMotors();
+
     }
 
     //------------------------------------------------------------------------------------------------
