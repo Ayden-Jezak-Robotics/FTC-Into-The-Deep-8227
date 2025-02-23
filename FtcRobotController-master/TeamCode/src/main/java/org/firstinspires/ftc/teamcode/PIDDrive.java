@@ -59,7 +59,7 @@ public class PIDDrive {
     public XYValue calculatePower(Position currentPosition, double currentHeading, double time) {
         XYValue error = calculateLocalError(currentPosition, currentHeading);
 
-        /// Prevent zero or very small time steps
+        // Prevent zero or very small time steps
         double deltaTime = Math.max(time, Constants.MINIMUM_TIME_IN_SECONDS);
 
         double kProportionalValueX = Range.clip(strafe.kP * error.x, -Constants.MAX_KP, Constants.MAX_KP);
