@@ -111,7 +111,7 @@ public class Robot {
 
             do {
 
-                double armPower = armPID.calculatePower(currentState.armHeight, armTimer.seconds());
+                double armPower = armPID.calculatePower(currentState.armHeight, timer.seconds());
                 double remainingArm = (targetState.armHeight - currentState.armHeight) * Constants.DEAD_WHEEL_TICKS_PER_INCH;
 
                 if (Math.abs(remainingArm) < Constants.MINIMUM_DISTANCE_IN_TICKS) {
