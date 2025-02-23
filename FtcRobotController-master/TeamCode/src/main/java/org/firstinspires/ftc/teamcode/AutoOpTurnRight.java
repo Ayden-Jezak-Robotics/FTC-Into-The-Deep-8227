@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 @Autonomous(name = "AutoOpTurnRight", group = "Test")
 public class AutoOpTurnRight extends LinearOpMode {
 
-    RobotState initialState = new RobotState(0, 0, 0, 0, 0, false,false,false);
+    RobotState initialState = new RobotState(0, 0, 0, 0, 0,false,false);
 
     /// In Degrees
 
@@ -17,7 +17,7 @@ public class AutoOpTurnRight extends LinearOpMode {
 
         waitForStart();
 
-        robot.moveToNewRobotState(new RobotState(0, 0, -53, 0, 0, false,false,false));
+        robot.moveToNewRobotState(new RobotState(0, 0, -53, 0, 0,false,false));
 
     }
 }

@@ -57,15 +57,17 @@ public class Robot {
         PIDTurn turnPID = new PIDTurn(currentState, targetState);
         PIDArm armPID = new PIDArm(currentState, targetState);
 
+        boolean driveLoop = true;
+        boolean armLoop = true;
+
         deadWheels.resetEncoders();
 
-        while (opMode.opModeIsActive()) {
+        while (opMode.opModeIsActive() && driveLoop && armLoop) {
 
             ElapsedTime timer = new ElapsedTime();
 
             XYValue motorPower;
             double turnPower;
-            boolean driveLoop = true;
 
             while (driveLoop) {
 
@@ -97,7 +99,7 @@ public class Robot {
             // Now do all the arm movements
 
             double initialShoulderAngle = arm.getShoulderPosition();
-            double elapsedTime = 2.0;
+            double elapsedTime = 1.5;
             timer.reset();
 
             while (timer.seconds() < elapsedTime) {
@@ -109,7 +111,7 @@ public class Robot {
             }
             currentState.armAngle = arm.getShoulderPosition();
 
-            do {
+            while (armLoop) {
 
                 double armPower = armPID.calculatePower(currentState.armHeight, timer.seconds());
                 double remainingArm = (targetState.armHeight - currentState.armHeight) * Constants.DEAD_WHEEL_TICKS_PER_INCH;
@@ -122,7 +124,11 @@ public class Robot {
 
                 updateArmPosition();
 
-            } while (!armPID.arrivedAtHeight());
+                if (armPID.arrivedAtHeight()) {
+                    armLoop = false;
+                }
+
+            }
 
             if (currentState.wristIsUp != targetState.wristIsUp) {
                 if (targetState.wristIsUp) {
@@ -148,7 +154,6 @@ public class Robot {
             arm.stopMotors();
             break;
         }
-
     }
 
     //------------------------------------------------------------------------------------------------
@@ -300,13 +305,13 @@ public class Robot {
 //        telemetry.update();
 
         // Local displacements
-        double deltaYLocal = (deltaDrive - LMMHS.arcLength(Constants.DRIVE_RADIUS, deltaThetaIMU));
         double deltaXLocal = (deltaStrafe - LMMHS.arcLength(Constants.STRAFE_RADIUS, deltaThetaIMU));
+        double deltaYLocal = (deltaDrive - LMMHS.arcLength(Constants.DRIVE_RADIUS, deltaThetaIMU));
 
         // Transform local displacements to global coordinates
         // changed the signs for globals
-        double deltaYGlobal = deltaXLocal * LMMHS.sin(currentState.heading) + deltaYLocal * LMMHS.cos(currentState.heading);
         double deltaXGlobal = deltaXLocal * LMMHS.cos(currentState.heading) - deltaYLocal * LMMHS.sin(currentState.heading);
+        double deltaYGlobal = deltaXLocal * LMMHS.sin(currentState.heading) + deltaYLocal * LMMHS.cos(currentState.heading);
 
         //final Pose3D currentAprilTagPosition = myAprilTagProcessor.getPose();
 

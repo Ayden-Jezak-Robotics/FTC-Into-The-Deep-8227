@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 @Autonomous(name = "AutoOpRedRight", group = "Main")
 public class AutoOpRedRight extends LinearOpMode {
 
-    RobotState initialState = new RobotState(0, 0, 0, 0, 0, false, false, false);
+    RobotState initialState = new RobotState(0, 0, 0, 0, 0, false, false);
 
     @Override
     public void runOpMode() throws InterruptedException {

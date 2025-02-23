@@ -26,7 +26,7 @@ public class PIDDrive {
 
     public PIDDrive(RobotState currentState, RobotState targetState) {
         this.targetPosition = new XYValue(targetState.position.x, targetState.position.y);
-        this.distanceToTarget = new XYValue(currentState.position.x - targetPosition.x, currentState.position.y - targetPosition.y);
+        this.distanceToTarget = new XYValue(targetPosition.x - currentState.position.x, targetPosition.y - currentState.position.y);
 
         this.priorError = new XYValue(0, 0);
         this.integralSum = new XYValue(0, 0);

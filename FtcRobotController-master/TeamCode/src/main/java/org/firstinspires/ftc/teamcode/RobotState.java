@@ -5,7 +5,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 public class RobotState {
 
-    final Position position;
+    final Position position = new Position(DistanceUnit.INCH, 0,0,0,System.nanoTime());
     double heading; // In Degrees
     double armHeight;
     double armAngle; // What units here?
@@ -14,7 +14,8 @@ public class RobotState {
 
     // Constructor to initialize the state
     public RobotState(int x, int y, int heading, double armHeight, double armAngle, boolean wristIsUp, boolean grabberIsOpen) {
-        this.position = new Position(DistanceUnit.INCH, x, y, 0, System.nanoTime()); // z is always 0 
+        this.position.x = x;
+        this.position.y = y;
         this.heading = heading; // in degrees
         this.armHeight = armHeight;
         this.armAngle = armAngle;
@@ -24,10 +25,8 @@ public class RobotState {
     }
 
     public RobotState(RobotState state) {
-        this.position = new Position(DistanceUnit.INCH,
-                state.position.x,
-                state.position.y,
-                0, System.nanoTime());
+        this.position.x = state.position.x;
+        this.position.y = state.position.y;
         this.heading = state.heading;
         this.armHeight = state.armHeight;
         this.armAngle = state.armAngle;
