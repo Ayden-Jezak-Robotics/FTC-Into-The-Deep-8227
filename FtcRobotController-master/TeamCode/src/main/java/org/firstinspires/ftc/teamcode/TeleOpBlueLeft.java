@@ -15,7 +15,7 @@ public class TeleOpBlueLeft extends LinearOpMode {
     private boolean movingForward = true;
     private boolean isMovingUp, isMovingDown = false;
     private double leftStartPosition, rightStartPosition, progress, triggerMultiplier;
-    private ElapsedTime moveTimer = new ElapsedTime();
+    private final ElapsedTime moveTimer = new ElapsedTime();
     private boolean grabberToggle = false;
     private boolean wristToggle = false;
     private boolean directionToggle = false;
@@ -38,7 +38,7 @@ public class TeleOpBlueLeft extends LinearOpMode {
             armMovement();
             armBrake(robot);
 
-            updateTelemetry(robot);
+            updateTelemetry();
         }
     }
 
@@ -200,7 +200,7 @@ public class TeleOpBlueLeft extends LinearOpMode {
 //        }
     }
 
-    private void updateTelemetry(Robot robot) {
+    private void updateTelemetry() {
 //        telemetry.addData("Arm Position", rightArmServo.getPosition());
 //        telemetry.addData("Arm Height", armLeft.getCurrentPosition());
 //        telemetry.addData("Ideal Arm Height", robot.getArmHeight());
