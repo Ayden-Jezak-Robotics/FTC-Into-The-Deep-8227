@@ -15,20 +15,18 @@ public class AutoOpWithHeight extends LinearOpMode {
 
         waitForStart();
 
-        robot.moveToPositionAndHeading(new RobotState(-44, -44, -45, 0, 0, 0, 2, 1));
-        sleep(1000);
-        robot.justArm(0.8,0.7,2,1,false);
-        sleep(1000);
+        robot.moveToPositionAndHeading(new RobotState(-44, -44, -45, 0, 0, 0, 1, 1));
+        robot.justArm(0.8,0.7,1,1,false);
         robot.wristUp();
-        robot.moveToPositionAndHeading(new RobotState(-55, -55, -45, 26, 0, 0, 2, 1));
-        robot.justArm(0.8,0.7,0.1,0.1,true);
+        robot.moveToPositionAndHeading(new RobotState(-55, -55, -45, 26, 0, 0, 1, 1));
+        robot.justArm(0.8,0.7,0.2,0.1,true);
         robot.wristDown();
-        robot.moveToPositionAndHeading(new RobotState(-46, -43, 0, 0, 0, 0, 2, 1));
+        robot.moveToPositionAndHeading(new RobotState(-46, -43, 0, 0, 0, 0, 1, 1));
         robot.justArm(0,0.7,2,1,false);
         robot.justArm(0.8,0.7,1,1,false);
         robot.wristUp();
-        robot.moveToPositionAndHeading(new RobotState(-55, -55, -45, 26, 0, 0, 2, 1));
-        robot.justArm(0.8,0.7,0.1,0.1,true);
+        robot.moveToPositionAndHeading(new RobotState(-55, -55, -45, 26, 0, 0, 1, 1));
+        robot.justArm(0.8,0.7,0.2,0.1,true);
         robot.wristDown();
         robot.moveToPositionAndHeading(new RobotState(-56, -42, 0, 0, 0, 0, 1, 1));
     }

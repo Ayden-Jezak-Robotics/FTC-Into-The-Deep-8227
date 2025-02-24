@@ -113,6 +113,16 @@ public class Robot {
         else{
             arm.closeGrabber();
         }
+        updatePosition();
+    }
+
+    public void openGrabber()
+    {
+        arm.openGrabber();
+    }
+    public void closeGrabber()
+    {
+        arm.closeGrabber();
     }
 
     public void wristUp()
@@ -226,9 +236,9 @@ public class Robot {
             double remainingArm = (targetArmHeight - currentArmHeight) * Constants.DEAD_WHEEL_TICKS_PER_INCH;
             
 
-            arm.setArmPowers(armPower); //need to add something that will keep thhe arm up there when it reaches the tolerance
+            arm.setArmPowers(armPower); //need to add something that will keep the arm up there when it reaches the tolerance
 
-            //handleArmWithTime(initialArmAngle,initialExtend,targetArmAngle,targetExtend,targetArmAngleTime,targetExtendTime);
+            handleArmWithTime(initialArmAngle,initialExtend,targetArmAngle,targetExtend,targetArmAngleTime,targetExtendTime);
 
             updatePosition();
         }
