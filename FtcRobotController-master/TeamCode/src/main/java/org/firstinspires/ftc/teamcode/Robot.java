@@ -61,9 +61,8 @@ public class Robot {
 
             XYValue motorPower;
             double turnPower;
-            boolean driveLoop = true;
 
-            while (driveLoop) {
+            while (!(xyPID.arrivedAtX() && xyPID.arrivedAtY() && turnPID.arrivedAtTheta())) {
 
                 // Calculate power outputs using PID
                 motorPower = xyPID.calculatePower(currentState.position, currentState.heading, timer.seconds());
@@ -84,10 +83,6 @@ public class Robot {
                 telemetry.addData("yPower", motorPower.y);
                 telemetry.addData("turnPower", turnPower);
                 telemetry.update();
-
-                if (xyPID.arrivedAtX() && xyPID.arrivedAtY() && turnPID.arrivedAtTheta()) {
-                    driveLoop = false;
-                }
             }
 
             // Now do all the arm movements
@@ -109,7 +104,7 @@ public class Robot {
             boolean armLoop = true;
             timer.reset();
 
-            while (armLoop) {
+            while (!armPID.arrivedAtHeight()) {
 
                 double armPower = armPID.calculatePower(currentState.armHeight, timer.seconds());
                 double remainingArm = (targetState.armHeight - currentState.armHeight) * Constants.DEAD_WHEEL_TICKS_PER_INCH;
@@ -119,14 +114,9 @@ public class Robot {
                 } else {
                     arm.setArmPowers(armPower); //need to add something that will keep thhe arm up there when it reaches the tolerance
                 }
-
-                updateArmPosition();
                 timer.reset();
 
-                if (armPID.arrivedAtHeight()) {
-                    armLoop = false;
-                }
-
+                updateArmPosition();
             }
 
             if (currentState.wristIsUp != targetState.wristIsUp) {

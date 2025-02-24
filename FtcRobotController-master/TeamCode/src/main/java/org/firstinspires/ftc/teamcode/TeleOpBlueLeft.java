@@ -9,27 +9,25 @@ import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("FieldCanBeLocal")
 @TeleOp(name = "TeleOpBlueLeft", group = "Main")
-public class TeleOpBlueLeft extends LinearOpMode
-{
+public class TeleOpBlueLeft extends LinearOpMode {
     RobotState initialState = new RobotState(-53, -53, -45, 0, 0, false, false);
 
-    private double speedMultiplier = 1.5;
     private boolean movingForward = true;
     private boolean isMovingUp, isMovingDown = false;
-    private double leftStartPosition, rightStartPosition, progress;
+    private double leftStartPosition, rightStartPosition, progress, triggerMultiplier;
     private ElapsedTime moveTimer = new ElapsedTime();
     private boolean grabberToggle = false;
     private boolean wristToggle = false;
     private boolean directionToggle = false;
 
     @Override
-    public void runOpMode(){
+    public void runOpMode() {
 
         Robot robot = new Robot(this, hardwareMap, telemetry, initialState, CameraPosition.LEFT);
 
         waitForStart();
 
-        while (opModeIsActive()){
+        while (opModeIsActive()) {
 
             driveWheels(robot);
             switchDirection();
@@ -48,9 +46,9 @@ public class TeleOpBlueLeft extends LinearOpMode
     // Game Pad 1
     //------------------------------------------------------------------------------------------------
 
-    private void driveWheels(Robot robot){
+    private void driveWheels(Robot robot) {
 
-        double triggerMultiplier = (1.0/3.0) + ((2.0/3.0) * (1.0 - gamepad1.left_trigger));
+        triggerMultiplier = (1.0 / 3.0) + ((2.0 / 3.0) * (1.0 - gamepad1.left_trigger));
 
         double r = Math.sqrt(Math.pow(gamepad1.left_stick_x, 2) + Math.pow(gamepad1.left_stick_y, 2));
         double robotAngle = Math.atan2(-1 * gamepad1.left_stick_y, gamepad1.left_stick_x) / Math.PI * 180 - 45;
@@ -71,10 +69,9 @@ public class TeleOpBlueLeft extends LinearOpMode
         if (gamepad1.cross && !directionToggle) {
             directionToggle = true;
 
-            if (movingForward){
+            if (movingForward) {
                 movingForward = false;
-            }
-            else{
+            } else {
                 movingForward = true;
             }
         }
@@ -103,14 +100,13 @@ public class TeleOpBlueLeft extends LinearOpMode
         }
     }
 
-    private void spinWrist(Robot robot){
+    private void spinWrist(Robot robot) {
         if (gamepad2.circle && !wristToggle) {
             wristToggle = true;
 
             if (robot.getWristPosition()) {
                 robot.turnWristDown();
-            }
-            else{
+            } else {
                 robot.turnWristUp();
             }
         }
@@ -119,7 +115,7 @@ public class TeleOpBlueLeft extends LinearOpMode
         }
     }
 
-    private void spinArmServosPrecise(){
+    private void spinArmServosPrecise() {
         if (Math.abs(gamepad2.left_stick_y) > 0.05) { // Deadzone
             isMovingUp = false;
             isMovingDown = false;
@@ -128,7 +124,7 @@ public class TeleOpBlueLeft extends LinearOpMode
         }
     }
 
-    private void spinArmServosNonprecise(){
+    private void spinArmServosNonprecise() {
         if (gamepad2.dpad_down && !isMovingUp && !isMovingDown) {
             isMovingDown = true;
             moveTimer.reset();
@@ -175,22 +171,22 @@ public class TeleOpBlueLeft extends LinearOpMode
     // Utilities
     //------------------------------------------------------------------------------------------------
 
-    private void armBrake(Robot robot){
+    private void armBrake(Robot robot) {
 //        if (armLeft.getCurrentPosition() < armCurrentHeight || armLeft.getCurrentPosition() > armCurrentHeight && gamepad2.right_stick_y == 0){
 //            armLeft.setPower(0.001 * (armCurrentHeight - armLeft.getCurrentPosition()));
 //        }
     }
 
-    private void armMovement(){
+    private void armMovement() {
 //        if (armLeft.getCurrentPosition() >= 0 && armRight.getCurrentPosition() >= 0) {
 //            armLeft.setPower(-gamepad2.right_stick_y * getArmSpeed());
 //            armRight.setPower(-gamepad2.right_stick_y * getArmSpeed());
 //            armCurrentHeight = armLeft.getCurrentPosition();
 //        }
-        if( gamepad2.right_bumper) {
+        if (gamepad2.right_bumper) {
 //            armLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 //            armRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            while(gamepad2.right_bumper){
+            while (gamepad2.right_bumper) {
 
             }
 //            armLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -204,8 +200,7 @@ public class TeleOpBlueLeft extends LinearOpMode
 //        }
     }
 
-    private void updateTelemetry(Robot robot){
-        telemetry.addData("Speed", speedMultiplier);
+    private void updateTelemetry(Robot robot) {
 //        telemetry.addData("Arm Position", rightArmServo.getPosition());
 //        telemetry.addData("Arm Height", armLeft.getCurrentPosition());
 //        telemetry.addData("Ideal Arm Height", robot.getArmHeight());
@@ -213,6 +208,7 @@ public class TeleOpBlueLeft extends LinearOpMode
 //        telemetry.addData("armSpeed", getArmSpeed());
 //        telemetry.addData("leftArmServo Position", leftArmServo.getPosition());
 //        telemetry.addData("rightArmServo Position", rightArmServo.getPosition());
+        telemetry.addData("Speed", triggerMultiplier);
         telemetry.addData("Arm Progress", progress);
         telemetry.addData("Moving down?", isMovingDown);
         telemetry.addData("Moving up?", isMovingUp);
@@ -220,7 +216,7 @@ public class TeleOpBlueLeft extends LinearOpMode
         telemetry.update();
     }
 
-    private double map(double in1, double in2, double out1, double out2, double value){
-        return out1 + ((value - in1)*(out2 - out1))/(in2 - in1);
+    private double map(double in1, double in2, double out1, double out2, double value) {
+        return out1 + ((value - in1) * (out2 - out1)) / (in2 - in1);
     }
 }
