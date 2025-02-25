@@ -89,7 +89,7 @@ public class IntoTheDeepTeleop extends LinearOpMode
             spinArmServosPrecise();
             spinArmServosNonprecise();
             spinWrist();
-            //armMovement();
+            armMovement();
             //armBrake();
 
 
@@ -175,13 +175,13 @@ public class IntoTheDeepTeleop extends LinearOpMode
         }
 
     }
-    /*
+
     private void armMovement(){
         if (armLeft.getCurrentPosition() >= 0 && armRight.getCurrentPosition() >= 0) {
             armLeft.setPower(-gamepad2.right_stick_y * getArmSpeed());
             armRight.setPower(-gamepad2.right_stick_y * getArmSpeed());
             armCurrentHeight = armLeft.getCurrentPosition();
-        }
+        }/*
         if( gamepad2.right_bumper) {
             armLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             armRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -190,7 +190,7 @@ public class IntoTheDeepTeleop extends LinearOpMode
             }
             armLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             armLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        }
+        }*/
         if (armLeft.getCurrentPosition() < 0 && gamepad2.right_stick_y == 0){
             armLeft.setPower(0.1);
         }
@@ -199,7 +199,7 @@ public class IntoTheDeepTeleop extends LinearOpMode
         }
     }
 
-     */
+
     private void openGrabber(){
         if (gamepad2.right_bumper){
             if (grabberClosed == false){

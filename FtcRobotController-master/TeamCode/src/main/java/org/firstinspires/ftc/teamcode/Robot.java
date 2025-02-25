@@ -43,6 +43,7 @@ public class Robot {
         this.arm = new ArmUtility(this.hardwareMap);
         this.deadWheels = new DeadWheelUtility(this.hardwareMap);
         this.imu = new IMUUtility(this.hardwareMap);
+        imu.resetIMU();
 
         //this.cameraPosition = side;
         this.currentPosition = initialState.position;
