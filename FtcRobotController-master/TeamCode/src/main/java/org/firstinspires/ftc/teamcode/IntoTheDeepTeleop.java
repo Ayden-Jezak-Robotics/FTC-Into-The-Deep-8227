@@ -29,10 +29,13 @@ public class IntoTheDeepTeleop extends LinearOpMode
     private int armUpFlag = 0;
     private double armCurrentHeight, armCurrentHeightFlag;
     private String wristPosition;
-    private int direction;
+    private int direction = 1;
     private boolean isMovingUp, isMovingDown = false;
     private double leftStartPosition, rightStartPosition, progress;
     private ElapsedTime moveTimer = new ElapsedTime();
+    private boolean pad1SquareFlag, pad1CrossFlag, pad1TriangleFlag, pad1CircleFlag;
+    private boolean pad2RightBumperFlag, pad2LeftBumperFlag, pad2CircleFlag;
+
     int xPressed = 0;
 
 
@@ -97,23 +100,27 @@ public class IntoTheDeepTeleop extends LinearOpMode
         }
     }
     private void speedMulti() {
-        if (gamepad1.circle == true) {
+        if (gamepad1.cross && !pad1CrossFlag) {
+            pad1CircleFlag = true;
             speedMulti += 1;
             if (speedMulti > 3) {
                 speedMulti = 1.5;
             }
-            while (gamepad1.circle == true) {
-            }
         }
-        if (gamepad1.cross == true) {
+        if (!gamepad1.cross){
+            pad1CrossFlag = false;
+        }
+        if (gamepad1.square   && !pad1SquareFlag) {
+            pad1SquareFlag = true;
             if (direction == 1){
                 direction = -1;
             }
             else{
                 direction = 1;
             }
-            while (gamepad1.cross == true) {
-            }
+        }
+        if (!gamepad1.square){
+            pad1SquareFlag = false;
         }
     }
     private void driveWheels(){
@@ -152,7 +159,8 @@ public class IntoTheDeepTeleop extends LinearOpMode
         }
     }
     private void spinWrist(){
-        if (gamepad2.left_bumper){
+        if (gamepad2.left_bumper && !pad2LeftBumperFlag){
+            pad2LeftBumperFlag = true;
             if (wristPosition == "UP"){
                 wristServo.setPosition(0.1);
                 wristPosition = "DOWN";
@@ -161,8 +169,9 @@ public class IntoTheDeepTeleop extends LinearOpMode
                 wristServo.setPosition(0.8);
                 wristPosition = "UP";
             }
-            while (gamepad2.left_bumper == true) {
-            }
+        }
+        if (!gamepad2.left_bumper){
+            pad2LeftBumperFlag = false;
         }
     }
 
@@ -181,16 +190,17 @@ public class IntoTheDeepTeleop extends LinearOpMode
             armLeft.setPower(-gamepad2.right_stick_y * getArmSpeed());
             armRight.setPower(-gamepad2.right_stick_y * getArmSpeed());
             armCurrentHeight = armLeft.getCurrentPosition();
-        }/*
-        if( gamepad2.right_bumper) {
+        }
+        if(gamepad2.circle && !pad2CircleFlag) {
+            pad2CircleFlag = true;
             armLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             armRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            while(gamepad2.right_bumper){
-
-            }
             armLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            armLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        }*/
+            armRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        }
+        if(!gamepad2.circle){
+            pad2CircleFlag = false;
+        }
         if (armLeft.getCurrentPosition() < 0 && gamepad2.right_stick_y == 0){
             armLeft.setPower(0.1);
         }
@@ -201,17 +211,19 @@ public class IntoTheDeepTeleop extends LinearOpMode
 
 
     private void openGrabber(){
-        if (gamepad2.right_bumper){
+        if (gamepad2.right_bumper && !pad2RightBumperFlag){
+            pad2RightBumperFlag = true;
             if (grabberClosed == false){
-                grabberServo.setPosition(0);
+                grabberServo.setPosition(0.3);
                 grabberClosed = true;
             }
             else{
-                grabberServo.setPosition(0.6);
+                grabberServo.setPosition(1);
                 grabberClosed = false;
             }
-            while (gamepad2.right_bumper == true) {
-            }
+        }
+        if (!gamepad2.right_bumper){
+            pad2RightBumperFlag = false;
         }
     }
 

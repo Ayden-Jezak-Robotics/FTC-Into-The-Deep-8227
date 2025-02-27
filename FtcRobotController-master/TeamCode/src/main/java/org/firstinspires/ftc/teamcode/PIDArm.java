@@ -8,7 +8,7 @@ public class PIDArm {
     private static final double kP = 0.0005; //Fix, Handling in inches... should I change it
     private static final double kI = 0;
     private static final double kD = 0;
-    private static final double kF = 0.1; //FIND the minimum value needed that equal the force of weight
+    private static final double kF = 0.15; //FIND the minimum value needed that equal the force of weight
 
     private double targetHeight;
 

@@ -93,12 +93,12 @@ public class ArmUtility {
     }
 
     void openGrabber() {
-        grabberServo.setPosition(0.7);
+        grabberServo.setPosition(1);
         sleep(500);
     }
 
     void closeGrabber() {
-        grabberServo.setPosition(0.3);
+        grabberServo.setPosition(0.15);
         sleep(500);
 
     }

@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-@Autonomous(name = "AutoOpRedRight", group = "Test")
+@Autonomous(name = "RIGHTAuto", group = "Test")
 public class AutoOpRedRight extends LinearOpMode {
 
     RobotState initialState = new RobotState(24, -63, 0, 0, 0, 0, 0, 0);
@@ -17,25 +17,21 @@ public class AutoOpRedRight extends LinearOpMode {
 
         waitForStart();
         robot.moveToPositionAndHeading(new RobotState(34, -16, 0, 0, 0, 0, 0.5, 0.5));
-        sleep(1000);
+        sleep(500);
+        robot.moveToPositionAndHeading(new RobotState(50, -16, 0, 0, 0, 0, 0.5, 0.5));
+        sleep(500);
+        robot.moveToPositionAndHeading(new RobotState(50, -60, 0, 0, 0, 0, 0.5, 0.5));
+        sleep(500);
         robot.moveToPositionAndHeading(new RobotState(48, -16, 0, 0, 0, 0, 0.5, 0.5));
-        sleep(1000);
-        robot.moveToPositionAndHeading(new RobotState(48, -60, 0, 0, 0, 0, 0.5, 0.5));
-        sleep(1000);
-        robot.moveToPositionAndHeading(new RobotState(48, -16, 0, 0, 0, 0, 0.5, 0.5));
-        sleep(1000);
-        robot.moveToPositionAndHeading(new RobotState(56, -8, 0, 0, 0, 0, 0.5, 0.5));
-        sleep(1000);
-        robot.moveToPositionAndHeading(new RobotState(56, -60, 0, 0, 0, 0, 0.5, 0.5));
-        sleep(1000);
-        robot.moveToPositionAndHeading(new RobotState(56, -16, 0, 0, 0, 0, 0.5, 0.5));
-        sleep(1000);
-        robot.moveToPositionAndHeading(new RobotState(60, -16, 0, 0, 0, 0, 0.5, 0.5));
-        sleep(1000);
-        robot.moveToPositionAndHeading(new RobotState(60, -60, 0, 0, 0, 0, 0.5, 0.5));
-        sleep(1000);
-        robot.moveToPositionAndHeading(new RobotState(28, -18, 0, 0, 0.6, 0.7, 1, 1));
-        sleep(1000);
-        robot.justArm(0,0.7,0.5,0.5,true);
+        sleep(500);
+        robot.moveToPositionAndHeading(new RobotState(58, -16, 0, 0, 0, 0, 0.5, 0.5));
+        sleep(500);
+        robot.moveToPositionAndHeading(new RobotState(58, -60, 0, 0, 0, 0, 0.5, 0.5));
+        sleep(500);
+        robot.moveToPositionAndHeading(new RobotState(48, -40, 90, 0, 0, 0, 0.5, 0.5));
+        sleep(500);
+        robot.justArm(0.3,0.7,1.5,0.5,true);
+        robot.justArm(0,0.7,0.5,1.5,true);
+        robot.moveToPositionAndHeading(new RobotState(48, -60, 90, 0, 0, 0.7, 0.5, 0.5));
     }
 }

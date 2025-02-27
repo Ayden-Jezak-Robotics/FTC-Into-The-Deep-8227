@@ -43,7 +43,6 @@ public class Robot {
         this.arm = new ArmUtility(this.hardwareMap);
         this.deadWheels = new DeadWheelUtility(this.hardwareMap);
         this.imu = new IMUUtility(this.hardwareMap);
-        imu.resetIMU();
 
         //this.cameraPosition = side;
         this.currentPosition = initialState.position;
@@ -124,6 +123,17 @@ public class Robot {
     public void closeGrabber()
     {
         arm.closeGrabber();
+    }
+
+    public void manualPower(double fl, double fr, double bl, double br)
+    {
+        motors.setPowerDirectly(fl,fr,bl,br);
+        ElapsedTime timer = new ElapsedTime();
+        while (timer.seconds() < 0.5)
+        {
+
+        }
+        motors.setPowerDirectly(0,0,0,0);
     }
 
     public void wristUp()
@@ -314,6 +324,16 @@ public class Robot {
         currentPosition.x += (deltaXGlobal / Constants.DEAD_WHEEL_TICKS_PER_INCH);
         currentPosition.y += (deltaYGlobal / Constants.DEAD_WHEEL_TICKS_PER_INCH);
 
+    }
+
+    public void setAllCurrentPositions(double currentX, double currentY, double heading, double height, double armAngle, double extend)
+    {
+        currentPosition.x = currentX;
+        currentPosition.y = currentY;
+        currentHeading = heading;
+        currentArmHeight = height;
+        currentArmAngle = armAngle;
+        currentExtend = extend;
     }
 
     /*public void pickUpObject(){
