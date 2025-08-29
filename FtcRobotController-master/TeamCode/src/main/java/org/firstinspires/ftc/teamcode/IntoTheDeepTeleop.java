@@ -214,7 +214,7 @@ public class IntoTheDeepTeleop extends LinearOpMode
         if (gamepad2.right_bumper && !pad2RightBumperFlag){
             pad2RightBumperFlag = true;
             if (grabberClosed == false){
-                grabberServo.setPosition(0.3);
+                grabberServo.setPosition(0.1);
                 grabberClosed = true;
             }
             else{

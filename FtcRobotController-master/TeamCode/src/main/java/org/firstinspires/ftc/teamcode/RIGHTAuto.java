@@ -3,8 +3,8 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-@Autonomous(name = "TESTINGAuto", group = "Test")
-public class TESTINGAuto extends LinearOpMode {
+@Autonomous(name = "RIGHTAuto", group = "Test")
+public class RIGHTAuto extends LinearOpMode {
 
     RobotState initialState = new RobotState(24, -63, 0, 0, 0, 0, 0, 0);
 
@@ -27,9 +27,9 @@ public class TESTINGAuto extends LinearOpMode {
         robot.openGrabber();
 
         robot.setAllCurrentPositions(5,-44,0,0,0.6,0.7);
-        robot.moveToPositionAndHeading(new RobotState(20,-55,0,0,0,0.7,0.2,0.2));
+        robot.moveToPositionAndHeading(new RobotState(39,-55,0,0,0,0.7,0.2,0.2));
 
-        robot.moveToPositionAndHeading(new RobotState(34, -16, 0, 0, 0, 0.7, 0.5, 0.5));
+        robot.moveToPositionAndHeading(new RobotState(39, -16, 0, 0, 0, 0.7, 0.5, 0.5));
         sleep(200);
         robot.moveToPositionAndHeading(new RobotState(50, -16, 0, 0, 0, 0.7, 0.5, 0.5));
         sleep(200);
